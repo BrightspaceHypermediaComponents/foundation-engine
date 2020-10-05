@@ -1,0 +1,20 @@
+name: "Pull Request"
+
+on: pull_request
+
+jobs:
+  build:
+    name: Pull Request
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Brightspace/third-party-actions@actions/checkout
+
+      - name: Use Node.js 12.x
+        uses: Brightspace/third-party-actions@actions/setup-node
+        with:
+          node-version: '12.x'
+
+      - name: Run tests
+        run: |
+          npm install
+          npm run test
