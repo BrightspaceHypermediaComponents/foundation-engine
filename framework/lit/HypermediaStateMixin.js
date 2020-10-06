@@ -1,6 +1,6 @@
-import { dispose, fetch, stateFactory } from '../state/store.js';
-import { deepCopy } from '../helper/deepCopy.js';
-export { observableTypes } from '../state/HypermediaState.js';
+import { dispose, fetch, stateFactory } from '../../state/store.js';
+import { deepCopy } from '../../helper/deepCopy.js';
+export { observableTypes } from '../../state/HypermediaState.js';
 
 /**
  * @export
