@@ -6,7 +6,7 @@ export { observableTypes } from '../state/HypermediaState.js';
  * @export
  * @polymerMixin
  **/
-export const HypermediaLitMixin = superclass => class extends superclass {
+export const HypermediaStateMixin = superclass => class extends superclass {
 
 	static get properties() {
 		return {
