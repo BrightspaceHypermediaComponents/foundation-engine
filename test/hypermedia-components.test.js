@@ -1,6 +1,6 @@
 import { assert }  from '@open-wc/testing';
 //import { html } from '../src/framework/hypermedia-components.js';
-import { componentStoreFactory } from '../src/render/componentFactory.js';
+import { componentStoreFactory } from '../render/componentFactory.js';
 //import sinon from 'sinon/pkg/sinon-esm.js';
 
 describe('Tester', () => {
