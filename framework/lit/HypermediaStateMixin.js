@@ -1,12 +1,12 @@
-import { dispose, fetch, stateFactory } from '../state/store.js';
-import { deepCopy } from '../helper/deepCopy.js';
-export { observableTypes } from '../state/HypermediaState.js';
+import { dispose, fetch, stateFactory } from '../../state/store.js';
+import { deepCopy } from '../../helper/deepCopy.js';
+export { observableTypes } from '../../state/HypermediaState.js';
 
 /**
  * @export
  * @polymerMixin
  **/
-export const HypermediaLitMixin = superclass => class extends superclass {
+export const HypermediaStateMixin = superclass => class extends superclass {
 
 	static get properties() {
 		return {
