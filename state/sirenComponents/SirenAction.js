@@ -3,13 +3,13 @@ import { performAction } from '../../state/store.js';
 import { refreshToken } from '../token.js';
 
 export class SirenAction {
-	static basicInfo({ name: id, token, state }) {
+	static basicInfo({name: id, token, state}) {
 		return { id, token, state };
 	}
 
-	constructor({ id: name, token, state }) {
+	constructor({id: name, token, state}) {
 		this._components = new Component();
-		this._action = { has: false, perform: () => undefined, update: () => undefined };
+		this._action = { has: false, commit: () => undefined };
 		this._name = name;
 		this._token = token;
 		this._state = state;
@@ -19,30 +19,37 @@ export class SirenAction {
 		return this._action;
 	}
 
-	set action({ has, perform, update }) {
-		if (!has || typeof perform !== 'function') {
-			perform = () => undefined;
-			update = () => undefined;
+	set action({has, commit}) {
+		if (!has || typeof commit !== 'function') {
+			commit = () => undefined;
 		}
-		if (this._action.has !== has || this._action.perform !== perform) {
-			this._components.setProperty({ has, perform, update });
+		if (this._action.has !== has || this._action.commit !== commit) {
+			this._components.setProperty({has, commit});
 		}
 
-		this._action = { has, perform, update };
+		this._action = {has, commit};
 
 	}
 
-	addComponent(component, property, { method }) {
+	get method() {
+		return this._rawSirenAction && this._rawSirenAction.method;
+	}
+
+	get token() {
+		return this._token;
+	}
+
+	addComponent(component, property, {method}) {
 		this._components.add(component, property, method);
 		this._components.setComponentProperty(component, this.action);
 	}
 
 	body(input) {
 		if (this._rawSirenAction.type.indexOf('json') !== -1) {
-			return JSON.stringify({ ...this._fields, ...input });
+			return JSON.stringify({...this._fields, ...input});
 		} else if (this._rawSirenAction.method !== 'GET' && this._rawSirenAction.method !== 'HEAD') {
 			const formData = new FormData();
-			const fields = { ...this._fields, ...input };
+			const fields = {...this._fields, ...input};
 			Object.keys(fields).forEach((name) => formData.append(name, fields[name]));
 			return formData;
 		}
@@ -64,7 +71,7 @@ export class SirenAction {
 	href(input) {
 		let url = new URL(this._rawSirenAction.href, window.location.origin);
 		if (this._rawSirenAction.method === 'GET' || this._rawSirenAction.method === 'HEAD') {
-			const fields = { ...this._fields, ...input };
+			const fields = {...this._fields, ...input};
 			const params = new URLSearchParams(Object.keys(fields).map((name) => [name, fields[name]]));
 			url = new URL(`${url.pathname}?${params.toString()}`, url.origin);
 		}
@@ -72,8 +79,12 @@ export class SirenAction {
 		return url.toString();
 	}
 
-	get method() {
-		return this._rawSirenAction && this._rawSirenAction.method;
+	push() {
+		if (typeof this._params !== 'object') return;
+		const params = {};
+		Object.keys(this._params).forEach(field => params[field] = this._params[field]?.value ? this._params[field].value : this._params[field]);
+		performAction(this, params);
+		this._params = undefined;
 	}
 
 	refreshToken() {
@@ -91,17 +102,15 @@ export class SirenAction {
 
 		this.action = {
 			has: true,
-			perform: (params) => {
-				return performAction(this, params);
-			},
-			update: (observables) => {
+			commit: (observables) => {
+				this._params = observables || {};
 				return this._state.updateProperties(observables);
 			}
 		};
 	}
 
-	get token() {
-		return this._token;
+	reset() {
+		this._params = undefined;
 	}
 
 	// Doesn't support field names with the same name.

@@ -2,11 +2,11 @@ import { Component, getEntityIdFromSirenEntity } from './Common.js';
 import { SirenSubEntity } from './SirenSubEntity.js';
 
 export class SirenSubEntities {
-	static basicInfo({ token }) {
+	static basicInfo({token}) {
 		return { token };
 	}
 
-	constructor({ id, token }) {
+	constructor({id, token}) {
 		this._rel = id;
 		this._childSubEntities = new Map();
 		this._components = new Component();
@@ -25,13 +25,23 @@ export class SirenSubEntities {
 		this._entityIds = entityIds || [];
 	}
 
-	addComponent(component, property, { method }) {
-		this._components.add(component, property, method);
-		this._components.setComponentProperty(component, this.entityIds);
+	get rel() {
+		return this._rel;
 	}
 
 	get childSubEntities() {
 		return this._childSubEntities;
+	}
+
+	get childStates() {
+		const childStateArray = [];
+		this.childSubEntities.forEach(state => state.childState && childStateArray.push(state.childState));
+		return childStateArray;
+	}
+
+	addComponent(component, property, {method}) {
+		this._components.add(component, property, method);
+		this._components.setComponentProperty(component, this.entityIds);
 	}
 
 	deleteComponent(component) {
@@ -41,10 +51,6 @@ export class SirenSubEntities {
 			return;
 		}
 		this._components.delete(component);
-	}
-
-	get rel() {
-		return this._rel;
 	}
 
 	setSirenEntity(sirenEntity) {
@@ -66,7 +72,7 @@ export class SirenSubEntities {
 				return;
 			}
 
-			const subEntity = new SirenSubEntity({ id: this.rel, token: this._token });
+			const subEntity = new SirenSubEntity({id: this.rel, token: this._token});
 			subEntity.entityId = entityId;
 			childSubEntities.set(entityId, subEntity);
 		});
