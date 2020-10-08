@@ -53,8 +53,21 @@ export class HypermediaState {
 		this.setSirenEntity(entity);
 	}
 
+	push() {
+		this._childStates().forEach(childState => childState.push());
+		const actions = this._getMap(this._decodedEntity, observableTypes.action);
+		actions.forEach(action => action.push());
+	}
+
 	refreshToken() {
 		return refreshToken(this.token);
+	}
+
+	reset() {
+		this._childStates().forEach(childState => childState?.reset());
+		this.setSirenEntity();
+		const actions = this._getMap(this._decodedEntity, observableTypes.action);
+		actions.forEach(action => action.reset());
 	}
 
 	setSirenEntity(entity = null) {
@@ -85,6 +98,17 @@ export class HypermediaState {
 			const sirenComponent = this._getSirenComponent(basicInfo);
 			sirenComponent && (sirenComponent.value = propertyInfo.value);
 		});
+	}
+
+	_childStates() {
+		let childStates = [];
+		this._decodedEntity.forEach(typeMap => {
+			typeMap.forEach(sirenComponent => {
+				childStates = [...childStates, ...(sirenComponent.childStates || [])];
+				sirenComponent.childState && childStates.push(sirenComponent.childState);
+			});
+		});
+		return childStates;
 	}
 
 	_getMap(map, identifier) {
