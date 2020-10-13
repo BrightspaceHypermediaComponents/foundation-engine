@@ -131,8 +131,8 @@ describe('state/store.js', () => {
 			const state2 = await createTestState('id', 'token');
 			expect(state).to.be.equal(state2);
 			verifyState(state, 'id', 'token');
-			expect(stateStore.makeNewState.called).to.be.true;
-			expect(stateStore.add.called).to.be.true;
+			expect(stateStore.makeNewState.callCount).to.be.equal(2); // ? why calling makeNewState for existing  state
+			expect(stateStore.add.callCount).to.be.equal(2); // ? why calling add for existing  state
 		});
 
 		it('Design Question: Should I be able to create state with token that is a promise pending to be resolved', async() => {
