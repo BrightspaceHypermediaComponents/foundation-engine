@@ -1,4 +1,4 @@
-import { Observable } from './Observable.js'
+import { Observable } from './Observable.js';
 
 export class SirenEntity extends Observable {
 

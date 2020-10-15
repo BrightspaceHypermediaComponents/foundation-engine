@@ -27,7 +27,7 @@ export class SirenSubEntity extends Observable {
 			this._routes.set(observer, { ...currentRoute, ...route });
 			return;
 		}
-		super.addObserver(observer, property, method, thie.entityId);
+		super.addObserver(observer, property, method, this.entityId);
 	}
 
 	get childState() {
