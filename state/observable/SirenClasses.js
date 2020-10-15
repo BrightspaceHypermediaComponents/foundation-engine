@@ -1,4 +1,3 @@
-//import { Component } from './Common.js';
 import { Observable } from './Observable.js'
 
 export class SirenClasses extends Observable {

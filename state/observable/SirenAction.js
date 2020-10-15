@@ -1,4 +1,3 @@
-import { Component } from './Common.js';
 import { Observable } from './Observable.js';
 import { performAction } from '../store.js';
 import { refreshToken } from '../token.js';

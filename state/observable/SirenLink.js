@@ -1,5 +1,4 @@
 import { fetch, stateFactory } from '../store.js';
-//import { Component } from './Common.js';
 import { Observable } from './Observable.js';
 import { shouldAttachToken } from '../token.js';
 

@@ -1,6 +1,4 @@
 import { Component } from './Common.js';
-import { performAction } from '../store.js';
-import { refreshToken } from '../token.js';
 
 export class Observable {
 	static definedProperty({ name: id, token, state }) {

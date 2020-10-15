@@ -1,6 +1,7 @@
-import { Component, getEntityIdFromSirenEntity } from './Common.js';
-import { SirenSubEntity } from './SirenSubEntity.js';
+import { getEntityIdFromSirenEntity } from './Common.js';
 import { Observable } from './Observable.js';
+import { SirenSubEntity } from './SirenSubEntity.js';
+
 
 export class SirenSubEntities extends Observable {
 	static basicInfo({ token }) {
