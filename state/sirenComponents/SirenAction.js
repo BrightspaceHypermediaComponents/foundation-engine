@@ -9,7 +9,7 @@ export class SirenAction {
 
 	constructor({ id: name, token, state }) {
 		this._components = new Component();
-		this._action = { has: false, perform: () => undefined, update: () => undefined };
+		this._action = { has: false, commit: () => undefined };
 		this._name = name;
 		this._token = token;
 		this._state = state;
@@ -19,16 +19,15 @@ export class SirenAction {
 		return this._action;
 	}
 
-	set action({ has, perform, update }) {
-		if (!has || typeof perform !== 'function') {
-			perform = () => undefined;
-			update = () => undefined;
+	set action({ has, commit }) {
+		if (!has || typeof commit !== 'function') {
+			commit = () => undefined;
 		}
-		if (this._action.has !== has || this._action.perform !== perform) {
-			this._components.setProperty({ has, perform, update });
+		if (this._action.has !== has || this._action.commit !== commit) {
+			this._components.setProperty({ has, commit });
 		}
 
-		this._action = { has, perform, update };
+		this._action = { has, commit };
 
 	}
 
@@ -76,8 +75,20 @@ export class SirenAction {
 		return this._rawSirenAction && this._rawSirenAction.method;
 	}
 
+	push() {
+		if (typeof this._params !== 'object') return;
+		const params = {};
+		Object.keys(this._params).forEach(field => params[field] = this._params[field]?.value ? this._params[field].value : this._params[field]);
+		performAction(this, params);
+		this._params = undefined;
+	}
+
 	refreshToken() {
 		return refreshToken(this.token);
+	}
+
+	reset() {
+		this._params = undefined;
 	}
 
 	setSirenEntity(sirenEntity) {
@@ -91,10 +102,8 @@ export class SirenAction {
 
 		this.action = {
 			has: true,
-			perform: (params) => {
-				return performAction(this, params);
-			},
-			update: (observables) => {
+			commit: (observables) => {
+				this._params = observables || {};
 				return this._state.updateProperties(observables);
 			}
 		};
