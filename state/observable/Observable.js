@@ -18,7 +18,6 @@ export class Observable {
 		this._observers.delete(observer);
 	}
 
-	setSirenEntity(sirenEntity) {
-		this.sirenEntity = sirenEntity;
+	setSirenEntity() {
 	}
 }
