@@ -26,6 +26,7 @@ const observableClasses = Object.freeze({
 	[observableTypes.action]: SirenAction
 });
 
+// TODO: define in defined Properties?
 function defaultBasicInfo({ observable: type, prime, rel: id, route, token }) {
 	return {
 		id,

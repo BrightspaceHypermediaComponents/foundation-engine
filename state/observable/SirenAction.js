@@ -28,8 +28,9 @@ export class SirenAction extends Observable {
 
 	}
 
-	addComponent(component, property, { method }) {
-		this.addComponent(component, property, method, this.action);
+	// TODO: remove in US121366
+	addObserver(component, property, { method }) {
+		super.addObserver(component, property, method, this.action);
 	}
 
 	body(input) {

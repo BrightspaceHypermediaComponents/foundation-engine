@@ -21,13 +21,13 @@ export class SirenSubEntity extends Observable {
 		this._entityId = entityId;
 	}
 
+	// TODO: remove in US121366?
 	addObserver(observer, property, { route, method }) {
 		if (route) {
-			const currentRoute = this._routes.has(observer) ? this._routes.get(observer) : {};
-			this._routes.set(observer, { ...currentRoute, ...route });
-			return;
+			this._addRoute(observer, route);
+		} else {
+			super.addObserver(observer, property, { method }, this.entityId);
 		}
-		super.addObserver(observer, property, method, this.entityId);
 	}
 
 	get childState() {

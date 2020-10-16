@@ -22,13 +22,13 @@ export class SirenLink extends Observable {
 
 	}
 
+	// TODO: remove in US121366
 	addObserver(observer, property, { route, method }) {
 		if (route) {
-			const currentRoute = this._routes.has(observer) ? this._routes.get(observer) : {};
-			this._routes.set(observer, { ...currentRoute, ...route });
-			return;
+			this._addRoute(observer, route);
+		} else {
+			super.addObserver(observer, property, method, this.link && this.link.href);
 		}
-		super.addObserver(observer, property, method, this.link && this.link.href);
 	}
 
 	get childState() {
@@ -37,11 +37,10 @@ export class SirenLink extends Observable {
 
 	deleteObserver(observer) {
 		if (this._routes.has(observer)) {
-			this._childState.dispose(observer);
-			this._routes.delete(observer);
-			return;
+			this._deleteRoute(observer);
+		} else {
+			super.deleteObserver(observer);
 		}
-		super.deleteObserver(observer);
 	}
 
 	get rel() {

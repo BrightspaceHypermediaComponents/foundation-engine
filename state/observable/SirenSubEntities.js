@@ -26,9 +26,9 @@ export class SirenSubEntities extends Observable {
 		this._entityIds = entityIds || [];
 	}
 
+	// TODO: remove in US121366
 	addObserver(observer, property, { method }) {
-		super.addObserver(observer, property, method, this.entityIds);
-
+		super.addObserver(observer, property, { method }, this.entityIds);
 	}
 
 	get childSubEntities() {
@@ -37,11 +37,10 @@ export class SirenSubEntities extends Observable {
 
 	deleteObserver(observer) {
 		if (this._route.has(observer)) {
-			this._childState.dispose(observer);
-			this._route.delete(observer);
-			return;
+			this._deleteRoute(observer);
+		} else {
+			super.deleteObserver(observer);
 		}
-		super.deleteObserver(observer);
 	}
 
 	get rel() {
