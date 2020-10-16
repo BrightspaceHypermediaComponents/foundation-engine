@@ -1,7 +1,7 @@
 import { Observable } from './Observable.js';
 
 export class SirenProperty extends Observable {
-	static basicInfo({ id, name, observable }) {
+	static definedProperty({ id, name, observable }) {
 		id = id || name.replace(/^_+/, '');
 		return { id, type: observable };
 	}

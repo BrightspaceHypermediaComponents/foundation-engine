@@ -3,7 +3,7 @@ import { Observable } from './Observable.js';
 import { SirenSubEntity } from './SirenSubEntity.js';
 
 export class SirenSubEntities extends Observable {
-	static basicInfo({ token }) {
+	static definedProperty({ token }) {
 		return { token };
 	}
 
