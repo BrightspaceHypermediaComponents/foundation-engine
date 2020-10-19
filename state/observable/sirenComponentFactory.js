@@ -26,6 +26,34 @@ const observableClasses = Object.freeze({
 	[observableTypes.action]: SirenAction
 });
 
+function definedProperty({ observable: type, prime, rel: id, route, token }) {
+	return {
+		id,
+		route,
+		token: (prime || route) ? token : undefined,
+		type
+	};
+}
+
+function handleRouting(observerProperties) {
+	if (!observerProperties.route || observerProperties.route.length === 0) return observerProperties;
+
+	const currentProperties = observerProperties.route.shift();
+	return { ...observerProperties, ...currentProperties, route: observerProperties };
+}
+
+export function sirenObserverDefinedProperty(observerProperties, state) {
+	observerProperties = handleRouting(observerProperties);
+	const sirenObserverType = observerProperties.observable && observableClasses[observerProperties.observable];
+	if (!sirenObserverType) {
+		return;
+	}
+
+	const definedObserverProperty = sirenObserverType.basicInfo ? sirenObserverType.definedProperty(observerProperties) : {};
+
+	return { ...definedProperty(observerProperties), ...definedObserverProperty, state };
+}
+
 export function sirenComponentFactory(componentProperties) {
 	const sirenComponentType = componentProperties.type && observableClasses[componentProperties.type];
 	if (!sirenComponentType) {

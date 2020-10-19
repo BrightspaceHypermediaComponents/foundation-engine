@@ -1,38 +1,7 @@
 import { Component } from './Common.js';
-import { observableClasses } from 'sirenComponentFactory.js';
-
-function defaultBasicInfo({ observable: type, prime, rel: id, route, token }) {
-	return {
-		id,
-		route,
-		token: (prime || route) ? token : undefined,
-		type
-	};
-}
-
-function handleRouting(observerProperties) {
-	if (!observerProperties.route || observerProperties.route.length === 0) return observerProperties;
-
-	const currentProperties = observerProperties.route.shift();
-	return { ...observerProperties, ...currentProperties, route: observerProperties };
-}
-
-export function sirenObserverDefinedProperty(observerProperties, state) {
-	observerProperties = handleRouting(observerProperties);
-	const sirenObserverType = observerProperties.observable && observableClasses[observerProperties.observable];
-	if (!sirenObserverType) {
-		return;
-	}
-
-	const definedProperty = sirenObserverType.basicInfo ? sirenObserverType.definedProperty(observerProperties) : {};
-
-	return { ...defaultBasicInfo(observerProperties), ...definedProperty, state };
-}
+//import { defaultBasicInfo } from 'sirenComponentFactory.js';
 
 export class Observable {
-	static definedProperty({ name: id, token, state }) {
-		return { id, token, state };
-	}
 
 	// TODO: change to ObserverMap in US121366
 	constructor() {
