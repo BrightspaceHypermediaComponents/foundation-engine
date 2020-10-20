@@ -228,7 +228,7 @@ export async function refreshState(state, refetch = true) {
 	return window.D2L.SirenSdk.StateStore.fetch(state, refetch);
 }
 
-export function stateFactoryByRawSirenEntity(rawEntity, token) {
+function stateFactoryByRawSirenEntity(rawEntity, token) {
 	const entityId = getEntityIdFromSirenEntity(rawEntity);
 	if (!entityId) {
 		const state = new HypermediaState(entityId, token);
@@ -239,7 +239,17 @@ export function stateFactoryByRawSirenEntity(rawEntity, token) {
 	return stateFactory(entityId, shouldAttachToken(token, rawEntity));
 }
 
-export async function stateFactory(entityId, token) {
+export async function tempStateFactory(options) {
+	if (options.state) {
+		return fetch(options.state);
+	} else if (options.rawEntity) {
+		return stateFactoryByRawSirenEntity(options.rawEntity, options.token);
+	} else if (options.entityId) {
+		return stateFactory(options.entityId, options.token);
+	}
+}
+
+async function stateFactory(entityId, token) {
 	if (!entityId) return;
 	const tokenResolved = await getToken(token);
 	const state = window.D2L.SirenSdk.StateStore.makeNewState(entityId, tokenResolved);
@@ -247,7 +257,7 @@ export async function stateFactory(entityId, token) {
 	return state;
 }
 
-export async function fetch(state) {
+async function fetch(state) {
 	if (!state || state.hasServerResponseCached()) {
 		return true;
 	}
