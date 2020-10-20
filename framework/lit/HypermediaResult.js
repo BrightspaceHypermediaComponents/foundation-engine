@@ -1,6 +1,6 @@
 import { componentStoreFactory, isPseudoTag } from '../../render/componentFactory.js';
 import { defaultTemplateProcessor, html, TemplateResult } from 'lit-html';
-import { tempStateFactory } from '../../state/store.js';
+import { stateFactory } from '../../state/stateFactory.js';
 import { observableTypes } from '../../state/HypermediaState.js';
 import { until } from 'lit-html/directives/until.js';
 
@@ -199,13 +199,13 @@ export class HypermediaResult extends TemplateResult {
 		const resources = { classes: [] };
 		const components = componentStoreFactory(pseudoTag);
 		if (!href || !token) return html`loading`;
-		const statePromise = tempStateFactory({
+		const statePromise = stateFactory({
 			entityId: href,
 			token: token
 		});
 		const fetchedResults  = statePromise.then(async state => {
 			state.addObservables(resources, observable);
-			await tempStateFactory({state: state});
+			await stateFactory({state: state});
 			return state;
 		}).then(state => this.render(state, components, resources, pseudoTag, strings, values));
 		return html`${until(fetchedResults, html`loading`)}`;

@@ -1,5 +1,5 @@
 import { Component, getEntityIdFromSirenEntity } from './Common.js';
-import { tempStateFactory } from '../../state/store.js';
+import { stateFactory } from '../../state/stateFactory.js';
 
 export class SirenSubEntity {
 	constructor({ id, token }) {
@@ -70,14 +70,14 @@ export class SirenSubEntity {
 		this.entityId = getEntityIdFromSirenEntity(subEntity);
 
 		if (this._token) {
-			this._childState = await tempStateFactory({
+			this._childState = await stateFactory({
 				rawEntity: subEntity,
 				token: this._token
 			});
 			this._routes.forEach((route, component) => {
 				this._childState.addObservables(component, route);
 			});
-			tempStateFactory({state: this._childState});
+			stateFactory({state: this._childState});
 		}
 	}
 

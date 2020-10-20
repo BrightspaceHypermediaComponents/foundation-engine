@@ -1,5 +1,5 @@
 import { Component } from './Common.js';
-import { performAction } from '../../state/store.js';
+import { performAction } from '../../state/stateFactory.js';
 import { refreshToken } from '../token.js';
 
 export class SirenAction {

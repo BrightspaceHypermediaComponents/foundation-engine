@@ -1,4 +1,4 @@
-import { tempStateFactory } from '../../state/store.js';
+import { stateFactory } from '../../state/stateFactory.js';
 import { Component } from './Common.js';
 import { shouldAttachToken } from '../token.js';
 
@@ -63,14 +63,14 @@ export class SirenLink {
 		}
 
 		if (this._token) {
-			this._childState = await tempStateFactory({
+			this._childState = await stateFactory({
 				entityId: this.link.href,
 				token: shouldAttachToken(this._token, this.link)
 			});
 			this._routes.forEach((route, component) => {
 				this._childState.addObservables(component, route);
 			});
-			tempStateFactory({state: this._childState});
+			stateFactory({state: this._childState});
 		}
 	}
 

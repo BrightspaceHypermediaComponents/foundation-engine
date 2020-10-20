@@ -1,4 +1,4 @@
-import { dispose, tempStateFactory } from '../../state/store.js';
+import { dispose, stateFactory } from '../../state/stateFactory.js';
 import { deepCopy } from '../../helper/deepCopy.js';
 export { observableTypes } from '../../state/HypermediaState.js';
 
@@ -54,12 +54,12 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 		if (this.__gettingState) return;
 		try {
 			this.__gettingState = true;
-			this._state = await tempStateFactory({
+			this._state = await stateFactory({
 				entityId: this.href,
 				token: this.token
 			});
 			this._state.addObservables(this, this._observables);
-			await tempStateFactory({state: this._state});
+			await stateFactory({state: this._state});
 		} catch (error) {
 			console.error(error);
 		} finally {
