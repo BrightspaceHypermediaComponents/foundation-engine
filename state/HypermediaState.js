@@ -35,7 +35,7 @@ export class HypermediaState {
 	dispose(component) {
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenComponent => {
-				sirenComponent.deleteComponent(component);
+				sirenComponent.delete(component);
 			});
 		});
 	}

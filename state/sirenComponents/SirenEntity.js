@@ -21,7 +21,7 @@ export class SirenEntity {
 		this._components.setComponentProperty(component, this.sirenEntity);
 	}
 
-	deleteComponent(component) {
+	delete(component) {
 		this._components.delete(component);
 	}
 

@@ -47,7 +47,7 @@ export class SirenAction {
 		}
 	}
 
-	deleteComponent(component) {
+	delete(component) {
 		this._components.delete(component);
 	}
 
