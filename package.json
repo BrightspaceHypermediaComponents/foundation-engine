@@ -1,5 +1,5 @@
 {
-  "name": "foundation-engine",
+  "name": "@brightspace-hmc/foundation-engine",
   "version": "1.0.0",
   "description": "engine for foundation-hmc",
   "private": true,
