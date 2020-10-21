@@ -1,7 +1,8 @@
 import 'd2l-fetch/d2l-fetch.js';
-import { StateStore } from './store.js';
 import { getToken, shouldAttachToken } from './token.js';
 import { getEntityIdFromSirenEntity } from './sirenComponents/Common.js';
+import { HypermediaState } from './HypermediaState.js';
+import { StateStore } from './store.js';
 import SirenParse from 'siren-parser';
 
 window.D2L = window.D2L || {};
@@ -10,22 +11,14 @@ window.D2L.SirenSdk.fetchStatus = window.D2L.SirenSdk.fetchStatus || new Map();
 window.D2L.SirenSdk.d2lfetch = window.D2L.SirenSdk.d2lfetch || window.d2lfetch;
 window.D2L.SirenSdk.StateStore = window.D2L.SirenSdk.StateStore || new StateStore();
 
-export async function stateFactory({state, token, rawEntity, entityId}) {
-	if (state) {
-		return _fetch(state);
-	}
-
-	if (!token) {
-		console.error('must include a token');
-		return;
-	}
-
-	if (rawEntity) {
-		return _stateFactoryByRawSirenEntity(rawEntity, token);
-	}
-
-	if (entityId) {
-		return _stateFactory(entityId, token);
+export async function stateFactory(type, objParam, token) {
+	switch (type) {
+		case 'HypermediaState':
+			return _fetch(objParam);
+		case 'Link':
+			return _stateFactoryByRawSirenEntity(objParam, token);
+		case 'String':
+			return _stateFactory(objParam, token);
 	}
 }
 
@@ -50,7 +43,7 @@ export async function performAction(action, input) {
 		await _handleCachePriming(action.token, response);
 		const json = await response.json();
 		const entity = await SirenParse(json);
-		const state = this.get(entity.getLink('self').href, action.token);
+		const state = window.D2L.SirenSdk.fetchStatus.get(entity.getLink('self').href, action.token);
 
 		state.onServerResponse(entity);
 	} catch (err) {
@@ -180,7 +173,7 @@ function _handleCachePriming(token, response) {
 
 	return Promise.all(cachePrimers.map((cachePrimer) => {
 		const state = window.D2L.SirenSdk.StateStore.makeNewState(cachePrimer.href, token);
-		return this.fetch(state, true);
+		return _fetch(state, true);
 	}));
 }
 
@@ -220,5 +213,3 @@ function _parseLinkHeader(links) {
 	}
 	return _links;
 }
-
-

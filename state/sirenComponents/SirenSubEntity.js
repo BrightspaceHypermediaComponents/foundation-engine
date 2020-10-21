@@ -70,14 +70,11 @@ export class SirenSubEntity {
 		this.entityId = getEntityIdFromSirenEntity(subEntity);
 
 		if (this._token) {
-			this._childState = await stateFactory({
-				rawEntity: subEntity,
-				token: this._token
-			});
+			this._childState = await stateFactory(subEntity.constructor.name, subEntity, this._token);
 			this._routes.forEach((route, component) => {
 				this._childState.addObservables(component, route);
 			});
-			stateFactory({state: this._childState});
+			stateFactory(this._childState.constructor.name, this._childState);
 		}
 	}
 

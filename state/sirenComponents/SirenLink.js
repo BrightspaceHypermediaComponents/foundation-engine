@@ -1,6 +1,6 @@
-import { stateFactory } from '../../state/stateFactory.js';
 import { Component } from './Common.js';
-import { shouldAttachToken } from '../token.js';
+import { stateFactory } from '../../state/stateFactory.js';
+import { shouldAttachToken } from '../token.js'; 
 
 export class SirenLink {
 	constructor({ id, token }) {
@@ -63,14 +63,11 @@ export class SirenLink {
 		}
 
 		if (this._token) {
-			this._childState = await stateFactory({
-				entityId: this.link.href,
-				token: shouldAttachToken(this._token, this.link)
-			});
+			this._childState = await stateFactory(this.link.href.constructor.name, this.link.href, shouldAttachToken(this._token, this.link));
 			this._routes.forEach((route, component) => {
 				this._childState.addObservables(component, route);
 			});
-			stateFactory({state: this._childState});
+			stateFactory(this._childState.constructor.name, this._childState);
 		}
 	}
 
