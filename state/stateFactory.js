@@ -10,24 +10,20 @@ window.D2L.SirenSdk.fetchStatus = window.D2L.SirenSdk.fetchStatus || new Map();
 window.D2L.SirenSdk.d2lfetch = window.D2L.SirenSdk.d2lfetch || window.d2lfetch;
 window.D2L.SirenSdk.StateStore = window.D2L.SirenSdk.StateStore || new StateStore();
 
-export async function stateFactory(options) {
-	const state = options.state;
+export async function stateFactory({state, token, rawEntity, entityId}) {
 	if (state) {
-		return _fetch(options.state);
+		return _fetch(state);
 	}
 
-	const token = options.token;
 	if (!token) {
 		console.error('must include a token');
 		return;
 	}
 
-	const rawEntity = options.rawEntity;
 	if (rawEntity) {
 		return _stateFactoryByRawSirenEntity(rawEntity, token);
 	}
 
-	const entityId = options.entityId;
 	if (entityId) {
 		return _stateFactory(entityId, token);
 	}
