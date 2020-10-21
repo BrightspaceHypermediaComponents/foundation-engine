@@ -34,6 +34,15 @@ export class SirenSubEntity {
 		return this._childState;
 	}
 
+	delete(component) {
+		if (this._routes.has(component)) {
+			this._childState.dispose(component);
+			this._routes.delete(component);
+			return;
+		}
+		this._components.delete(component);
+	}
+
 	get rel() {
 		return this._rel;
 	}

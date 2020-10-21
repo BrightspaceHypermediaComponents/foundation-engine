@@ -36,7 +36,7 @@ export class SirenLink {
 		return this._childState;
 	}
 
-	deleteComponent(component) {
+	delete(component) {
 		if (this._routes.has(component)) {
 			this._childState.dispose(component);
 			this._routes.delete(component);

@@ -28,7 +28,7 @@ export class SirenProperty {
 		this._components.setComponentProperty(component, this.value);
 	}
 
-	deleteComponent(component) {
+	delete(component) {
 		this._components.delete(component);
 	}
 

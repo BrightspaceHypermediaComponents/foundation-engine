@@ -40,7 +40,7 @@ export class SirenSubEntities {
 		return this._childSubEntities;
 	}
 
-	deleteComponent(component) {
+	delete(component) {
 		if (this._route.has(component)) {
 			this._childState.dispose(component);
 			this._route.delete(component);
