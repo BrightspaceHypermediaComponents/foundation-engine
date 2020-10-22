@@ -6,6 +6,7 @@ import SirenParse from 'siren-parser';
 
 class StateStore {
 	constructor(fetch) {
+		this.states = new Map();
 		this._states = new Map();
 		this._fetchStatus = new Map();
 		this._d2lfetch = fetch;
@@ -228,23 +229,27 @@ export async function refreshState(state, refetch = true) {
 	return window.D2L.SirenSdk.StateStore.fetch(state, refetch);
 }
 
-export function stateFactoryByRawSirenEntity(rawEntity, token) {
-	const entityId = getEntityIdFromSirenEntity(rawEntity);
-	if (!entityId) {
-		const state = new HypermediaState(entityId, token);
-		state.onServerResponse(rawEntity);
-		return state;
+export async function stateFactory(entity, token) {
+	if (!entity) return;
+
+	const entityId = entity.constructor.name === 'Link' ? getEntityIdFromSirenEntity(entity) : entity;
+	token = entity.constructor.name === 'Link' ? shouldAttachToken(token, entity) : token;
+
+	const cachedState = _getStateFromMap(entityId, token.toString());
+	if (cachedState) {
+		return cachedState;
 	}
 
-	return stateFactory(entityId, shouldAttachToken(token, rawEntity));
-}
+	if (!entityId) {
+		const state = new HypermediaState(entityId, token);
+		state.onServerResponse(entity);
+		return _addStateToMap(null, token.toString(), state);
+	}
 
-export async function stateFactory(entityId, token) {
-	if (!entityId) return;
 	const tokenResolved = await getToken(token);
 	const state = window.D2L.SirenSdk.StateStore.makeNewState(entityId, tokenResolved);
 	window.D2L.SirenSdk.StateStore.add(state);
-	return state;
+	return _addStateToMap(entityId, token.toString(), state);
 }
 
 export async function fetch(state) {
@@ -263,4 +268,14 @@ export async function performAction(action, input) {
 
 export async function dispose(state, component) {
 	state && state.dispose(component);
+}
+
+function _addStateToMap(href, token, state) {
+	window.D2L.SirenSdk.StateStore.states[token] = window.D2L.SirenSdk.StateStore.states[token] || new Map();
+	window.D2L.SirenSdk.StateStore.states[token][href] = state;
+	return state;
+}
+
+function _getStateFromMap(href, token) {
+	return window.D2L.SirenSdk.StateStore.states[token] && window.D2L.SirenSdk.StateStore.states[token][href];
 }
