@@ -6,7 +6,7 @@ import SirenParse from 'siren-parser';
 
 class StateStore {
 	constructor(fetch) {
-		this.states = new Map();
+		this.cachedStates = new Map();
 		this._states = new Map();
 		this._fetchStatus = new Map();
 		this._d2lfetch = fetch;
@@ -272,11 +272,11 @@ export async function dispose(state, component) {
 
 function _addStateToMap(href, token, state) {
 	const tokenCache = token.toString();
-	window.D2L.SirenSdk.StateStore.states[tokenCache] = window.D2L.SirenSdk.StateStore.states[tokenCache] || new Map();
-	window.D2L.SirenSdk.StateStore.states[tokenCache][href] = state;
+	window.D2L.SirenSdk.StateStore.cachedStates[tokenCache] = window.D2L.SirenSdk.StateStore.cachedStates[tokenCache] || new Map();
+	window.D2L.SirenSdk.StateStore.cachedStates[tokenCache][href] = state;
 	return state;
 }
 
 function _getStateFromMap(href, token) {
-	return window.D2L.SirenSdk.StateStore.states[token] && window.D2L.SirenSdk.StateStore.states[token][href];
+	return window.D2L.SirenSdk.StateStore.cachedStates[token] && window.D2L.SirenSdk.StateStore.cachedStates[token][href];
 }

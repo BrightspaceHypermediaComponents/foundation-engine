@@ -14,14 +14,14 @@ describe('StateFactory', () => {
 	}
 
 	async function emptyRecycleBin() {
-		window.D2L.SirenSdk.StateStore.states = new Map();
+		window.D2L.SirenSdk.StateStore.cachedStates = new Map();
 	}
 
 	function verifyState(state, id, token) {
 		expect(state).to.be.instanceOf(HypermediaState);
 		expect(state.entityId, 'entityId').to.be.equal(id);
 		expect(state.token.value, 'token').to.be.equal(token);
-		const storedState = window.D2L.SirenSdk.StateStore.states[token.toString()][id];
+		const storedState = window.D2L.SirenSdk.StateStore.cachedStates[token.toString()][id];
 		expect(storedState, 'stored state').to.be.equal(state);
 	}
 
