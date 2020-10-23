@@ -235,7 +235,7 @@ export async function stateFactory(entity, token) {
 	const entityId = entity.constructor.name === 'Link' ? getEntityIdFromSirenEntity(entity) : entity;
 	token = entity.constructor.name === 'Link' ? shouldAttachToken(token, entity) : token;
 
-	const cachedState = _getStateFromMap(entityId, token.toString());
+	const cachedState = _getStateFromMap(entityId, token);
 	if (cachedState) {
 		return cachedState;
 	}
@@ -243,13 +243,13 @@ export async function stateFactory(entity, token) {
 	if (!entityId) {
 		const state = new HypermediaState(entityId, token);
 		state.onServerResponse(entity);
-		return _addStateToMap(null, token.toString(), state);
+		return _addStateToMap(null, token, state);
 	}
 
 	const tokenResolved = await getToken(token);
 	const state = window.D2L.SirenSdk.StateStore.makeNewState(entityId, tokenResolved);
 	window.D2L.SirenSdk.StateStore.add(state);
-	return _addStateToMap(entityId, token.toString(), state);
+	return _addStateToMap(entityId, token, state);
 }
 
 export async function fetch(state) {
@@ -271,8 +271,9 @@ export async function dispose(state, component) {
 }
 
 function _addStateToMap(href, token, state) {
-	window.D2L.SirenSdk.StateStore.states[token] = window.D2L.SirenSdk.StateStore.states[token] || new Map();
-	window.D2L.SirenSdk.StateStore.states[token][href] = state;
+	const tokenCache = token.toString();
+	window.D2L.SirenSdk.StateStore.states[tokenCache] = window.D2L.SirenSdk.StateStore.states[tokenCache] || new Map();
+	window.D2L.SirenSdk.StateStore.states[tokenCache][href] = state;
 	return state;
 }
 

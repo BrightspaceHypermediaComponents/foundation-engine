@@ -3,7 +3,7 @@ import { assert }  from '@open-wc/testing';
 import { componentStoreFactory } from '../render/componentFactory.js';
 //import sinon from 'sinon/pkg/sinon-esm.js';
 
-describe('Tester', () => {
+describe('HypermediaComponent', () => {
 
 	it('should register d2l-activity-name for customHypermediaElement', async() => {
 		window.D2L = window.D2L || {};
