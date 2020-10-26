@@ -5,14 +5,13 @@ import { refreshToken } from '../token.js';
 export class SirenAction extends Observable {
 	constructor({ id: name, token, state }) {
 		super();
-		this._action = { has: false, perform: () => undefined, update: () => undefined };
 		this._name = name;
 		this._token = token;
 		this._state = state;
 	}
 
 	get action() {
-		return this._action;
+		return this._components.value || { has: false, perform: () => undefined, update: () => undefined };
 	}
 
 	set action({ has, perform, update }) {
@@ -20,12 +19,9 @@ export class SirenAction extends Observable {
 			perform = () => undefined;
 			update = () => undefined;
 		}
-		if (this._action.has !== has || this._action.perform !== perform) {
+		if (this.action().has !== has || this.action().perform !== perform) {
 			this._components.setProperty({ has, perform, update });
 		}
-
-		this._action = { has, perform, update };
-
 	}
 
 	// TODO: remove in US121366

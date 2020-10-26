@@ -1,16 +1,14 @@
-import { Component } from './Common.js';
+import { ObserverMap } from './ObserverMapjs';
 //import { defaultBasicInfo } from 'sirenComponentFactory.js';
 
 export class Observable {
 
-	// TODO: change to ObserverMap in US121366
 	constructor() {
-		this._observers = new Component(); // new ObserverMap()
+		this._observers = new ObserverMap();
 	}
 
 	addObserver(observer, property, { method }, value) {
-		this._observers.add(observer, property, method);
-		this._observers.setObserverProperty(observer, value);
+		this._observers.add(observer, property, method, value);
 	}
 
 	deleteObserver(observer) {

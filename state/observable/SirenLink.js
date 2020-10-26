@@ -11,15 +11,13 @@ export class SirenLink extends Observable {
 	}
 
 	get link() {
-		return this._link;
+		return this._observers.value;
 	}
 
 	set link(link) {
-		if (!this._link !== link) {
+		if (!this.link() !== link) {
 			this._observers.setProperty(link && link.href);
 		}
-		this._link = link;
-
 	}
 
 	// TODO: remove in US121366

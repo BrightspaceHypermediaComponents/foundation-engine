@@ -2,14 +2,13 @@ import { Observable } from './Observable.js';
 
 export class SirenClasses extends Observable {
 	get value() {
-		return this._value;
+		return this._observers.value;
 	}
 
 	set value(value) {
-		if (!this._value !== value) {
+		if (!this.value() !== value) {
 			this._observers.setProperty(value);
 		}
-		this._value = value;
 	}
 
 	// TODO: remove in future
