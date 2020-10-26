@@ -1,4 +1,4 @@
-import { observableTypes as ot, sirenComponentBasicInfo, sirenComponentFactory } from './sirenComponents/sirenComponentFactory.js';
+import { observableTypes as ot, sirenDefinedProperty, sirenObservableFactory } from './observable/sirenObservablesFactory.js';
 import { refreshToken } from './token.js';
 
 export const observableTypes = ot;
@@ -24,7 +24,7 @@ export class HypermediaState {
 				...observables[name]
 			};
 
-			const basicInfo = sirenComponentBasicInfo(propertyInfo, this);
+			const basicInfo = sirenDefinedProperty(propertyInfo, this);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
@@ -92,7 +92,7 @@ export class HypermediaState {
 				...observables[name]
 			};
 
-			const basicInfo = sirenComponentBasicInfo(propertyInfo);
+			const basicInfo = sirenDefinedProperty(propertyInfo);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
@@ -124,7 +124,7 @@ export class HypermediaState {
 		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
 		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
 
-		const sirenComponent = sirenComponentFactory(basicInfo);
+		const sirenComponent = sirenObservableFactory(basicInfo);
 		typeMap.set(basicInfo.id, sirenComponent);
 		this._entity && sirenComponent.setSirenEntity(this._entity, typeMap);
 
