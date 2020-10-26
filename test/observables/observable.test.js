@@ -150,7 +150,7 @@ describe('observable multiple components', () => {
 		obj.addObserver(comp1, 'foo', { method }, 'bar');
 		method = method2;
 		obj.addObserver(comp2, 'abc', { method }, '');
-		obj.deleteObserver(comp1)
+		obj.deleteObserver(comp1);
 		const map = obj._observers.components;
 		assert(map.size === 1);
 		assert(!map.has(comp1));
