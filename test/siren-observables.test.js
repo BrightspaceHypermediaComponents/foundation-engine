@@ -9,11 +9,9 @@ import { SirenProperty } from '../state/observable/SirenProperty.js';
 import { SirenSubEntities } from '../state/observable/SirenSubEntities.js';
 import { SirenSubEntity } from '../state/observable/SirenSubEntity.js';
 
-describe('observerFactory creation', () => {
+describe('observerFactory object creation', () => {
 	it('SirenAction', () => {
 		const propertyInfo = {
-			name: 'foo',
-			token: 'bar',
 			type: ot.action
 		};
 		const basicInfo = sirenObservableFactory(propertyInfo);
@@ -21,8 +19,6 @@ describe('observerFactory creation', () => {
 	});
 	it('SirenClasses', () => {
 		const propertyInfo = {
-			name: 'foo',
-			token: 'bar',
 			type: ot.classes
 		};
 		const basicInfo = sirenObservableFactory(propertyInfo);
@@ -30,8 +26,6 @@ describe('observerFactory creation', () => {
 	});
 	it('SirenProperty', () => {
 		const propertyInfo = {
-			name: 'foo',
-			token: 'bar',
 			type: ot.property
 		};
 		const basicInfo = sirenObservableFactory(propertyInfo);
@@ -39,8 +33,6 @@ describe('observerFactory creation', () => {
 	});
 	it('SirenLink', () => {
 		const propertyInfo = {
-			name: 'foo',
-			token: 'bar',
 			type: ot.link
 		};
 		const basicInfo = sirenObservableFactory(propertyInfo);
@@ -48,8 +40,6 @@ describe('observerFactory creation', () => {
 	});
 	it('SirenEntity', () => {
 		const propertyInfo = {
-			name: 'foo',
-			token: 'bar',
 			type: ot.entity
 		};
 		const basicInfo = sirenObservableFactory(propertyInfo);
@@ -57,8 +47,6 @@ describe('observerFactory creation', () => {
 	});
 	it('SirenSubEntities', () => {
 		const propertyInfo = {
-			name: 'foo',
-			token: 'bar',
 			type: ot.subEntities
 		};
 		const basicInfo = sirenObservableFactory(propertyInfo);
@@ -66,8 +54,6 @@ describe('observerFactory creation', () => {
 	});
 	it('SirenSubEntity', () => {
 		const propertyInfo = {
-			name: 'foo',
-			token: 'bar',
 			type: ot.subEntity
 		};
 		const basicInfo = sirenObservableFactory(propertyInfo);
@@ -75,8 +61,6 @@ describe('observerFactory creation', () => {
 	});
 	it('fake class', () => {
 		const propertyInfo = {
-			name: 'foo',
-			token: 'bar',
 			type: 8
 		};
 		try {
@@ -87,8 +71,6 @@ describe('observerFactory creation', () => {
 	});
 	it('type missing in property', () => {
 		const propertyInfo = {
-			name: 'foo',
-			token: 'bar',
 		};
 		try {
 			sirenObservableFactory(propertyInfo);

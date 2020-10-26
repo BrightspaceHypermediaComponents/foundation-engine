@@ -21,7 +21,7 @@ export class Component {
 		return this._components.delete(component);
 	}
 
-	setComponentProperty(component, value) {
+	setObserverProperty(component, value) {
 		if (!this._components.has(component)) {
 			return false;
 		}
