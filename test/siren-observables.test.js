@@ -1,4 +1,4 @@
-import { observableTypes as ot, sirenDefinedProperty, sirenObservableFactory } from '../state/observable/sirenObservablesFactory.js'; // , sirenObservableFactory
+import { observableTypes as ot, sirenObservableFactory } from '../state/observable/sirenObservablesFactory.js'; // sirenDefinedProperty
 import { assert }  from '@open-wc/testing';
 //import { HypermediaState } from '../state/HypermediaState.js';
 import { SirenAction } from '../state/observable/SirenAction.js';
