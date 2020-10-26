@@ -32,6 +32,7 @@ export class SirenAction extends Fetchable(Observable) {
 	}
 
 	get headers() {
+		super.headers;
 		// set header content to json if present
 		if (this._rawSirenAction.type.indexOf('json') !== -1) {
 			this._headers.set('Content-Type', this._rawSirenAction.type);
