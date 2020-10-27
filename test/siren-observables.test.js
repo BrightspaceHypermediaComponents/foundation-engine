@@ -243,7 +243,7 @@ describe('sirenDefinedProperty complete properties', () => {
 	});
 
 	it('sirenEntity', () => {
-		const obj = {type: String, observable: ot.entity, rel: orgHref, token: 123123  };
+		const obj = { type: String, observable: ot.entity, rel: orgHref, token: 123123  };
 		const res = sirenDefinedProperty(obj, null);
 
 		assert(res.type === ot.entity);
