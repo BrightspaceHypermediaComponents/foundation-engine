@@ -6,7 +6,9 @@ describe('Observable methods', () => {
 	it('addObserver without method', () => {
 		const comp = new Component();
 		const obj = new Observable();
+
 		obj.addObserver(comp, 'foo', {}, false);
+
 		const map = obj._observers.components;
 		assert(map.size === 1, map.size);
 		assert(map.get(comp) === 'foo', map.get(comp));
@@ -14,52 +16,67 @@ describe('Observable methods', () => {
 		assert(!methods.has(comp));
 		assert(comp.components.size === 0);
 	});
+
 	it('addObserver with method', () => {
 		const comp = new Component();
 		const obj = new Observable();
 		const method = (val) => val;
+
 		obj.addObserver(comp, 'foo', { method }, 'bar');
+
 		const map = obj._observers.components;
 		assert(map.size === 1, map.size);
 		assert(map.get(comp) === 'foo', map.get(comp));
+
 		const methods = obj._observers._methods;
 		assert(methods.has(comp));
 		assert(methods.get(comp) === method);
 		assert(comp['foo'] === 'bar');
 	});
+
 	it('deleteObserver without method', () => {
 		const comp = new Component();
 		const obj = new Observable();
+
 		obj.addObserver(comp, 'foo', {}, false);
 		obj.deleteObserver(comp);
+
 		const map = obj._observers.components;
 		assert(map.size === 0, map.size);
 	});
+
 	it('deleteObserver with method', () => {
 		const comp = new Component();
 		const obj = new Observable();
 		const method = (val) => val;
+
 		obj.addObserver(comp, 'foo', { method }, 'bar');
 		obj.deleteObserver(comp);
+
 		const map = obj._observers.components;
 		assert(map.size === 0, map.size);
+
 		const methods = obj._observers._methods;
 		assert(!methods.has(comp));
 		assert(comp['foo'] === 'bar');
 	});
 });
+
 describe('observable multiple components', () => {
 	it('addObserver two components', () => {
 		const comp1 = new Component();
 		const comp2 = new Component();
 		const obj = new Observable();
+
 		obj.addObserver(comp1, 'foo', {}, false);
+
 		const map = obj._observers.components;
 		assert(map.size === 1, map.size);
 		assert(map.get(comp1) === 'foo', map.get(comp1));
 		let methods = obj._observers._methods;
 		assert(!methods.has(comp1));
 		assert(comp1.components.size === 0);
+
 		obj.addObserver(comp2, 'abc', {}, 'xyz');
 		const map2 = obj._observers.components;
 		assert(map2.size === 2, map.size);
@@ -71,62 +88,75 @@ describe('observable multiple components', () => {
 		assert(comp1.components.size === 0);
 		assert(comp2.components.size === 0);
 	});
+
 	it('addObserver two components, delete first', () => {
 		const comp1 = new Component();
 		const comp2 = new Component();
 		const obj = new Observable();
+
 		obj.addObserver(comp1, 'foo', {}, false);
 		obj.addObserver(comp2, 'abc', {}, 'xyz');
 		obj.deleteObserver(comp1);
+
 		const map = obj._observers.components;
 		assert(map.size === 1, map.size);
 		assert(!map.has(comp1), map.get(comp1));
 		assert(map.get(comp2) === 'abc', map.get(comp2));
+
 		const methods = obj._observers._methods;
 		assert(!methods.has(comp1));
 		assert(!methods.has(comp2));
 		assert(comp1.components.size === 0);
 		assert(comp2.components.size === 0);
 	});
+
 	it('addObserver two components, delete second', () => {
 		const comp1 = new Component();
 		const comp2 = new Component();
 		const obj = new Observable();
+
 		obj.addObserver(comp1, 'foo', {}, false);
 		obj.addObserver(comp2, 'abc', {}, 'xyz');
 		obj.deleteObserver(comp2);
+
 		const map = obj._observers.components;
 		assert(map.size === 1, map.size);
 		assert(map.get(comp1) === 'foo', map.get(comp1));
 		assert(!map.has(comp2), map.get(comp2));
+
 		const methods = obj._observers._methods;
 		assert(!methods.has(comp1));
 		assert(!methods.has(comp2));
 		assert(comp1.components.size === 0);
 		assert(comp2.components.size === 0);
 	});
-	it('readd component with new data', () => {
+
+	it('read component after adding with new data', () => {
 		const comp1 = new Component();
 		const obj = new Observable();
+
 		obj.addObserver(comp1, 'foo', {}, false);
 		obj.addObserver(comp1, 'abc', {}, 'xyz');
+
 		const map = obj._observers.components;
 		assert(map.size === 1, map.size);
 		assert(map.get(comp1) === 'foo', map.get(comp1));
+
 		const methods = obj._observers._methods;
 		assert(!methods.has(comp1));
 		assert(comp1.components.size === 0);
 	});
+
 	it('addObserver two components with methods', () => {
 		const comp1 = new Component();
-		const comp2 = new Component();
-		const obj = new Observable();
 		const method1 = (val) => val;
-		let method = method1;
+		const comp2 = new Component();
 		const method2 = (val) => `${val}xyz`;
-		obj.addObserver(comp1, 'foo', { method }, 'bar');
-		method = method2;
-		obj.addObserver(comp2, 'abc', { method }, '');
+		const obj = new Observable();
+
+		obj.addObserver(comp1, 'foo', { method: method1 }, 'bar');
+		obj.addObserver(comp2, 'abc', { method: method2 }, '');
+
 		const map = obj._observers.components;
 		assert(map.size === 2);
 		assert(map.get(comp1) === 'foo');
@@ -142,15 +172,17 @@ describe('observable multiple components', () => {
 	});
 	it('addObserver two components with methods, remove first', () => {
 		const comp1 = new Component();
-		const comp2 = new Component();
-		const obj = new Observable();
 		const method1 = (val) => val;
-		let method = method1;
+
+		const comp2 = new Component();
 		const method2 = (val) => `${val}xyz`;
-		obj.addObserver(comp1, 'foo', { method }, 'bar');
-		method = method2;
-		obj.addObserver(comp2, 'abc', { method }, '');
+
+		const obj = new Observable();
+
+		obj.addObserver(comp1, 'foo', { method: method1 }, 'bar');
+		obj.addObserver(comp2, 'abc', { method: method2 }, '');
 		obj.deleteObserver(comp1);
+
 		const map = obj._observers.components;
 		assert(map.size === 1);
 		assert(!map.has(comp1));
