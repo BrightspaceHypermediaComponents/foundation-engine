@@ -4,7 +4,7 @@ import { performAction } from '../store.js';
 
 export class SirenAction extends Fetchable(Observable) {
 	constructor({ id: name, token, state }) {
-		super(state?.href, token);
+		super(null, token);
 		this._action = { has: false, perform: () => undefined, update: () => undefined };
 		this._name = name;
 		this._state = state;
@@ -71,6 +71,7 @@ export class SirenAction extends Fetchable(Observable) {
 		}
 
 		this._rawSirenAction = sirenEntity.getActionByName(this._name);
+		this._href = this._rawSirenAction.href;
 		this._fields = this._decodeFields(this._rawSirenAction);
 
 		this.action = {
