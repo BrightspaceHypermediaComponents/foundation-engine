@@ -1,8 +1,6 @@
 import { observableTypes, sirenDefinedProperty, sirenObservableFactory } from './observable/sirenObservablesFactory.js';
 import { refreshToken } from './token.js';
 
-//export const observableTypes = ot;
-
 /**
  *
  * @export

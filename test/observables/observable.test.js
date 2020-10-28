@@ -3,7 +3,12 @@ import { Component } from '../../state/observable/Common.js';
 import { Observable } from '../../state/observable/Observable.js';
 
 describe('Observable methods', () => {
-	it('addObserver without method', () => {
+	it('call Observable constructor', () => {
+		const obj = new Observable();
+		assert(obj._observers instanceof Component);
+	});
+
+	it('methods of observable is empty when no method added', () => {
 		const comp = new Component();
 		const obj = new Observable();
 
@@ -17,7 +22,7 @@ describe('Observable methods', () => {
 		assert(comp.components.size === 0);
 	});
 
-	it('addObserver with method', () => {
+	it('methods of observable contains method and observerMap uses method', () => {
 		const comp = new Component();
 		const obj = new Observable();
 		const method = (val) => val;
@@ -34,7 +39,7 @@ describe('Observable methods', () => {
 		assert(comp['foo'] === 'bar');
 	});
 
-	it('deleteObserver without method', () => {
+	it('observerMap is removed from Observable when deleted from object', () => {
 		const comp = new Component();
 		const obj = new Observable();
 
@@ -45,7 +50,7 @@ describe('Observable methods', () => {
 		assert(map.size === 0, map.size);
 	});
 
-	it('deleteObserver with method', () => {
+	it('observerMap is removed from Observable when deleted from object, component mapping still exists', () => {
 		const comp = new Component();
 		const obj = new Observable();
 		const method = (val) => val;
@@ -62,8 +67,8 @@ describe('Observable methods', () => {
 	});
 });
 
-describe('observable multiple components', () => {
-	it('addObserver two components', () => {
+describe('create observable multiple components', () => {
+	it('observable contains two components without methods', () => {
 		const comp1 = new Component();
 		const comp2 = new Component();
 		const obj = new Observable();
@@ -89,7 +94,7 @@ describe('observable multiple components', () => {
 		assert(comp2.components.size === 0);
 	});
 
-	it('addObserver two components, delete first', () => {
+	it('observable contains second observerMap after first observerMap is removed', () => {
 		const comp1 = new Component();
 		const comp2 = new Component();
 		const obj = new Observable();
@@ -110,7 +115,7 @@ describe('observable multiple components', () => {
 		assert(comp2.components.size === 0);
 	});
 
-	it('addObserver two components, delete second', () => {
+	it('observable contains first observerMap after second observerMap is removed', () => {
 		const comp1 = new Component();
 		const comp2 = new Component();
 		const obj = new Observable();
@@ -131,7 +136,7 @@ describe('observable multiple components', () => {
 		assert(comp2.components.size === 0);
 	});
 
-	it('read component after adding with new data', () => {
+	it('observable is not updated when component is added a second time', () => {
 		const comp1 = new Component();
 		const obj = new Observable();
 
@@ -147,7 +152,7 @@ describe('observable multiple components', () => {
 		assert(comp1.components.size === 0);
 	});
 
-	it('addObserver two components with methods', () => {
+	it('observable contains two components with different data', () => {
 		const comp1 = new Component();
 		const method1 = (val) => val;
 		const comp2 = new Component();
@@ -170,7 +175,8 @@ describe('observable multiple components', () => {
 		assert(methods.get(comp2) === method2);
 		assert(comp2['abc'] === 'xyz');
 	});
-	it('addObserver two components with methods, remove first', () => {
+
+	it('observable contains one components with method after one is removed', () => {
 		const comp1 = new Component();
 		const method1 = (val) => val;
 

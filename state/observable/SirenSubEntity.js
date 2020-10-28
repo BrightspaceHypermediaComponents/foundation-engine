@@ -1,4 +1,4 @@
-import { fetch, stateFactoryByRawSirenEntity } from '../../state/store.js';
+import { fetch, stateFactoryByRawSirenEntity } from '../store.js';
 import { getEntityIdFromSirenEntity } from './Common.js';
 import { Observable } from './Observable.js';
 
