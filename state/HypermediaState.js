@@ -1,15 +1,15 @@
 import { observableTypes, sirenDefinedProperty, sirenObservableFactory } from './observable/sirenObservablesFactory.js';
 import { refreshToken } from './token.js';
 
+
 /**
  *
  * @export
  * @class HypermediaState
  */
-export class HypermediaState {
+export class HypermediaState extends Fetchable(Object) {
 	constructor(entityId, token) {
-		this._entityId = entityId;
-		this._token = token;
+		super(entityId, token);
 
 		this._decodedEntity = new Map();
 	}
@@ -39,7 +39,7 @@ export class HypermediaState {
 	}
 
 	get entityId() {
-		return this._entityId;
+		return this.href;
 	}
 
 	hasServerResponseCached() {
@@ -57,10 +57,6 @@ export class HypermediaState {
 		actions.forEach(action => action.push());
 	}
 
-	refreshToken() {
-		return refreshToken(this.token);
-	}
-
 	reset() {
 		this._childStates().forEach(childState => childState?.reset());
 		this.setSirenEntity();
@@ -75,10 +71,6 @@ export class HypermediaState {
 				sirenComponent.setSirenEntity(this._entity, typeMap);
 			});
 		});
-	}
-
-	get token() {
-		return this._token;
 	}
 
 	updateProperties(observables) {

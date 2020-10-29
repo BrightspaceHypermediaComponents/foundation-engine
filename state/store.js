@@ -7,7 +7,6 @@ import SirenParse from 'siren-parser';
 class StateStore {
 	constructor(fetch) {
 		this._states = new Map();
-		this._fetchStatus = new Map();
 		this._d2lfetch = fetch;
 	}
 
@@ -29,17 +28,13 @@ class StateStore {
 			return;
 		}
 
-		if (this._fetchStatus.has(state)) {
-			return this._fetchStatus.get(state);
+		if (state.fetchStatus.pending) {
+			return state.fetchStatus.complete;
 		}
 
-		let resolver;
-		const promise = new Promise(resolve => resolver = resolve);
-		this._fetchStatus.set(state, promise);
+		state.fetchStatus.start();
 
-		const headers = new Headers();
-		!state.token.cookie && headers.set('Authorization', `Bearer ${state.token.value}`);
-
+		const headers = state.headers;
 		const fetch = !state.token.cookie
 			? this._d2lfetch
 			: this._d2lfetch.removeTemp('auth');
@@ -63,8 +58,7 @@ class StateStore {
 		} catch (err) {
 			state.onServerResponse(null, err);
 		} finally {
-			resolver();
-			this._fetchStatus.delete(state);
+			state.fetchStatus.done();
 		}
 	}
 
@@ -84,11 +78,10 @@ class StateStore {
 	}
 
 	async performAction(action, input) {
-		const href = action.href(input);
-		const body = action.body(input);
+		const href = action.setQueryParams(input);
+		const body = action.setBodyFromInput(input);
 
-		const headers = action.header();
-		!action.token.cookie && headers.set('Authorization', `Bearer ${action.token.value}`);
+		const headers = action.headers;
 
 		const fetch = !action.token.cookie
 			? this._d2lfetch
