@@ -11,7 +11,7 @@ export class SirenAction extends Fetchable(Observable) {
 	}
 
 	get action() {
-		return this._components.value || { has: false, perform: () => undefined, update: () => undefined };
+		return this._observers.value || { has: false, perform: () => undefined, update: () => undefined };
 	}
 
 	set action({ has, perform, update }) {
@@ -20,15 +20,15 @@ export class SirenAction extends Fetchable(Observable) {
 			update = () => undefined;
 		}
 		if (this.action().has !== has || this.action().perform !== perform) {
-			this._components.setProperty({ has, perform, update });
+			this._observers.setProperty({ has, perform, update });
 		}
 
 		this._action = { has, perform, update };
 	}
 
 	// TODO: remove in US121366
-	addObserver(component, property, { method }) {
-		super.addObserver(component, property, method, this.action);
+	addObserver(observer, property, { method }) {
+		super.addObserver(observer, property, method, this.action);
 	}
 
 	get headers() {

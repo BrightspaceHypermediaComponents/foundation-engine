@@ -5,34 +5,34 @@ export class ObserverMap {
 		this.value = {};
 	}
 
-	add(component, property, method, value) {
-		if (this._observers.has(component)) {
+	add(observer, property, method, value) {
+		if (this._observers.has(observer)) {
 			return;
 		}
 
 		this.value = value;
-		this._observers.set(component, property);
-		method && this._methods.set(component, method);
-		this._setObserverProperty(component, value);
+		this._observers.set(observer, property);
+		method && this._methods.set(observer, method);
+		this._setObserverProperty(observer, value);
 	}
 
-	delete(component) {
-		this._methods.delete(component);
-		return this._observers.delete(component);
+	delete(observer) {
+		this._methods.delete(observer);
+		return this._observers.delete(observer);
 	}
 
 	setProperty(value) {
 		this.value = value;
 
-		this._observers.forEach((property, component) => {
-			const method = this._methods.has(component) && this._methods.get(component);
-			component[property] = method ? method(this.value) : this.value;
+		this._observers.forEach((property, observer) => {
+			const method = this._methods.has(observer) && this._methods.get(observer);
+			observer[property] = method ? method(this.value) : this.value;
 		});
 	}
 
-	_setObserverProperty(component) {
-		const method = this._methods.has(component) && this._methods.get(component);
-		component[this._observers.get(component)] = method ? method(this.value) : this.value;
+	_setObserverProperty(observer) {
+		const method = this._methods.has(observer) && this._methods.get(observer);
+		observer[this._observers.get(observer)] = method ? method(this.value) : this.value;
 	}
 
 }

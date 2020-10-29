@@ -1,5 +1,4 @@
 import { ObserverMap } from './ObserverMapjs';
-//import { defaultBasicInfo } from 'sirenComponentFactory.js';
 
 export class Observable {
 
