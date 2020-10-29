@@ -15,9 +15,7 @@ export class SirenSubEntity extends Observable {
 	}
 
 	set entityId(entityId) {
-		if (!this.entityId() !== entityId) {
-			this._observers.setProperty(entityId);
-		}
+		this.setValue(!this.entityId, entityId);
 	}
 
 	// TODO: remove in US121366?

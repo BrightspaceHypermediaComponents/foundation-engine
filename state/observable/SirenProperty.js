@@ -16,9 +16,7 @@ export class SirenProperty extends Observable {
 	}
 
 	set value(value) {
-		if (!this.value() !== value) {
-			this._observers.setProperty(value);
-		}
+		this.setValue(!this.value, value);
 	}
 
 	// TODO: remove in US121366

@@ -19,9 +19,7 @@ export class SirenSubEntities extends Observable {
 	}
 
 	set entityIds(entityIds) {
-		if (!this.entityIds() !== entityIds) {
-			this._observers.setProperty(entityIds || []);
-		}
+		this.setValue(!this.entityIds(), entityIds || []);
 	}
 
 	// TODO: remove in US121366

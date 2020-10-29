@@ -15,6 +15,12 @@ export class Observable {
 	}
 	setSirenEntity() {}
 
+	setValue(oldValue, newValue) {
+		if (oldValue !== newValue) {
+			this._observers.setProperty(newValue);
+		}
+	}
+
 	_addRoute(observer, route) {
 		const currentRoute = this._routes.has(observer) ? this._routes.get(observer) : {};
 		this._routes.set(observer, { ...currentRoute, ...route });
