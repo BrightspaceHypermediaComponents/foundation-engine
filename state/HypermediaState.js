@@ -1,6 +1,5 @@
 import { observableTypes, sirenDefinedProperty, sirenObservableFactory } from './observable/sirenObservablesFactory.js';
-import { refreshToken } from './token.js';
-
+import { Fetchable } from './Fetchable.js';
 
 /**
  *
