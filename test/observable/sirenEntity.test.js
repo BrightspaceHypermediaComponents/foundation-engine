@@ -5,14 +5,14 @@ import { SirenEntity } from '../../state/observable/SirenEntity.js';
 describe('sirenEntity methods', () => {
 	it('constructor called', () => {
 		const obj = new SirenEntity();
-		assert(!obj.sirenEntity);
+		assert.isUndefined(obj.sirenEntity, 'sirenEntity should be unset');
 	});
 
 	it('objects entity is set', () => {
 		const obj = new SirenEntity();
 		obj.sirenEntity = 'abc';
-		assert(obj.sirenEntity === 'abc');
-		assert(obj._observers._components.size === 0);
+		assert.equal(obj.sirenEntity, 'abc', 'sirenEnity field was not set through method');
+		assert.equal(obj._observers._components.size, 0, 'sirenEntity should have no observers');
 	});
 
 	it('observerMap is added to sirenEntity', () => {
@@ -23,13 +23,13 @@ describe('sirenEntity methods', () => {
 		obj.addObserver(comp, 'foo', { method });
 
 		const map = obj._observers.components;
-		assert(map.size === 1, map.size);
-		assert(map.get(comp) === 'foo', map.get(comp));
+		assert.equal(map.size, 1, 'entity has one observer');
+		assert.equal(map.get(comp), 'foo', 'observer is not mapped to value');
 
 		const methods = obj._observers._methods;
-		assert(methods.has(comp));
-		assert(methods.get(comp) === method);
-		assert(comp['foo'] === undefined);
+		assert.isTrue(methods.has(comp), 'method is not recorded for observer');
+		assert.equal(methods.get(comp), method, 'observer maps to incorrect method');
+		assert.isUndefined(comp['foo'], 'observer should not map to a defined value');
 	});
 });
 
@@ -39,7 +39,7 @@ describe('sirenEntity setting values and adding observers', () => {
 		const obj = new SirenEntity();
 		obj.sirenEntity = 'foo';
 		obj.setSirenEntity(undefined);
-		assert(!obj.sirenEntity);
+		assert.isUndefined(obj.sirenEntity, 'resetting entity to undefined failed');
 	});
 
 	it('sirenEntity is reset when setSiren is used', () => {
@@ -49,7 +49,7 @@ describe('sirenEntity setting values and adding observers', () => {
 		obj.sirenEntity = 'foo';
 		obj.setSirenEntity(entity);
 
-		assert(obj.sirenEntity === 'bar');
+		assert.equal(obj.sirenEntity, 'bar', 'setting entity to new value failed');
 	});
 
 	it('observer maps to value of sirenEntity set before observer was added', () => {
@@ -60,48 +60,6 @@ describe('sirenEntity setting values and adding observers', () => {
 		obj.sirenEntity = 'bar';
 		obj.addObserver(comp, 'foo', { method });
 
-		assert(comp['foo'] === 'bar');
-	});
-
-	it('observer maps to value of sirenEntity set after observer was added', () => {
-		const obj = new SirenEntity();
-		const comp = new Component();
-		const method = (val) => val;
-
-		obj.addObserver(comp, 'foo', { method });
-		obj.sirenEntity = 'bar';
-
-		assert(comp['foo'] === 'bar');
-	});
-
-	it('observer remaps to value of sirenEntity set after observer was added', () => {
-		const obj = new SirenEntity();
-		const comp = new Component();
-		const method = (val) => val;
-
-		obj.sirenEntity = 'bar';
-		obj.addObserver(comp, 'foo', { method });
-		assert(comp['foo'] === 'bar');
-
-		obj.sirenEntity = 'baz';
-		assert(comp['foo'] === 'baz');
-	});
-
-	it('multiple observers map to value of sirenEntity', () => {
-		const obj = new SirenEntity();
-		const comp1 = new Component();
-		const comp2 = new Component();
-		const method1 = (val) => val;
-		const method2 = (val) => `${val}123`;
-
-		obj.sirenEntity = 'bar';
-		obj.addObserver(comp1, 'foo', { method: method1 });
-		obj.addObserver(comp2, 'abc', { method: method2 });
-		assert(comp1['foo'] === 'bar');
-		assert(comp2['abc'] === 'bar123');
-
-		obj.sirenEntity = 'baz';
-		assert(comp1['foo'] === 'baz');
-		assert(comp2['abc'] === 'baz123');
+		assert.equal(comp['foo'], 'bar', 'entity value was not set to the observer');
 	});
 });
