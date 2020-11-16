@@ -23,7 +23,7 @@ export class SirenProperty extends Observable {
 
 	// TODO: remove in US121366
 	addObserver(observer, property, { method }) {
-		super.addObserver(observer, property, method, this.value);
+		super.addObserver(observer, property, method);
 	}
 
 	get property() {

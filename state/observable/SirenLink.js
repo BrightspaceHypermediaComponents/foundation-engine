@@ -25,7 +25,7 @@ export class SirenLink extends Observable {
 		if (route) {
 			this._addRoute(observer, route);
 		} else {
-			super.addObserver(observer, property, method, this.link && this.link.href);
+			super.addObserver(observer, property, method);
 		}
 	}
 

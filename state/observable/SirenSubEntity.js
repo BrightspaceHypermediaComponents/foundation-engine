@@ -25,7 +25,7 @@ export class SirenSubEntity extends Observable {
 		if (route) {
 			this._addRoute(observer, route);
 		} else {
-			super.addObserver(observer, property, { method }, this.entityId);
+			super.addObserver(observer, property, { method });
 		}
 	}
 

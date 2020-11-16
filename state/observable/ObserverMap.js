@@ -2,10 +2,10 @@ export class ObserverMap {
 	constructor() {
 		this._observers = new Map();
 		this._methods = new WeakMap();
-		this.value = {};
+		this.value = undefined;
 	}
 
-	add(observer, property, method, value) {
+	add(observer, property, method) {
 		if (this._observers.has(observer)) {
 			return;
 		}
@@ -13,7 +13,6 @@ export class ObserverMap {
 		this.value = value;
 		this._observers.set(observer, property);
 		method && this._methods.set(observer, method);
-		this._setObserverProperty(observer, value);
 	}
 
 	delete(observer) {

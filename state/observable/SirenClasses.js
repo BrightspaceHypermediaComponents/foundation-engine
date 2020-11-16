@@ -13,7 +13,7 @@ export class SirenClasses extends Observable {
 
 	// TODO: remove in future
 	addObserver(observer, property, { method }) {
-		super.addObserver(observer, property, method, this._value);
+		super.addObserver(observer, property, method);
 	}
 
 	setSirenEntity(sirenEntity) {
