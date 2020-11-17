@@ -19,14 +19,9 @@ export class SirenSubEntities extends Observable {
 	}
 
 	set entityIds(entityIds) {
-		if (!this.entityIds() !== entityIds) {
+		if (!this.entityIds !== entityIds) {
 			this._observers.setProperty(entityIds || []);
 		}
-	}
-
-	// TODO: remove in US121366
-	addObserver(observer, property, { method }) {
-		super.addObserver(observer, property, { method });
 	}
 
 	get childSubEntities() {

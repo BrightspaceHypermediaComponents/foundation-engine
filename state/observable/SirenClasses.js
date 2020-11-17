@@ -1,22 +1,17 @@
 import { Observable } from './Observable.js';
 
 export class SirenClasses extends Observable {
-	get value() {
+	get classes() {
 		return this._observers.value;
 	}
 
-	set value(value) {
-		if (!this.value() !== value) {
+	set classes(value) {
+		if (!this.classes !== value) {
 			this._observers.setProperty(value);
 		}
 	}
 
-	// TODO: remove in future
-	addObserver(observer, property, { method }) {
-		super.addObserver(observer, property, method);
-	}
-
 	setSirenEntity(sirenEntity) {
-		this.value = sirenEntity && sirenEntity['class'];
+		this.classes = sirenEntity && sirenEntity['class'];
 	}
 }

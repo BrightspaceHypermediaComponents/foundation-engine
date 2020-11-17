@@ -1,18 +1,32 @@
+import { deepCopy } from '../../helper/deepCopy.js';
+
 export class ObserverMap {
 	constructor() {
 		this._observers = new Map();
 		this._methods = new WeakMap();
-		this.value = undefined;
 	}
 
 	add(observer, property, method) {
+
+		if (observer === undefined || typeof observer !== 'object') {
+			return;
+		}
+
+		if (property === undefined || typeof property !== 'string') {
+			return;
+		}
+
 		if (this._observers.has(observer)) {
 			return;
 		}
 
-		this.value = value;
 		this._observers.set(observer, property);
-		method && this._methods.set(observer, method);
+
+		if (method) {
+			this._methods.set(observer, method);
+		}
+
+		this._setObserverProperty(observer, property);
 	}
 
 	delete(observer) {
@@ -21,17 +35,21 @@ export class ObserverMap {
 	}
 
 	setProperty(value) {
-		this.value = value;
+		this._value = value;
 
 		this._observers.forEach((property, observer) => {
-			const method = this._methods.has(observer) && this._methods.get(observer);
-			observer[property] = method ? method(this.value) : this.value;
+			this._setObserverProperty(observer, property);
 		});
 	}
 
-	_setObserverProperty(observer) {
+	get value() {
+		return this._value;
+	}
+
+	_setObserverProperty(observer, property) {
 		const method = this._methods.has(observer) && this._methods.get(observer);
-		observer[this._observers.get(observer)] = method ? method(this.value) : this.value;
+		const value = deepCopy(this._value);
+		observer[property] = method ? method(value) : value;
 	}
 
 }
