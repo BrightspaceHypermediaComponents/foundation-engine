@@ -1,4 +1,4 @@
-import { ObserverMap } from './ObserverMapjs';
+import { ObserverMap } from './ObserverMap.js';
 
 export class Observable {
 
