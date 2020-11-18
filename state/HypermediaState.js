@@ -5,14 +5,6 @@ export const observableTypes = ot;
 
 const store = window.D2L.SirenSdk.StateStore;
 
-export function stateFactory(state) {
-	if (store.has(state.entityID, state.token)) {
-		return store.get(state.entityID, state.token);
-	}
-	const result = fetch(state);
-	store.add(result);
-}
-
 /**
  *
  * @export
@@ -131,4 +123,13 @@ export class HypermediaState extends Fetchable(Object) {
 
 		return sirenComponent;
 	}
+}
+
+export function stateFactory(entityID, token) {
+	if (store.has(entityID, token)) {
+		return store.get(entityID, token);
+	}
+	const result = new HypermediaState(entityID, token);
+	store.add(result);
+	return result;
 }
