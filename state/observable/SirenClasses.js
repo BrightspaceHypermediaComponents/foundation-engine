@@ -6,7 +6,7 @@ export class SirenClasses extends Observable {
 	}
 
 	set classes(value) {
-		if (!this.classes !== value) {
+		if (this.classes !== value) {
 			this._observers.setProperty(value);
 		}
 	}

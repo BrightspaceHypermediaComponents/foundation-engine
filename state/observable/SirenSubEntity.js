@@ -1,10 +1,12 @@
-//import { fetch } from '../store.js';
+import { fetch } from '../fetch.js';
 import { getEntityIdFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
+import { shouldAttachToken } from '../token.js';
 
 export class SirenSubEntity extends Observable {
 	constructor({ id, token, state } = {}) {
-		super({ state });
+		super();
+		this._state = state;
 		this._rel = id;
 		this._routes = new Map();
 		this._token = token;
@@ -15,13 +17,13 @@ export class SirenSubEntity extends Observable {
 	}
 
 	set entityId(entityId) {
-		if (!this.entityId !== entityId) {
+		if (this.entityId !== entityId) {
 			this._observers.setProperty(entityId);
 		}
 	}
 
 	// TODO: remove in US121366?
-	addObserver(observer, property, { route, method }) {
+	addObserver(observer, property, { route, method }  = {}) {
 		if (route) {
 			this._addRoute(observer, route);
 		} else {
@@ -66,7 +68,7 @@ export class SirenSubEntity extends Observable {
 			return;
 		}
 
-		entity._observers.observers.forEach((observer, property) => {
+		entity._observers._observers.forEach((observer, property) => {
 			this.addObserver(observer, property);
 		});
 
@@ -77,12 +79,13 @@ export class SirenSubEntity extends Observable {
 		this.entityId = getEntityIdFromSirenEntity(subEntity);
 
 		if (this._token) {
-			this._childState = this._state.createChildStateByyRawSirenEntity(subEntity, this._token);
+			this._childState = await this.createChildState(this.entityId, shouldAttachToken(this._token, subEntity));
+			this._childState.setSirenEntity(subEntity);
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});
-			// TODO: Call new fetch
-			//fetch(this._childState);
+
+			fetch(this._childState);
 		}
 	}
 

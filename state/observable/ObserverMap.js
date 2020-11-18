@@ -26,7 +26,9 @@ export class ObserverMap {
 			this._methods.set(observer, method);
 		}
 
-		this._setObserverProperty(observer, property);
+		if (this._value !== undefined) {
+			this._setObserverProperty(observer, property);
+		}
 	}
 
 	delete(observer) {

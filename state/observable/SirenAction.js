@@ -1,31 +1,35 @@
-import { Fetchable } from '../Fetchable.js';
+import { Fetchable, FetchError } from '../Fetchable.js';
+import { fetch } from '../fetch.js';
 import { Observable } from './Observable.js';
-//import { performAction } from '../store.js';
 
-const defaultAction = { has: false, perform: () => undefined, update: () => undefined };
+const defaultAction = { has: false, commit: () => undefined };
 
 export class SirenAction extends Fetchable(Observable) {
+	static definedProperty({ name: id, token }) {
+		return { id, token };
+	}
+
 	constructor({ id: name, token, state }) {
 		super(null, token);
-		super._state = state;
 		this._action = defaultAction;
 		this._name = name;
+		this._readyToSend = false;
+		this._state = state;
 	}
 
 	get action() {
 		return this._observers.value || defaultAction;
 	}
 
-	set action({ has, perform, update }) {
-		if (!has || typeof perform !== 'function') {
-			perform = () => undefined;
-			update = () => undefined;
+	set action({ has, commit }) {
+		if (!has || typeof commit !== 'function') {
+			commit = () => undefined;
 		}
-		if (this.action.has !== has || this.action.perform !== perform) {
-			this._observers.setProperty({ has, perform, update });
+		if (this._action.has !== has || this._action.commit !== commit) {
+			this._observers.setProperty({ has, commit });
 		}
 
-		this._action = { has, perform, update };
+		this._action = { has, commit };
 	}
 
 	get headers() {
@@ -39,6 +43,30 @@ export class SirenAction extends Fetchable(Observable) {
 
 	get method() {
 		return this._rawSirenAction && this._rawSirenAction.method;
+	}
+
+	onServerResponse(json, error) {
+		if (error) {
+			throw new FetchError(error);
+		}
+		if (!json) {
+			return;
+		}
+
+		this._state.processRawJsonSirenEntity(json);
+	}
+
+	push() {
+		if (this._readyToSend) {
+			fetch(this);
+			this.reset();
+		}
+	}
+
+	reset() {
+		this._href = this._rawSirenAction.href;
+		this._body = null;
+		this._readyToSend = false;
 	}
 
 	setBodyFromInput(input) {
@@ -73,11 +101,9 @@ export class SirenAction extends Fetchable(Observable) {
 
 		this.action = {
 			has: true,
-			perform: (params) => {
-				this.action.refreshToken();
-				return window.D2L.SirenSdk.StateStore.performAction(this.action, params);
-			},
-			update: (observables) => {
+			commit: (observables) => {
+				this._prepareAction(observables);
+				this._readyToSend = true;
 				return this._state.updateProperties(observables);
 			}
 		};
@@ -105,5 +131,12 @@ export class SirenAction extends Fetchable(Observable) {
 			});
 		}
 		return fields;
+	}
+
+	_prepareAction(observables) {
+		const input = {};
+		Object.keys(observables).forEach(field => input[field] = observables[field]?.value ? observables[field].value : observables[field]);
+		this.setQueryParams(input);
+		this.setBodyFromInput(input);
 	}
 }

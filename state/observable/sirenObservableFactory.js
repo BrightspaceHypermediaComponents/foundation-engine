@@ -26,12 +26,13 @@ const observableClasses = Object.freeze({
 	[observableTypes.action]: SirenAction
 });
 
-function definedProperty({ observable: type, prime, rel: id, route, token }) {
+function definedProperty({ observable: type, prime, rel: id, route, token, state }) {
 	return {
 		id,
 		route,
 		token: (prime || route) ? token : undefined,
-		type
+		type,
+		state
 	};
 }
 
@@ -42,7 +43,7 @@ function handleRouting(observerProperties) {
 	return { ...observerProperties, ...currentProperties, route: observerProperties };
 }
 
-export function sirenDefinedProperty(observerProperties, state) {
+export function sirenObserverDefinedProperty(observerProperties, state) {
 	observerProperties = handleRouting(observerProperties);
 	const sirenObserverType = observerProperties.observable && observableClasses[observerProperties.observable];
 	if (!sirenObserverType) {
