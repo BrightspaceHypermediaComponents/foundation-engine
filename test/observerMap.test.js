@@ -1,4 +1,4 @@
-import { expect }  from '@open-wc/testing';
+import { assert }  from '@open-wc/testing';
 import { ObserverMap } from '../state/observable/ObserverMap.js';
 
 describe('ObserverMap', () => {
@@ -20,9 +20,9 @@ describe('ObserverMap', () => {
 
 			observerMap.add(observer, property, method, value);
 
-			expect(observerMap._observers.has(observer)).to.be.true;
+			assert(observerMap._observers.has(observer) === true);
 			const getProperty = observerMap._observers.get(observer);
-			expect(getProperty).to.be.equal(property);
+			assert(getProperty === property);
 		});
 
 		it('should set value when adding a observer', async() => {
@@ -36,8 +36,8 @@ describe('ObserverMap', () => {
 			observerMap.add(observer, property, method);
 			observerMap.setProperty(value);
 
-			expect(observerMap.value).to.be.equal(value);
-			expect(observer[property]).to.be.equal(value);
+			assert(observerMap.value === value);
+			assert(observer[property] === value);
 		});
 
 	});
@@ -54,8 +54,8 @@ describe('ObserverMap', () => {
 		observerMap.setProperty(value);
 		observerMap.delete(observer);
 
-		expect(observerMap._observers.has(observer)).to.be.false;
-		expect(observer[property]).to.be.equal(value); //should this be removed
+		assert(observerMap._observers.has(observer) === false);
+		assert(observer[property] === value); //should this be removed
 	});
 
 	it('should update all object with new value', async() => {
@@ -70,7 +70,7 @@ describe('ObserverMap', () => {
 		observerMap.add(observer, property, method, value);
 		observerMap.setProperty(newValue);
 
-		expect(observer[property]).to.be.equal(newValue);
+		assert(observer[property] === newValue);
 	});
 
 });
