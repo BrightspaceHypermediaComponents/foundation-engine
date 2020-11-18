@@ -1,9 +1,11 @@
+import { fetch } from '../fetch.js';
 import { Observable } from './Observable.js';
 import { shouldAttachToken } from '../token.js';
 
 export class SirenLink extends Observable {
 	constructor({ id, token, state } = {}) {
-		super({ state });
+		super();
+		this._state = state;
 		this._rel = id;
 		this._routes = new Map();
 		this._token = token;
@@ -14,12 +16,11 @@ export class SirenLink extends Observable {
 	}
 
 	set href(href) {
-		if (!this.href !== href) {
-			this._observers.setProperty(href && href.href);
+		if (this.href !== href) {
+			this._observers.setProperty(href);
 		}
 	}
 
-	// TODO: remove in US121366
 	addObserver(observer, property, { route, method } = {}) {
 		if (route) {
 			this._addRoute(observer, { route });
@@ -45,11 +46,13 @@ export class SirenLink extends Observable {
 	}
 
 	async setSirenEntity(sirenEntity, linkCollectionMap) {
-		this.href = sirenEntity && sirenEntity.hasLinkByRel(this.rel) && sirenEntity.getLinkByRel(this.rel);
-		if (!this.href) return;
+		const link = sirenEntity && sirenEntity.hasLinkByRel(this.rel) && sirenEntity.getLinkByRel(this.rel);
+		if (!link) return;
+
+		this.href = link.href;
 
 		if (linkCollectionMap && linkCollectionMap instanceof Map) {
-			this.href.rel.forEach(rel => {
+			link.rel.forEach(rel => {
 				if (linkCollectionMap.has(rel) && this !== linkCollectionMap.get(rel)) {
 					this._merge(linkCollectionMap.get(rel));
 				}
@@ -58,12 +61,12 @@ export class SirenLink extends Observable {
 		}
 
 		if (this._token) {
-			this._childState = await this.createChildState(this.href.href, shouldAttachToken(this._token, this.href));
+			this._childState = await this.createChildState(link.href, shouldAttachToken(this._token, link));
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});
-			// TODO: waiting for fetch function
-			//fetch(this._childState);
+
+			fetch(this._childState);
 		}
 	}
 

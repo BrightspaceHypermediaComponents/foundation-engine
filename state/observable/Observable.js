@@ -2,17 +2,16 @@ import { ObserverMap } from './ObserverMap.js';
 
 export class Observable {
 
-	constructor({ state } = {}) {
+	constructor() {
 		this._observers = new ObserverMap();
-		this._state = state;
 	}
 
-	addObserver(observer, property, { method }) {
+	addObserver(observer, property, { method } = {}) {
 		this._observers.add(observer, property, method);
 	}
 
-	async createChildState(entityID, token) {
-		return this._state.createChildState(entityID, token);
+	createChildState(entityId, token) {
+		return this._state.createChildState(entityId, token);
 	}
 
 	deleteObserver(observer) {
