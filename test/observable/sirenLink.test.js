@@ -164,6 +164,7 @@ describe('merging sirenLinks', () => {
 
 		// checking that link1 is updated correctly
 		assert.equal(link1._token, 'bar', 'link token was not left unchanged after merge');
+		assert.equal(link1.rel, 'foo', 'link rel was altered in merge');
 
 		const map = link1._observers.components;
 		assert.equal(map.size, 2, 'link map has incorrect size after another link was merge into it');
@@ -229,7 +230,7 @@ describe('merging sirenLinks', () => {
 		assert.isFalse(map.get(obs1), 'observer maps to incorrect value when routed');
 
 		const methods = link1._observers._methods;
-		assert.isFalse(methods.has(obs1), 'method for observer is not stored');
+		assert.isFalse(methods.has(obs1), 'method for observer is stored when no method present');
 
 		assert.isTrue(methods.has(obs2), 'method for observer is not stored');
 		assert.equal(methods.get(obs2), method1, 'incorrect method stored for observer');
@@ -255,7 +256,7 @@ describe('merging sirenLinks', () => {
 });
 
 describe('sirenLink set siren entity', () => {
-	let link1, link2, method1, method2, obs1, obs2, entity;
+	let link1, link2, entity; // method1, method2, obs1, obs2,
 
 	beforeEach(() => {
 		link1 = new SirenLink({ id: 'foo', token: 'bar' });
@@ -263,11 +264,11 @@ describe('sirenLink set siren entity', () => {
 		link1.link = { href: 'www.abc.com', rel: ['12345'] };
 		link2.link = { href: 'www.xyz.com', rel: ['67890'] };
 
-		method1 = (val) => { `${val}1`; };
-		method2 = (val) => { `${val}2`; };
+		// method1 = (val) => { `${val}1`; };
+		// method2 = (val) => { `${val}2`; };
 
-		obs1 = new Component();
-		obs2 = new Component();
+		// obs1 = new Component();
+		// obs2 = new Component();
 
 		const stub1 = sinon.stub(entity, 'hasLinkByRel');
 		stub1.callsFake(() => true);
