@@ -1,9 +1,14 @@
 import { observableTypes as ot, sirenComponentBasicInfo, sirenComponentFactory } from './sirenComponents/sirenComponentFactory.js';
 import { Fetchable } from './Fetchable.js';
+import { StateStore } from './stateStore.js';
 
 export const observableTypes = ot;
 
-const store = window.D2L.SirenSdk.StateStore;
+window.D2L = window.D2L || {};
+window.D2L.Foundation = window.D2L.Foundation || {};
+window.D2L.Foundation.StateStore = window.D2L.Foundation.StateStore || new StateStore();
+
+const store = window.D2L.Foundation.StateStore;
 
 /**
  *
@@ -125,11 +130,11 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 }
 
-export function stateFactory(entityID, token) {
-	if (store.has(entityID, token)) {
-		return store.get(entityID, token);
+export async function stateFactory(entityID, token) {
+	if (await store.has(entityID, token)) {
+		return await store.get(entityID, token);
 	}
 	const result = new HypermediaState(entityID, token);
-	store.add(result);
+	await store.add(result);
 	return result;
 }
