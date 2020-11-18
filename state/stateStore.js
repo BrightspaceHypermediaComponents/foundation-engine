@@ -1,29 +1,41 @@
-class StateStore {
+import { refreshToken } from 'token.js';
+
+export class StateStore {
 	constructor() {
 		this._states = new Map();
 	}
 
-	add(state) {
-		if (!state || !state.entityId || !state.token.toString) {
+	async add(state) {
+		await state.refreshToken();
+		if (!state || !state.entityId || !state.token.toString()) {
 			return;
 		}
 
 		this._initContainer(state.entityId, state.token);
 	}
 
-	get(entityID, token) {
+	async get(entityID, token) {
+		await refreshToken(token);
 		const lowerCaseEntityId = entityID.toLowerCase();
-		return this.has(entityID, token) && this._states.get(token.toString()).get(lowerCaseEntityId).keys().next().value;
+		const tokenCache = token.toString();
+
+		const state = this.has(entityID, token) && this._states.get(tokenCache).get(lowerCaseEntityId).keys().next().value;
+		state.refreshToken();
+		return state;
 	}
 
-	has(entityID, token) {
+	async has(entityID, token) {
+		await refreshToken(token);
 		const lowerCaseEntityId = entityID.toLowerCase();
-		return this._states.has(token.toString()) && this._states.get(token.toString()).has(lowerCaseEntityId);
+		const tokenCache = token.toString();
+
+		return this._states.has(tokenCache) && this._states.get(tokenCache).has(lowerCaseEntityId);
 	}
 
 	_initContainer(entityId, token) {
 		const lowerCaseEntityId = entityId.toLowerCase();
 		const tokenCache = token.toString();
+
 		if (!this._states.has(tokenCache)) {
 			this._states.set(tokenCache, new Map());
 		}
