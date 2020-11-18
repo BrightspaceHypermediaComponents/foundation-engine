@@ -2,16 +2,18 @@ import { Fetchable } from '../Fetchable.js';
 import { Observable } from './Observable.js';
 import { performAction } from '../store.js';
 
+const defaultAction = { has: false, perform: () => undefined, update: () => undefined };
+
 export class SirenAction extends Fetchable(Observable) {
 	constructor({ id: name, token, state }) {
 		super(null, token);
-		this._action = { has: false, perform: () => undefined, update: () => undefined };
+		this._action = defaultAction;
 		this._name = name;
 		this._state = state;
 	}
 
 	get action() {
-		return this._action;
+		return this._observers.value || defaultAction;
 	}
 
 	set action({ has, perform, update }) {
@@ -19,16 +21,11 @@ export class SirenAction extends Fetchable(Observable) {
 			perform = () => undefined;
 			update = () => undefined;
 		}
-		if (this._action.has !== has || this._action.perform !== perform) {
-			this._components.setProperty({ has, perform, update });
+		if (this.action.has !== has || this.action.perform !== perform) {
+			this._observers.setProperty({ has, perform, update });
 		}
 
 		this._action = { has, perform, update };
-	}
-
-	// TODO: remove in US121366
-	addObserver(component, property, { method }) {
-		super.addObserver(component, property, method, this.action);
 	}
 
 	get headers() {

@@ -10,16 +10,14 @@ export class SirenLink extends Observable {
 		this._token = token;
 	}
 
-	get link() {
-		return this._link;
+	get href() {
+		return this._observers.value;
 	}
 
-	set link(link) {
-		if (!this._link !== link) {
-			this._observers.setProperty(link && link.href);
+	set href(href) {
+		if (!this.href !== href) {
+			this._observers.setProperty(href && href.href);
 		}
-		this._link = link;
-
 	}
 
 	// TODO: remove in US121366
@@ -27,7 +25,7 @@ export class SirenLink extends Observable {
 		if (route) {
 			this._addRoute(observer, route);
 		} else {
-			super.addObserver(observer, property, method, this.link && this.link.href);
+			super.addObserver(observer, property, method);
 		}
 	}
 
@@ -48,11 +46,11 @@ export class SirenLink extends Observable {
 	}
 
 	async setSirenEntity(sirenEntity, linkCollectionMap) {
-		this.link = sirenEntity && sirenEntity.hasLinkByRel(this.rel) && sirenEntity.getLinkByRel(this.rel);
-		if (!this.link) return;
+		this.href = sirenEntity && sirenEntity.hasLinkByRel(this.rel) && sirenEntity.getLinkByRel(this.rel);
+		if (!this.href) return;
 
 		if (linkCollectionMap && linkCollectionMap instanceof Map) {
-			this.link.rel.forEach(rel => {
+			this.href.rel.forEach(rel => {
 				if (linkCollectionMap.has(rel) && this !== linkCollectionMap.get(rel)) {
 					this._merge(linkCollectionMap.get(rel));
 				}
@@ -61,7 +59,7 @@ export class SirenLink extends Observable {
 		}
 
 		if (this._token) {
-			this._childState = await stateFactory(this.link.href, shouldAttachToken(this._token, this.link));
+			this._childState = await stateFactory(this.href.href, shouldAttachToken(this._token, this.href));
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});

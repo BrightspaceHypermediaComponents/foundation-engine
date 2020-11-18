@@ -12,23 +12,16 @@ export class SirenSubEntities extends Observable {
 		this._rel = id;
 		this._childSubEntities = new Map();
 		this._token = token;
-		this._entityIds = [];
 	}
 
 	get entityIds() {
-		return this._entityIds;
+		return this._observers.value;
 	}
 
 	set entityIds(entityIds) {
-		if (!this._entityId !== entityIds) {
+		if (!this.entityIds !== entityIds) {
 			this._observers.setProperty(entityIds || []);
 		}
-		this._entityIds = entityIds || [];
-	}
-
-	// TODO: remove in US121366
-	addObserver(observer, property, { method }) {
-		super.addObserver(observer, property, { method }, this.entityIds);
 	}
 
 	get childSubEntities() {
