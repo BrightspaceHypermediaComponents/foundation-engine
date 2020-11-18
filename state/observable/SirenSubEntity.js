@@ -54,16 +54,16 @@ export class SirenSubEntity extends Observable {
 		this._setSubEntity(subEntity);
 	}
 
-	_merge(sirenLink) {
-		if (!sirenLink || !(sirenLink instanceof SirenSubEntity)) {
+	_merge(entity) {
+		if (!entity || !(entity instanceof SirenSubEntity)) {
 			return;
 		}
 
-		sirenLink._observers.observers.forEach((observer, property) => {
+		entity._observers.observers.forEach((observer, property) => {
 			this.addObserver(observer, property);
 		});
 
-		this._token = this._token || sirenLink._token;
+		this._token = this._token || entity._token;
 	}
 
 	async _setSubEntity(subEntity) {
