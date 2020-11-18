@@ -1,9 +1,9 @@
-
-import { observableTypes as ot, sirenDefinedProperty, sirenObservableFactory } from './observable/sirenObservablesFactory.js';
-import { Fetchable } from './Fetchable.js';
-import { getEntityIdFromSirenEntity } from './observable/Common.js';
-import { shouldAttachToken } from './token.js';
-import { StateStore } from './stateStore.js';
+import { Fetchable, FetchError } from './Fetchable.js';
+import { observableTypes as ot, sirenObservableFactory, sirenObserverDefinedProperty } from './observable/sirenObservableFactory.js';
+import { fetch } from './fetch.js';
+import { getToken } from './token.js';
+import SirenParse from 'siren-parser';
+import { StateStore } from './StateStore.js';
 
 export const observableTypes = ot;
 
@@ -33,20 +33,16 @@ export class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenDefinedProperty(propertyInfo, this);
+			const basicInfo = sirenObserverDefinedProperty(propertyInfo, this);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
-			sirenComponent.addComponent(component, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
+			sirenComponent.addObserver(component, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
 		});
 	}
 
 	createChildState(entityID) {
 		return stateFactory(entityID, this.token.rawToken);
-	}
-
-	createChildStateByRawSirenEntity(rawEntity, token) {
-		return stateFactoryByRawSirenEntity(rawEntity, token);
 	}
 
 	dispose(component) {
@@ -61,13 +57,26 @@ export class HypermediaState extends Fetchable(Object) {
 		return this.href;
 	}
 
+	async handleCachePriming(links) {
+		return Promise.all(links.map(async(link) => {
+			const state = await stateFactory(link, this.token.rawToken);
+			return fetch(state, true);
+		}));
+	}
+
 	hasServerResponseCached() {
 		return !!this._entity;
 	}
 
-	onServerResponse(entity, error) {
-		if (!entity) throw error;
+	async onServerResponse(response, error) {
+		if (error) throw new FetchError(error);
+
+		const entity = await SirenParse(response);
 		this.setSirenEntity(entity);
+	}
+
+	processRawJsonSirenEntity(json) {
+		return processRawJsonSirenEntity(json, this.token.rawToken);
 	}
 
 	push() {
@@ -84,6 +93,9 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 
 	setSirenEntity(entity = null) {
+		if (entity && entity.href) {
+			return;
+		}
 		this._entity = entity !== null ? entity : this._entity;
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenComponent => {
@@ -101,7 +113,7 @@ export class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenDefinedProperty(propertyInfo);
+			const basicInfo = sirenObserverDefinedProperty(propertyInfo);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
@@ -141,22 +153,25 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 }
 
-export async function stateFactory(entityID, token) {
-	if (await store.has(entityID, token)) {
-		return await store.get(entityID, token);
+export async function processRawJsonSirenEntity(json, rawToken) {
+	const entity = await SirenParse(json);
+	const entityId = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self');
+	if (!entityId) return;
+	const state = await stateFactory(entityId, rawToken);
+	state.setSirenEntity(entity);
+}
+
+export async function stateFactory(entityId, rawToken) {
+	const token = await getToken(rawToken);
+	if (store.has(entityId, token)) {
+		const state = store.get(entityId, token);
+		return state;
 	}
-	const state = new HypermediaState(entityID, token);
-	await store.add(state);
+	const state = new HypermediaState(entityId, token);
+	store.add(state);
 	return state;
 }
 
-export function stateFactoryByRawSirenEntity(rawEntity, token) {
-	const entityId = getEntityIdFromSirenEntity(rawEntity);
-	if (!entityId) {
-		const state = new HypermediaState(entityId, token);
-		state.onServerResponse(rawEntity);
-		return state;
-	}
-
-	return stateFactory(entityId, shouldAttachToken(token, rawEntity));
+export function dispose(state, component) {
+	state && state.dispose(component);
 }

@@ -1,4 +1,4 @@
-import { getEntityIdFromSirenEntity } from './Common.js';
+import { getEntityIdFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 import { SirenSubEntity } from './SirenSubEntity.js';
 
@@ -8,10 +8,12 @@ export class SirenSubEntities extends Observable {
 	}
 
 	constructor({ id, token, state }) {
-		super({ state });
+		super();
+		this._state = state;
 		this._rel = id;
 		this._childSubEntities = new Map();
 		this._token = token;
+		this.entityIds = [];
 	}
 
 	get entityIds() {
@@ -19,7 +21,7 @@ export class SirenSubEntities extends Observable {
 	}
 
 	set entityIds(entityIds) {
-		if (!this.entityIds !== entityIds) {
+		if (this.entityIds !== entityIds) {
 			this._observers.setProperty(entityIds || []);
 		}
 	}
