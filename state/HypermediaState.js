@@ -134,7 +134,7 @@ export async function stateFactory(entityID, token) {
 	if (await store.has(entityID, token)) {
 		return await store.get(entityID, token);
 	}
-	const result = new HypermediaState(entityID, token);
-	await store.add(result);
-	return result;
+	const state = new HypermediaState(entityID, token);
+	await store.add(state);
+	return state;
 }
