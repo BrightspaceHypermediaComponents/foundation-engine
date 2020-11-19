@@ -11,14 +11,13 @@ export class SirenSubEntity extends Observable {
 	}
 
 	get entityId() {
-		return this._entityId;
+		return this._observers.value;
 	}
 
 	set entityId(entityId) {
-		if (!this._entityId !== entityId) {
+		if (!this.entityId !== entityId) {
 			this._observers.setProperty(entityId);
 		}
-		this._entityId = entityId;
 	}
 
 	// TODO: remove in US121366?
@@ -26,7 +25,7 @@ export class SirenSubEntity extends Observable {
 		if (route) {
 			this._addRoute(observer, route);
 		} else {
-			super.addObserver(observer, property, { method }, this.entityId);
+			super.addObserver(observer, property, { method });
 		}
 	}
 
