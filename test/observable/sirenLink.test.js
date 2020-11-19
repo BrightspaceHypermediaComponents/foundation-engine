@@ -1,8 +1,8 @@
 import { assert }  from '@open-wc/testing';
 import { Component } from '../../state/observable/Common.js';
-import { sinon } from 'sinon/pkg/sinon-esm.js';
+//import { sinon } from 'sinon/pkg/sinon-esm.js';
+//import { SirenEntity } from '../../state/observable/SirenEntity.js';
 import { SirenLink } from '../../state/observable/SirenLink.js';
-import { SirenEntity } from '../../state/observable/SirenEntity.js';
 
 describe('call sirenLink methods', () => {
 	it('sirenLink constructed from no object', () => {
@@ -255,54 +255,54 @@ describe('merging sirenLinks', () => {
 	});
 });
 
-describe('sirenLink set siren entity', () => {
-	let link1, link2, entity; // method1, method2, obs1, obs2,
+// describe('sirenLink set siren entity', () => {
+// 	let link1, link2, entity; // method1, method2, obs1, obs2,
 
-	beforeEach(() => {
-		link1 = new SirenLink({ id: 'foo', token: 'bar' });
-		link2 = new SirenLink({ id: 'abc', token: 'def' });
-		link1.link = { href: 'www.abc.com', rel: ['12345'] };
-		link2.link = { href: 'www.xyz.com', rel: ['67890'] };
+// 	beforeEach(() => {
+// 		link1 = new SirenLink({ id: 'foo', token: 'bar' });
+// 		link2 = new SirenLink({ id: 'abc', token: 'def' });
+// 		link1.link = { href: 'www.abc.com', rel: ['12345'] };
+// 		link2.link = { href: 'www.xyz.com', rel: ['67890'] };
 
-		// method1 = (val) => { `${val}1`; };
-		// method2 = (val) => { `${val}2`; };
+// 		// method1 = (val) => { `${val}1`; };
+// 		// method2 = (val) => { `${val}2`; };
 
-		// obs1 = new Component();
-		// obs2 = new Component();
+// 		// obs1 = new Component();
+// 		// obs2 = new Component();
 
-		const stub1 = sinon.stub(entity, 'hasLinkByRel');
-		stub1.callsFake(() => true);
-		const stub2 = sinon.stub(entity, 'getLinkByRel');
-		stub2.callsFake(() => 'foo');
-	});
+// 		const stub1 = sinon.stub(entity, 'hasLinkByRel');
+// 		stub1.callsFake(() => true);
+// 		const stub2 = sinon.stub(entity, 'getLinkByRel');
+// 		stub2.callsFake(() => 'foo');
+// 	});
 
-	it('sirenEntity without link set attempted and failed', () => {
-		const stub1 = sinon.stub(entity, 'hasLinkByRel');
-		stub1.callsFake(() => false);
-		entity = new SirenEntity();
+// 	it('sirenEntity without link set attempted and failed', () => {
+// 		const stub1 = sinon.stub(entity, 'hasLinkByRel');
+// 		stub1.callsFake(() => false);
+// 		entity = new SirenEntity();
 
-		link1.setSirenEntity(entity);
+// 		link1.setSirenEntity(entity);
 
-		assert.equal(link1.rel, 'foo', 'SirenLink rel altered when linkless entity set');
-		assert.instanceOf(link1._routes, Map, 'SirenLink route is not a Map');
-		assert.equal(link1.routes.size, 0, 'SirenLink number of routes increased when linkless entity set');
-		assert.equal(link1._token, 'bar', 'SirenLink token altered when linkless entity set');
-		assert.isUndefined(link1.childState, 'SirenLink child state set with linkless entity');
-	});
+// 		assert.equal(link1.rel, 'foo', 'SirenLink rel altered when linkless entity set');
+// 		assert.instanceOf(link1._routes, Map, 'SirenLink route is not a Map');
+// 		assert.equal(link1.routes.size, 0, 'SirenLink number of routes increased when linkless entity set');
+// 		assert.equal(link1._token, 'bar', 'SirenLink token altered when linkless entity set');
+// 		assert.isUndefined(link1.childState, 'SirenLink child state set with linkless entity');
+// 	});
 
-	// it('sirenEntity without link set attempted and failed', () => {
-	// 	const entityToSet = new SirenLink({ id: 'cat', token: 'meow' });
-	// 	entityToSet.link = { href: 'testing', rel: ['12345'] };
+// 	it('sirenEntity without link set attempted and failed', () => {
+// 		const entityToSet = new SirenLink({ id: 'cat', token: 'meow' });
+// 		entityToSet.link = { href: 'testing', rel: ['12345'] };
 
-	// 	const linkCollection = new Map();
-	// 	linkCollection['12345'] = link2;
+// 		const linkCollection = new Map();
+// 		linkCollection['12345'] = link2;
 
-	// 	link1.addObserver(obs1, 'foo', { method: method1 });
-	// 	link2.addObserver(obs2, 'bar', { method: method2 });
-	// 	link1.setSirenEntity(entityToSet);
+// 		link1.addObserver(obs1, 'foo', { method: method1 });
+// 		link2.addObserver(obs2, 'bar', { method: method2 });
+// 		link1.setSirenEntity(entityToSet);
 
-	// 	const observers = link1._observers.components;
-	// 	assert.equal(observers.size, 1, 'link has incorrect observers after set entity should add one');
-	// 	assert.equal(observers.get());
-	// });
-});
+// 		const observers = link1._observers.components;
+// 		assert.equal(observers.size, 1, 'link has incorrect observers after set entity should add one');
+// 		assert.equal(observers.get());
+// 	});
+// });

@@ -1,5 +1,14 @@
-import { observableTypes, sirenDefinedProperty, sirenObservableFactory } from './observable/sirenObservablesFactory.js';
+import { observableTypes as ot, sirenComponentBasicInfo, sirenComponentFactory } from './sirenComponents/sirenComponentFactory.js';
 import { Fetchable } from './Fetchable.js';
+import { StateStore } from './stateStore.js';
+
+export const observableTypes = ot;
+
+window.D2L = window.D2L || {};
+window.D2L.Foundation = window.D2L.Foundation || {};
+window.D2L.Foundation.StateStore = window.D2L.Foundation.StateStore || new StateStore();
+
+const store = window.D2L.Foundation.StateStore;
 
 /**
  *
@@ -21,7 +30,7 @@ export class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenDefinedProperty(propertyInfo, this);
+			const basicInfo = sirenComponentBasicInfo(propertyInfo, this);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
@@ -81,7 +90,7 @@ export class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenDefinedProperty(propertyInfo);
+			const basicInfo = sirenComponentBasicInfo(propertyInfo);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
@@ -113,10 +122,19 @@ export class HypermediaState extends Fetchable(Object) {
 		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
 		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
 
-		const sirenComponent = sirenObservableFactory(basicInfo);
+		const sirenComponent = sirenComponentFactory(basicInfo);
 		typeMap.set(basicInfo.id, sirenComponent);
 		this._entity && sirenComponent.setSirenEntity(this._entity, typeMap);
 
 		return sirenComponent;
 	}
+}
+
+export async function stateFactory(entityID, token) {
+	if (await store.has(entityID, token)) {
+		return await store.get(entityID, token);
+	}
+	const result = new HypermediaState(entityID, token);
+	await store.add(result);
+	return result;
 }
