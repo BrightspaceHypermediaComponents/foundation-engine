@@ -33,6 +33,14 @@ export class SirenSubEntity extends Observable {
 		return this._childState;
 	}
 
+	deleteObserver(observer) {
+		if (this._route.has(observer)) {
+			this._deleteRoute(observer);
+		} else {
+			super.deleteObserver(observer);
+		}
+	}
+
 	get rel() {
 		return this._rel;
 	}
