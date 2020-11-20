@@ -1,10 +1,10 @@
-import { fetch, stateFactoryByRawSirenEntity } from '../store.js';
+//import { fetch } from '../store.js';
 import { getEntityIdFromSirenEntity } from './Common.js';
 import { Observable } from './Observable.js';
 
 export class SirenSubEntity extends Observable {
-	constructor({ id, token }) {
-		super();
+	constructor({ id, token, state }) {
+		super({ state });
 		this._rel = id;
 		this._routes = new Map();
 		this._token = token;
@@ -77,11 +77,12 @@ export class SirenSubEntity extends Observable {
 		this.entityId = getEntityIdFromSirenEntity(subEntity);
 
 		if (this._token) {
-			this._childState = await stateFactoryByRawSirenEntity(subEntity, this._token);
+			this._childState = this._state.createChildStateByyRawSirenEntity(subEntity, this._token);
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});
-			fetch(this._childState);
+			// TODO: Call new fetch
+			//fetch(this._childState);
 		}
 	}
 

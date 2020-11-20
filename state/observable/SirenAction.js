@@ -1,15 +1,15 @@
 import { Fetchable } from '../Fetchable.js';
 import { Observable } from './Observable.js';
-import { performAction } from '../store.js';
+//import { performAction } from '../store.js';
 
 const defaultAction = { has: false, perform: () => undefined, update: () => undefined };
 
 export class SirenAction extends Fetchable(Observable) {
 	constructor({ id: name, token, state }) {
 		super(null, token);
+		super._state = state;
 		this._action = defaultAction;
 		this._name = name;
-		this._state = state;
 	}
 
 	get action() {
@@ -74,7 +74,8 @@ export class SirenAction extends Fetchable(Observable) {
 		this.action = {
 			has: true,
 			perform: (params) => {
-				return performAction(this, params);
+				this.action.refreshToken();
+				return window.D2L.SirenSdk.StateStore.performAction(this.action, params);
 			},
 			update: (observables) => {
 				return this._state.updateProperties(observables);

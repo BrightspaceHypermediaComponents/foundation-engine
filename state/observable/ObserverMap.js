@@ -48,7 +48,7 @@ export class ObserverMap {
 
 	_setObserverProperty(observer, property) {
 		const method = this._methods.has(observer) && this._methods.get(observer);
-		const value = deepCopy(this._value);
+		const value = deepCopy(this.value);
 		observer[property] = method ? method(value) : value;
 	}
 

@@ -13,7 +13,7 @@ describe('Observable methods', () => {
 		const comp = new Component();
 		const obj = new Observable();
 
-		obj.addObserver(comp, 'foo', {}, false);
+		obj.addObserver(comp, 'foo', {});
 
 		const map = obj._observers.components;
 		assert(map.size === 1, 'Observable does not have exactly one observerMap');
@@ -29,7 +29,7 @@ describe('Observable methods', () => {
 		const obj = new Observable();
 		const method = (val) => val;
 
-		obj.addObserver(comp, 'foo', { method }, 'bar');
+		obj.addObserver(comp, 'foo', { method });
 
 		const map = obj._observers.components;
 		assert.equal(map.size, 1, 'Observable does not have exactly one observerMap');
@@ -38,14 +38,14 @@ describe('Observable methods', () => {
 		const methods = obj._observers._methods;
 		assert.isTrue(methods.has(comp), 'added ObserverMap is not associated with a method');
 		assert.equal(methods.get(comp), method, 'added ObserverMap is not associated with correct method');
-		assert.equal(comp['foo'], 'bar', 'ObserverMap incorrectly maps the output of method');
+		assert.isUndefined(comp['foo'], 'ObserverMap incorrectly maps the output of method');
 	});
 
 	it('observerMap is removed from Observable when deleted from object', () => {
 		const comp = new Component();
 		const obj = new Observable();
 
-		obj.addObserver(comp, 'foo', {}, false);
+		obj.addObserver(comp, 'foo', {});
 		obj.deleteObserver(comp);
 
 		const map = obj._observers.components;
@@ -54,10 +54,11 @@ describe('Observable methods', () => {
 
 	it('observerMap is removed from Observable when deleted from object, component mapping still exists', () => {
 		const comp = new Component();
+		comp.setProperty('bar');
 		const obj = new Observable();
-		const method = (val) => val;
+		const method = (val) => `${val}1`;
 
-		obj.addObserver(comp, 'foo', { method }, 'bar');
+		obj.addObserver(comp, 'foo', { method });
 		obj.deleteObserver(comp);
 
 		const map = obj._observers.components;
@@ -65,7 +66,7 @@ describe('Observable methods', () => {
 
 		const methods = obj._observers._methods;
 		assert.isFalse(methods.has(comp), 'observer method tracked after observer is removed');
-		assert.equal(comp['foo'], 'bar', 'observer maps method correctly after removed from observable');
+		assert.equal(comp['foo'], 'bar1', 'observer maps method correctly after removed from observable');
 	});
 });
 
@@ -75,8 +76,8 @@ describe('create observable multiple components', () => {
 		const comp2 = new Component();
 		const obj = new Observable();
 
-		obj.addObserver(comp1, 'foo', {}, false);
-		obj.addObserver(comp2, 'abc', {}, 'xyz');
+		obj.addObserver(comp1, 'foo', {});
+		obj.addObserver(comp2, 'abc', {});
 
 		const map = obj._observers.components;
 		assert.equal(map.size, 2, 'an observer is missing after two unique observers added');
@@ -95,8 +96,8 @@ describe('create observable multiple components', () => {
 		const comp2 = new Component();
 		const obj = new Observable();
 
-		obj.addObserver(comp1, 'foo', {}, false);
-		obj.addObserver(comp2, 'abc', {}, 'xyz');
+		obj.addObserver(comp1, 'foo', {});
+		obj.addObserver(comp2, 'abc', {});
 		obj.deleteObserver(comp1);
 
 		const map = obj._observers.components;
@@ -110,8 +111,8 @@ describe('create observable multiple components', () => {
 		const comp2 = new Component();
 		const obj = new Observable();
 
-		obj.addObserver(comp1, 'foo', {}, false);
-		obj.addObserver(comp2, 'abc', {}, 'xyz');
+		obj.addObserver(comp1, 'foo', {});
+		obj.addObserver(comp2, 'abc', {});
 		obj.deleteObserver(comp2);
 
 		const map = obj._observers.components;
@@ -124,8 +125,8 @@ describe('create observable multiple components', () => {
 		const comp1 = new Component();
 		const obj = new Observable();
 
-		obj.addObserver(comp1, 'foo', {}, false);
-		obj.addObserver(comp1, 'abc', {}, 'xyz');
+		obj.addObserver(comp1, 'foo', {});
+		obj.addObserver(comp1, 'abc', {});
 
 		const map = obj._observers.components;
 		assert.equal(map.size, 1, 'observer count is not one after same component is added twice');
@@ -134,13 +135,15 @@ describe('create observable multiple components', () => {
 
 	it('observable contains two components with different data', () => {
 		const comp1 = new Component();
-		const method1 = (val) => val;
+		comp1.setProperty('bar');
+		const method1 = (val) => `${val}1`;
 		const comp2 = new Component();
+		comp2.setProperty('');
 		const method2 = (val) => `${val}xyz`;
 		const obj = new Observable();
 
-		obj.addObserver(comp1, 'foo', { method: method1 }, 'bar');
-		obj.addObserver(comp2, 'abc', { method: method2 }, '');
+		obj.addObserver(comp1, 'foo', { method: method1 });
+		obj.addObserver(comp2, 'abc', { method: method2 });
 
 		const map = obj._observers.components;
 		assert.equal(map.size, 2, 'Observable has incorrect number of observers');
@@ -150,7 +153,7 @@ describe('create observable multiple components', () => {
 		const methods = obj._observers._methods;
 		assert.isTrue(methods.has(comp1), 'method for first observer not stored');
 		assert.equal(methods.get(comp1), method1, 'incorrect method stored for first observer');
-		assert.equal(comp1['foo'], 'bar', 'first observer maps tp wrong value');
+		assert.equal(comp1['foo'], 'bar1', 'first observer maps tp wrong value');
 
 		assert.isTrue(methods.has(comp2), 'method for second observer not stored');
 		assert.equal(methods.get(comp2), method2, 'incorrect method stored for second observer');
@@ -159,15 +162,17 @@ describe('create observable multiple components', () => {
 
 	it('observable contains one components with method after one is removed', () => {
 		const comp1 = new Component();
-		const method1 = (val) => val;
+		comp1.setProperty('bar');
+		const method1 = (val) => `${val}1`;
 
 		const comp2 = new Component();
+		comp2.setProperty('');
 		const method2 = (val) => `${val}xyz`;
 
 		const obj = new Observable();
 
-		obj.addObserver(comp1, 'foo', { method: method1 }, 'bar');
-		obj.addObserver(comp2, 'abc', { method: method2 }, '');
+		obj.addObserver(comp1, 'foo', { method: method1 });
+		obj.addObserver(comp2, 'abc', { method: method2 });
 		obj.deleteObserver(comp1);
 
 		const map = obj._observers.components;
@@ -177,9 +182,9 @@ describe('create observable multiple components', () => {
 
 		const methods = obj._observers._methods;
 		assert.isFalse(methods.has(comp1), 'method for first observer was not removed');
-		assert.equal(comp1['foo'], 'bar', 'first observer maps to wrong value');
-		assert(methods.has(comp2));
-		assert(methods.get(comp2) === method2);
-		assert(comp2['abc'] === 'xyz');
+		assert.equal(comp1['foo'], 'bar1', 'first observer maps to wrong value');
+		assert.isTrue(methods.has(comp2), 'method for second observer should exist');
+		assert.equal(methods.get(comp2), method2, 'method for second observer is incorrect method');
+		assert.equal(comp2['abc'], 'xyz', 'second observer applies method incorrectly');
 	});
 });
