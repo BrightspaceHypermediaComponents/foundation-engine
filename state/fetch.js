@@ -4,10 +4,14 @@ const d2lfetch = window.d2lfetch;
 
 export async function fetch(fetchable, { bypassCache }) {
 	if (fetchable.fetchStatus.pending) {
-		return fetchable.fetchStatus.complete;
+		if (!bypassCache) {
+			return fetchable.fetchStatus.complete;
+		}
+		fetchable.fetchStatus.cancel();
 	}
 
 	fetchable.fetchStatus.start();
+	await fetchable.refreshToken();
 
 	const fetch = !fetchable.token.cookie ? d2lfetch : d2lfetch.removeTemp('auth');
 
@@ -23,12 +27,13 @@ export async function fetch(fetchable, { bypassCache }) {
 			throw response.status;
 		}
 		fetchable.handleCachePriming(cachePrimingList(response));
-		fetchable.onServerResponse(response);
+		const json = await response.json();
+		fetchable.fetchStatus.done(json);
 	} catch (err) {
-		fetchable.onServerResponse(null, err);
-	} finally {
-		fetchable.fetchStatus.done();
+		fetchable.fetchStatus.done(null, err);
 	}
+
+	await fetchable.fetchStatus.complete;
 }
 
 function cachePrimingList(response) {

@@ -50,6 +50,13 @@ export class HypermediaState extends Fetchable(Object) {
 		return this.href;
 	}
 
+	handleCachePriming(links) {
+		return Promise.all(links.map((link) => {
+			const state = stateFactory(link, this.token);
+			return fetch(state, true);
+		}));
+	}
+
 	hasServerResponseCached() {
 		return !!this._entity;
 	}

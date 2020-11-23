@@ -30,9 +30,9 @@ class FetchStatus {
 	/**
 	 * Resolves Promise to true and sets pending status to false
 	 */
-	done() {
+	done(response, error) {
 		if (!this.pending) throw new FetchError('Cannot call done() on a status that is not pending');
-		this._resolver(true);
+		error ? this._rejecter(new FetchError(error)) : this._resolver(response);
 		this.pending = false;
 	}
 
@@ -40,7 +40,10 @@ class FetchStatus {
 	 * Creates a Promise and sets pending status to true
 	 */
 	start() {
-		this.complete = new Promise(resolve => this._resolver = resolve);
+		this.complete = new Promise((resolve, reject) => {
+			this._resolver = resolve;
+			this._rejecter = reject;
+		});
 		this.pending = true;
 	}
 }
@@ -78,6 +81,12 @@ export const Fetchable = superclass => class extends superclass {
 	get fetchStatus() {
 		return this._fetchStatus;
 	}
+
+	/**
+	 * abstract, handles links in cache primer.
+	 * @param links the links the prime in the cache.
+	 */
+	handleCachePriming() {}
 
 	/**
 	 * @returns {Headers} Headers for the request
