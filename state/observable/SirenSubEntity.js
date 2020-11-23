@@ -1,6 +1,7 @@
-import { fetch, stateFactoryByRawSirenEntity } from '../../state/store.js';
+import { fetch } from '../fetch.js';
 import { getEntityIdFromSirenEntity } from './Common.js';
 import { Observable } from './Observable.js';
+import { stateFactory } from '../HypermediaState.js';
 
 export class SirenSubEntity extends Observable {
 	constructor({ id, token }) {
@@ -21,7 +22,7 @@ export class SirenSubEntity extends Observable {
 	}
 
 	// TODO: remove in US121366?
-	addObserver(observer, property, { route, method }) {
+	addObserver(observer, property, { route, method }  = {}) {
 		if (route) {
 			this._addRoute(observer, route);
 		} else {
@@ -69,7 +70,8 @@ export class SirenSubEntity extends Observable {
 		this.entityId = getEntityIdFromSirenEntity(subEntity);
 
 		if (this._token) {
-			this._childState = await stateFactoryByRawSirenEntity(subEntity, this._token);
+			this._childState = await stateFactory(this.entityId, this._token);
+			this._childState.setSirenEntity(subEntity);
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});

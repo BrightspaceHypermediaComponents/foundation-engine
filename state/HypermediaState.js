@@ -1,6 +1,9 @@
-import { observableTypes as ot, sirenComponentBasicInfo, sirenComponentFactory } from './sirenComponents/sirenComponentFactory.js';
+import { observableTypes as ot, sirenObserverDefinedProperty, sirenObserverFactory } from './observable/sirenObserverFactory.js';
+import { fetch } from './fetch.js';
 import { Fetchable } from './Fetchable.js';
-import { StateStore } from './stateStore.js';
+import { getToken } from './token.js';
+import SirenParse from 'siren-parser';
+import { StateStore } from './StateStore.js';
 
 export const observableTypes = ot;
 
@@ -30,11 +33,11 @@ export class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenComponentBasicInfo(propertyInfo, this);
+			const basicInfo = sirenObserverDefinedProperty(propertyInfo, this);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
-			sirenComponent.addComponent(component, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
+			sirenComponent.addObserver(component, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
 		});
 	}
 
@@ -50,9 +53,9 @@ export class HypermediaState extends Fetchable(Object) {
 		return this.href;
 	}
 
-	handleCachePriming(links) {
-		return Promise.all(links.map((link) => {
-			const state = stateFactory(link, this.token);
+	async handleCachePriming(links) {
+		return Promise.all(links.map(async(link) => {
+			const state = await stateFactory(link, this.token);
 			return fetch(state, true);
 		}));
 	}
@@ -61,8 +64,10 @@ export class HypermediaState extends Fetchable(Object) {
 		return !!this._entity;
 	}
 
-	onServerResponse(entity, error) {
-		if (!entity) throw error;
+	async onServerResponse(response, error) {
+		if (!response) throw error;
+
+		const entity = await SirenParse(response);
 		this.setSirenEntity(entity);
 	}
 
@@ -80,6 +85,9 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 
 	setSirenEntity(entity = null) {
+		if (entity && entity.href) {
+			return;
+		}
 		this._entity = entity !== null ? entity : this._entity;
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenComponent => {
@@ -97,7 +105,7 @@ export class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenComponentBasicInfo(propertyInfo);
+			const basicInfo = sirenObserverDefinedProperty(propertyInfo);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
@@ -129,7 +137,7 @@ export class HypermediaState extends Fetchable(Object) {
 		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
 		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
 
-		const sirenComponent = sirenComponentFactory(basicInfo);
+		const sirenComponent = sirenObserverFactory(basicInfo);
 		typeMap.set(basicInfo.id, sirenComponent);
 		this._entity && sirenComponent.setSirenEntity(this._entity, typeMap);
 
@@ -137,11 +145,16 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 }
 
-export async function stateFactory(entityID, token) {
-	if (await store.has(entityID, token)) {
-		return await store.get(entityID, token);
+export async function stateFactory(entityId, token) {
+	token = await getToken(token);
+	if (await store.has(entityId, token)) {
+		return store.get(entityId, token);
 	}
-	const state = new HypermediaState(entityID, token);
+	const state = new HypermediaState(entityId, token);
 	await store.add(state);
 	return state;
+}
+
+export function dispose(state, component) {
+	state && state.dispose(component);
 }

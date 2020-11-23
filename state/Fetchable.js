@@ -1,4 +1,4 @@
-import { refreshToken } from './token.js';
+import { getToken, refreshToken } from './token.js';
 
 /**
  * FetchError
@@ -92,7 +92,7 @@ export const Fetchable = superclass => class extends superclass {
 	 * @returns {Headers} Headers for the request
 	 */
 	get headers() {
-		if (!this._headers) this._initHeaders();
+		this._initHeaders();
 		return this._headers;
 	}
 

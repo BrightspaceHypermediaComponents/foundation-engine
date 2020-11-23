@@ -1,4 +1,4 @@
-import { refreshToken } from 'token.js';
+import { refreshToken } from './token.js';
 
 export class StateStore {
 	constructor() {
@@ -11,7 +11,8 @@ export class StateStore {
 			return;
 		}
 
-		this._initContainer(state.entityId, state.token);
+		const registrations = this._initContainer(state.entityId, state.token);
+		registrations.set(state, null);
 	}
 
 	async get(entityID, token) {
@@ -20,7 +21,7 @@ export class StateStore {
 		const tokenCache = token.toString();
 
 		const state = this.has(entityID, token) && this._states.get(tokenCache).get(lowerCaseEntityId).keys().next().value;
-		state.refreshToken();
+
 		return state;
 	}
 

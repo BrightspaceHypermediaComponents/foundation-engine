@@ -6,7 +6,7 @@ export class Observable {
 		this._observers = new ObserverMap();
 	}
 
-	addObserver(observer, property, { method }) {
+	addObserver(observer, property, { method } = {}) {
 		this._observers.add(observer, property, method);
 	}
 

@@ -54,7 +54,7 @@ export function sirenObserverDefinedProperty(observerProperties, state) {
 	return { ...definedProperty(observerProperties), ...definedObserverProperty, state };
 }
 
-export function sirenComponentFactory(componentProperties) {
+export function sirenObserverFactory(componentProperties) {
 	const sirenComponentType = componentProperties.type && observableClasses[componentProperties.type];
 	if (!sirenComponentType) {
 		throw new Error('Bad siren component');

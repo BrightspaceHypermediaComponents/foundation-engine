@@ -1,6 +1,6 @@
+import { fetch } from '../fetch';
 import { Fetchable } from '../Fetchable.js';
 import { Observable } from './Observable.js';
-import { performAction } from '../store.js';
 
 const defaultAction = { has: false, perform: () => undefined, update: () => undefined };
 
@@ -73,8 +73,8 @@ export class SirenAction extends Fetchable(Observable) {
 
 		this.action = {
 			has: true,
-			perform: (params) => {
-				return performAction(this, params);
+			perform: () => {
+				return fetch(this);
 			},
 			update: (observables) => {
 				return this._state.updateProperties(observables);

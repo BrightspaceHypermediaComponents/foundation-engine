@@ -12,6 +12,7 @@ export class SirenSubEntities extends Observable {
 		this._rel = id;
 		this._childSubEntities = new Map();
 		this._token = token;
+		this.entityIds = [];
 	}
 
 	get entityIds() {

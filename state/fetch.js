@@ -2,7 +2,7 @@ import 'd2l-fetch/d2l-fetch.js';
 
 const d2lfetch = window.d2lfetch;
 
-export async function fetch(fetchable, { bypassCache }) {
+export async function fetch(fetchable, bypassCache) {
 	if (fetchable.fetchStatus.pending) {
 		if (!bypassCache) {
 			return fetchable.fetchStatus.complete;
@@ -28,12 +28,14 @@ export async function fetch(fetchable, { bypassCache }) {
 		}
 		fetchable.handleCachePriming(cachePrimingList(response));
 		const json = await response.json();
-		fetchable.fetchStatus.done(json);
+		fetchable.onServerResponse(json);
+		fetchable.fetchStatus.done(json); // I decided to not include this call in onServerResponse so fetchable don't need to worry about calling super.onServerResponse();
 	} catch (err) {
+		fetchable.onServerResponse(null, err);
 		fetchable.fetchStatus.done(null, err);
 	}
 
-	await fetchable.fetchStatus.complete;
+	return fetchable.fetchStatus.complete;
 }
 
 function cachePrimingList(response) {

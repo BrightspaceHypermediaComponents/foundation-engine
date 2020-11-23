@@ -1,6 +1,7 @@
-import { fetch, stateFactory } from '../store.js';
+import { fetch } from '../fetch.js';
 import { Observable } from './Observable.js';
 import { shouldAttachToken } from '../token.js';
+import { stateFactory } from '../HypermediaState.js';
 
 export class SirenLink extends Observable {
 	constructor({ id, token }) {
@@ -21,7 +22,7 @@ export class SirenLink extends Observable {
 	}
 
 	// TODO: remove in US121366
-	addObserver(observer, property, { route, method }) {
+	addObserver(observer, property, { route, method } = {}) {
 		if (route) {
 			this._addRoute(observer, route);
 		} else {
@@ -46,11 +47,13 @@ export class SirenLink extends Observable {
 	}
 
 	async setSirenEntity(sirenEntity, linkCollectionMap) {
-		this.href = sirenEntity && sirenEntity.hasLinkByRel(this.rel) && sirenEntity.getLinkByRel(this.rel);
-		if (!this.href) return;
+		const link = sirenEntity && sirenEntity.hasLinkByRel(this.rel) && sirenEntity.getLinkByRel(this.rel);
+		if (!link) return;
+
+		this.href = link.href;
 
 		if (linkCollectionMap && linkCollectionMap instanceof Map) {
-			this.href.rel.forEach(rel => {
+			link.rel.forEach(rel => {
 				if (linkCollectionMap.has(rel) && this !== linkCollectionMap.get(rel)) {
 					this._merge(linkCollectionMap.get(rel));
 				}
@@ -59,7 +62,7 @@ export class SirenLink extends Observable {
 		}
 
 		if (this._token) {
-			this._childState = await stateFactory(this.href.href, shouldAttachToken(this._token, this.href));
+			this._childState = await stateFactory(link.href, shouldAttachToken(this._token, link));
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});
