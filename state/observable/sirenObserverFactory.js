@@ -49,7 +49,7 @@ export function sirenObserverDefinedProperty(observerProperties, state) {
 		return;
 	}
 
-	const definedObserverProperty = sirenObserverType.basicInfo ? sirenObserverType.definedProperty(observerProperties) : {};
+	const definedObserverProperty = sirenObserverType.definedProperty ? sirenObserverType.definedProperty(observerProperties) : {};
 
 	return { ...definedProperty(observerProperties), ...definedObserverProperty, state };
 }

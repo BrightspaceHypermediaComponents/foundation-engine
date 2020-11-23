@@ -17,7 +17,7 @@ export class SirenLink extends Observable {
 
 	set href(href) {
 		if (!this.href !== href) {
-			this._observers.setProperty(href && href.href);
+			this._observers.setProperty(href);
 		}
 	}
 

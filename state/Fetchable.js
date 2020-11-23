@@ -110,6 +110,8 @@ export const Fetchable = superclass => class extends superclass {
 		return 'GET';
 	}
 
+	onServerResponse() {}
+
 	/**
 	 * Refreshes the token object
 	 * @returns {Promise}

@@ -135,8 +135,9 @@ export class HypermediaState extends Fetchable(Object) {
 
 	_getSirenComponent(basicInfo) {
 		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
-		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
-
+		if (typeMap.has(basicInfo.id)) {
+			return typeMap.get(basicInfo.id);
+		}
 		const sirenComponent = sirenObserverFactory(basicInfo);
 		typeMap.set(basicInfo.id, sirenComponent);
 		this._entity && sirenComponent.setSirenEntity(this._entity, typeMap);
