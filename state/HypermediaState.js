@@ -1,5 +1,8 @@
-import { observableTypes as ot, sirenComponentBasicInfo, sirenComponentFactory } from './sirenComponents/sirenComponentFactory.js';
+
+import { observableTypes as ot, sirenDefinedProperty, sirenObservableFactory } from './observable/sirenObservablesFactory.js';
 import { Fetchable } from './Fetchable.js';
+import { getEntityIdFromSirenEntity } from './observable/Common.js';
+import { shouldAttachToken } from './token.js';
 import { StateStore } from './stateStore.js';
 
 export const observableTypes = ot;
@@ -30,12 +33,20 @@ export class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenComponentBasicInfo(propertyInfo, this);
+			const basicInfo = sirenDefinedProperty(propertyInfo, this);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
 			sirenComponent.addComponent(component, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
 		});
+	}
+
+	createChildState(entityID) {
+		return stateFactory(entityID, this.token.rawToken);
+	}
+
+	createChildStateByRawSirenEntity(rawEntity, token) {
+		return stateFactoryByRawSirenEntity(rawEntity, token);
 	}
 
 	dispose(component) {
@@ -90,7 +101,7 @@ export class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenComponentBasicInfo(propertyInfo);
+			const basicInfo = sirenDefinedProperty(propertyInfo);
 			if (!basicInfo) return;
 
 			const sirenComponent = this._getSirenComponent(basicInfo);
@@ -122,7 +133,7 @@ export class HypermediaState extends Fetchable(Object) {
 		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
 		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
 
-		const sirenComponent = sirenComponentFactory(basicInfo);
+		const sirenComponent = sirenObservableFactory(basicInfo);
 		typeMap.set(basicInfo.id, sirenComponent);
 		this._entity && sirenComponent.setSirenEntity(this._entity, typeMap);
 
@@ -137,4 +148,15 @@ export async function stateFactory(entityID, token) {
 	const state = new HypermediaState(entityID, token);
 	await store.add(state);
 	return state;
+}
+
+export function stateFactoryByRawSirenEntity(rawEntity, token) {
+	const entityId = getEntityIdFromSirenEntity(rawEntity);
+	if (!entityId) {
+		const state = new HypermediaState(entityId, token);
+		state.onServerResponse(rawEntity);
+		return state;
+	}
+
+	return stateFactory(entityId, shouldAttachToken(token, rawEntity));
 }

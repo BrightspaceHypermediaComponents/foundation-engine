@@ -7,8 +7,8 @@ export class SirenSubEntities extends Observable {
 		return { token };
 	}
 
-	constructor({ id, token }) {
-		super();
+	constructor({ id, token, state }) {
+		super({ state });
 		this._rel = id;
 		this._childSubEntities = new Map();
 		this._token = token;

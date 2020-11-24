@@ -1,10 +1,9 @@
-import { fetch, stateFactory } from '../store.js';
 import { Observable } from './Observable.js';
 import { shouldAttachToken } from '../token.js';
 
 export class SirenLink extends Observable {
-	constructor({ id, token }) {
-		super();
+	constructor({ id, token, state } = {}) {
+		super({ state });
 		this._rel = id;
 		this._routes = new Map();
 		this._token = token;
@@ -21,11 +20,11 @@ export class SirenLink extends Observable {
 	}
 
 	// TODO: remove in US121366
-	addObserver(observer, property, { route, method }) {
+	addObserver(observer, property, { route, method } = {}) {
 		if (route) {
-			this._addRoute(observer, route);
+			this._addRoute(observer, { route });
 		} else {
-			super.addObserver(observer, property, method);
+			super.addObserver(observer, property, { method });
 		}
 	}
 
@@ -59,11 +58,12 @@ export class SirenLink extends Observable {
 		}
 
 		if (this._token) {
-			this._childState = await stateFactory(this.href.href, shouldAttachToken(this._token, this.href));
+			this._childState = await this.createChildState(this.href.href, shouldAttachToken(this._token, this.href));
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});
-			fetch(this._childState);
+			// TODO: waiting for fetch function
+			//fetch(this._childState);
 		}
 	}
 
@@ -72,7 +72,7 @@ export class SirenLink extends Observable {
 			return;
 		}
 
-		sirenLink._observers.observers.forEach((observer, property) => {
+		sirenLink._observers._observers.forEach((observer, property) => {
 			this.addObserver(observer, property);
 		});
 
