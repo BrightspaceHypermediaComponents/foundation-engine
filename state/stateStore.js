@@ -1,4 +1,4 @@
-import { refreshToken } from 'token.js';
+import { refreshToken } from './token.js';
 
 export class StateStore {
 	constructor() {

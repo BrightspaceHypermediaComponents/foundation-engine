@@ -1,10 +1,10 @@
-import { fetch, stateFactoryByRawSirenEntity } from '../../state/store.js';
-import { getEntityIdFromSirenEntity } from './Common.js';
+//import { fetch } from '../store.js';
+import { getEntityIdFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 
 export class SirenSubEntity extends Observable {
-	constructor({ id, token }) {
-		super();
+	constructor({ id, token, state } = {}) {
+		super({ state });
 		this._rel = id;
 		this._routes = new Map();
 		this._token = token;
@@ -33,6 +33,14 @@ export class SirenSubEntity extends Observable {
 		return this._childState;
 	}
 
+	deleteObserver(observer) {
+		if (this._route.has(observer)) {
+			this._deleteRoute(observer);
+		} else {
+			super.deleteObserver(observer);
+		}
+	}
+
 	get rel() {
 		return this._rel;
 	}
@@ -53,27 +61,28 @@ export class SirenSubEntity extends Observable {
 		this._setSubEntity(subEntity);
 	}
 
-	_merge(sirenLink) {
-		if (!sirenLink || !(sirenLink instanceof SirenSubEntity)) {
+	_merge(entity) {
+		if (!entity || !(entity instanceof SirenSubEntity)) {
 			return;
 		}
 
-		sirenLink._observers.observers.forEach((observer, property) => {
+		entity._observers.observers.forEach((observer, property) => {
 			this.addObserver(observer, property);
 		});
 
-		this._token = this._token || sirenLink._token;
+		this._token = this._token || entity._token;
 	}
 
 	async _setSubEntity(subEntity) {
 		this.entityId = getEntityIdFromSirenEntity(subEntity);
 
 		if (this._token) {
-			this._childState = await stateFactoryByRawSirenEntity(subEntity, this._token);
+			this._childState = this._state.createChildStateByyRawSirenEntity(subEntity, this._token);
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});
-			fetch(this._childState);
+			// TODO: Call new fetch
+			//fetch(this._childState);
 		}
 	}
 

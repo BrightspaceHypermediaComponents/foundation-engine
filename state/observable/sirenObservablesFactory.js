@@ -42,19 +42,19 @@ function handleRouting(observerProperties) {
 	return { ...observerProperties, ...currentProperties, route: observerProperties };
 }
 
-export function sirenObserverDefinedProperty(observerProperties, state) {
+export function sirenDefinedProperty(observerProperties, state) {
 	observerProperties = handleRouting(observerProperties);
 	const sirenObserverType = observerProperties.observable && observableClasses[observerProperties.observable];
 	if (!sirenObserverType) {
 		return;
 	}
 
-	const definedObserverProperty = sirenObserverType.basicInfo ? sirenObserverType.definedProperty(observerProperties) : {};
+	const definedObserverProperty = sirenObserverType.definedProperty ? sirenObserverType.definedProperty(observerProperties) : {};
 
 	return { ...definedProperty(observerProperties), ...definedObserverProperty, state };
 }
 
-export function sirenComponentFactory(componentProperties) {
+export function sirenObservableFactory(componentProperties) {
 	const sirenComponentType = componentProperties.type && observableClasses[componentProperties.type];
 	if (!sirenComponentType) {
 		throw new Error('Bad siren component');

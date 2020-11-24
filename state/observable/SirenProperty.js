@@ -6,8 +6,8 @@ export class SirenProperty extends Observable {
 		return { id, type: observable };
 	}
 
-	constructor({ id }) {
-		super();
+	constructor({ id, state }) {
+		super({ state });
 		this._property = id;
 	}
 

@@ -7,8 +7,8 @@ export class SirenSubEntities extends Observable {
 		return { token };
 	}
 
-	constructor({ id, token }) {
-		super();
+	constructor({ id, token, state }) {
+		super({ state });
 		this._rel = id;
 		this._childSubEntities = new Map();
 		this._token = token;
@@ -26,14 +26,6 @@ export class SirenSubEntities extends Observable {
 
 	get childSubEntities() {
 		return this._childSubEntities;
-	}
-
-	deleteObserver(observer) {
-		if (this._route.has(observer)) {
-			this._deleteRoute(observer);
-		} else {
-			super.deleteObserver(observer);
-		}
 	}
 
 	get rel() {
