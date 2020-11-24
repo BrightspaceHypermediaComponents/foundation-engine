@@ -1,9 +1,9 @@
 //import { fetch } from '../store.js';
-import { getEntityIdFromSirenEntity } from './Common.js';
+import { getEntityIdFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 
 export class SirenSubEntity extends Observable {
-	constructor({ id, token, state }) {
+	constructor({ id, token, state } = {}) {
 		super({ state });
 		this._rel = id;
 		this._routes = new Map();

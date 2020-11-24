@@ -1,5 +1,4 @@
 import { assert }  from '@open-wc/testing';
-import { Component } from '../../state/observable/Common.js';
 import { SirenProperty } from '../../state/observable/SirenProperty.js';
 
 describe('SirenProperty method calls', () => {
@@ -15,18 +14,18 @@ describe('SirenProperty method calls', () => {
 
 	it('observerMap with method added SirenProperty', () => {
 		const obj = new SirenProperty({ id: '_field' });
-		const comp = new Component();
+		const comp = { foo: 'bar' };
 		const method = (val) => val;
 
 		obj.addObserver(comp, 'foo', { method });
 
-		const map = obj._observers.components;
+		const map = obj._observers._observers;
 		assert.equal(map.size, 1, 'property has incorrect number of observers');
 		assert.equal(map.get(comp), 'foo', 'property has incorrect value');
 
 		const methods = obj._observers._methods;
-		assert.isFalse(methods.has(comp), 'observer has a method it should not have');
-		assert.isUndefined(comp['foo'], 'property maps to incorrect value in observer');
+		assert.isTrue(methods.has(comp), 'observer should have a method for the object');
+		assert.isUndefined(comp['foo'],  'property maps to incorrect value in observer');
 	});
 });
 

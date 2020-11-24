@@ -2,7 +2,7 @@ import { ObserverMap } from './ObserverMap.js';
 
 export class Observable {
 
-	constructor({ state }) {
+	constructor({ state } = {}) {
 		this._observers = new ObserverMap();
 		this._state = state;
 	}
@@ -26,7 +26,9 @@ export class Observable {
 	}
 
 	_deleteRoute(observer) {
-		this._childState.dispose(observer);
+		if (this._childState) {
+			this._childState.dispose(observer);
+		}
 		this._routes.delete(observer);
 	}
 }
