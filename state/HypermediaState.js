@@ -41,8 +41,8 @@ export class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
-	createChildState(entityID, token) {
-		return stateFactory(entityID, token);
+	createChildState(entityID) {
+		return stateFactory(entityID, this.token.rawToken);
 	}
 
 	createChildStateByRawSirenEntity(rawEntity, token) {
