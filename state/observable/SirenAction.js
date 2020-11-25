@@ -56,9 +56,9 @@ export class SirenAction extends Fetchable(Observable) {
 		this._state.processRawJsonSirenEntity(json);
 	}
 
-	push() {
+	async push() {
 		if (this._readyToSend) {
-			fetch(this);
+			await fetch(this);
 			this.reset();
 		}
 	}
@@ -75,7 +75,9 @@ export class SirenAction extends Fetchable(Observable) {
 		} else if (this.method !== 'GET' && this.method !== 'HEAD') {
 			const formData = new FormData();
 			const fields = { ...this._fields, ...input };
-			Object.keys(fields).forEach((name) => formData.append(name, fields[name]));
+			Object.keys(fields).forEach((name) => {
+				formData.append(name, fields[name]);
+			});
 			this._body = formData;
 		}
 		return this._body;
