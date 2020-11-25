@@ -1,6 +1,6 @@
 {
   "name": "@brightspace-hmc/foundation-engine",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "description": "engine for foundation-hmc",
   "scripts": {
     "test": "npm run lint && npm run karma",
