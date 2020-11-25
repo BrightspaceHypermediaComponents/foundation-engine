@@ -79,7 +79,11 @@ export class SirenSubEntity extends Observable {
 		this.entityID = getEntityIDFromSirenEntity(subEntity);
 
 		if (this._token) {
+<<<<<<< HEAD
 			this._childState = await this.createChildState(this.entityID, shouldAttachToken(this._token.rawToken, subEntity));
+=======
+			this._childState = await this.createChildState(this.entityId, shouldAttachToken(this._token.rawToken, subEntity));
+>>>>>>> Actions work
 			this._childState.setSirenEntity(subEntity);
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
