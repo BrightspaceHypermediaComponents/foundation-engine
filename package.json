@@ -3,9 +3,10 @@
   "version": "0.0.2",
   "description": "engine for foundation-hmc",
   "scripts": {
-    "test": "npm run lint && npm run karma",
+    "test": "npm run lint && npm run test:headless",
     "lint": "eslint . --ext .js,.html",
-    "karma": "karma start"
+    "test:headless": "karma start",
+    "test:sauce": "karma start karma.sauce.conf.js"
   },
   "repository": {
     "type": "git",
@@ -25,7 +26,7 @@
     "eslint-plugin-html": "^6.1.0",
     "eslint-plugin-lit": "^1.2.2",
     "eslint-plugin-sort-class-members": "^1.8.0",
-    "karma-sauce-launcher": "^4.1.5",
+    "karma-sauce-launcher": "^2",
     "sinon": "^9.1.0"
   },
   "dependencies": {
