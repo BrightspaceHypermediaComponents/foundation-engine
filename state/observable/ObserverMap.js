@@ -56,7 +56,7 @@ export class ObserverMap {
 
 }
 
-export function getEntityIdFromSirenEntity(entity) {
+export function getEntityIDFromSirenEntity(entity) {
 	const self = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self');
 	return  entity.href || (self && self.href);
 }

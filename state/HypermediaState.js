@@ -19,8 +19,8 @@ const store = window.D2L.Foundation.StateStore;
  * @class HypermediaState
  */
 export class HypermediaState extends Fetchable(Object) {
-	constructor(entityId, token) {
-		super(entityId, token);
+	constructor(entityID, token) {
+		super(entityID, token);
 
 		this._decodedEntity = new Map();
 	}
@@ -41,9 +41,9 @@ export class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
-	createChildState(entityId, token) {
+	createChildState(entityID, token) {
 		token = token === undefined ? this.token.rawToken : token;
-		return stateFactory(entityId, token);
+		return stateFactory(entityID, token);
 	}
 
 	dispose(component) {
@@ -54,7 +54,7 @@ export class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
-	get entityId() {
+	get entityID() {
 		return this.href;
 	}
 
@@ -157,19 +157,19 @@ export class HypermediaState extends Fetchable(Object) {
 
 export async function processRawJsonSirenEntity(json, rawToken) {
 	const entity = await SirenParse(json);
-	const entityId = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self').href;
-	if (!entityId) return;
-	const state = await stateFactory(entityId, rawToken);
+	const entityID = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self').href;
+	if (!entityID) return;
+	const state = await stateFactory(entityID, rawToken);
 	state.setSirenEntity(entity);
 }
 
-export async function stateFactory(entityId, rawToken) {
+export async function stateFactory(entityID, rawToken) {
 	const token = await getToken(rawToken);
-	if (store.has(entityId, token)) {
-		const state = store.get(entityId, token);
+	if (store.has(entityID, token)) {
+		const state = store.get(entityID, token);
 		return state;
 	}
-	const state = new HypermediaState(entityId, token);
+	const state = new HypermediaState(entityID, token);
 	store.add(state);
 	return state;
 }
