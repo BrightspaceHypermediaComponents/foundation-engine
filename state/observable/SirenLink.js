@@ -23,7 +23,7 @@ export class SirenLink extends Observable {
 
 	addObserver(observer, property, { route, method } = {}) {
 		if (route) {
-			this._addRoute(observer, { route });
+			this._addRoute(observer, route);
 		} else {
 			super.addObserver(observer, property, { method });
 		}
@@ -61,7 +61,7 @@ export class SirenLink extends Observable {
 		}
 
 		if (this._token) {
-			this._childState = await this.createChildState(link.href, shouldAttachToken(this._token, link));
+			this._childState = await this.createChildState(link.href, shouldAttachToken(this._token.rawToken, link));
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});

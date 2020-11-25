@@ -41,8 +41,9 @@ export class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
-	createChildState(entityID) {
-		return stateFactory(entityID, this.token.rawToken);
+	createChildState(entityId, token) {
+		token = token === undefined ? this.token.rawToken : token;
+		return stateFactory(entityId, token);
 	}
 
 	dispose(component) {
@@ -75,8 +76,9 @@ export class HypermediaState extends Fetchable(Object) {
 		this.setSirenEntity(entity);
 	}
 
-	processRawJsonSirenEntity(json) {
-		return processRawJsonSirenEntity(json, this.token.rawToken);
+	processRawJsonSirenEntity(json, token) {
+		token = token === undefined ? this.token.rawToken : token;
+		return processRawJsonSirenEntity(json, token);
 	}
 
 	push() {
@@ -155,7 +157,7 @@ export class HypermediaState extends Fetchable(Object) {
 
 export async function processRawJsonSirenEntity(json, rawToken) {
 	const entity = await SirenParse(json);
-	const entityId = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self');
+	const entityId = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self').href;
 	if (!entityId) return;
 	const state = await stateFactory(entityId, rawToken);
 	state.setSirenEntity(entity);
