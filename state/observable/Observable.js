@@ -10,8 +10,8 @@ export class Observable {
 		this._observers.add(observer, property, method);
 	}
 
-	createChildState(entityId, token) {
-		return this._state.createChildState(entityId, token);
+	createChildState(entityID, token) {
+		return this._state.createChildState(entityID, token);
 	}
 
 	deleteObserver(observer) {
