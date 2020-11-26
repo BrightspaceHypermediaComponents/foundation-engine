@@ -1,5 +1,5 @@
 import { assert, expect }  from '@open-wc/testing';
-import { observableTypes as ot, sirenDefinedProperty, sirenObservableFactory } from '../state/observable/sirenObservablesFactory.js';
+import { observableTypes as ot, sirenDefinedProperty, sirenObservableFactory } from '../state/observable/sirenObservableFactory.js';
 import { HypermediaState } from '../state/HypermediaState.js';
 import { SirenAction } from '../state/observable/SirenAction.js';
 import { SirenClasses } from '../state/observable/SirenClasses.js';

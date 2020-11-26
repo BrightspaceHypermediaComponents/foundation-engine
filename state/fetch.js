@@ -12,7 +12,7 @@ export function fetch(fetchable, bypassCache = false) {
 
 	const responsePromise = fetchable.fetchStatus.start();
 
-	fetchFromServer(fetchable, bypassCache);
+	performServerFetch(fetchable, bypassCache);
 
 	responsePromise
 		.then(json => fetchable.onServerResponse(json))
@@ -21,7 +21,7 @@ export function fetch(fetchable, bypassCache = false) {
 	return responsePromise;
 }
 
-async function fetchFromServer(fetchable, bypassCache) {
+async function performServerFetch(fetchable, bypassCache) {
 	await fetchable.refreshToken();
 
 	const fetch = !fetchable.token.cookie ? d2lfetch : d2lfetch.removeTemp('auth');
