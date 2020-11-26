@@ -1,4 +1,3 @@
-// import { processRawJsonSirenEntity, stateFactory } from '../state/HypermediaState';
 import { assert }  from '@open-wc/testing';
 import { StateStore } from '../state/stateStore.js';
 
@@ -17,54 +16,21 @@ describe('State Store', () => {
 	});
 
 	describe('Add state', () => {
-		it('should not add an undefined state', () => {
-			const state = undefined;
-			stateStore.add(state);
-			assert.equal(stateStore._states.size, 0, 'State was added to the store');
-		});
 
-		it('should not add an empty state', () => {
-			const state = {};
-			stateStore.add(state);
-			assert.equal(stateStore._states.size, 0, 'State was added to the store');
-		});
+		const invalidStateTests = [
+			{ state: undefined, description: 'is undefined' },
+			{ state: {}, description: 'is empty' },
+			{ state: { entityID: entityID }, description: 'is missing token' },
+			{ state: { token: token }, description: 'is missing entityID' },
+			{ state: { entityID: entityID, token: '' }, description: 'has an empty token' },
+			{ state: { entityID: '', token: token }, description: 'has an empty ID' }
+		];
 
-		it('should not add a state without token', () => {
-			const state = {
-				entityID: entityID
-			};
-
-			stateStore.add(state);
-			assert.equal(stateStore._states.size, 0, 'State was added to the store');
-		});
-
-		it('should not add a state without ID', () => {
-			const state = {
-				token: token
-			};
-
-			stateStore.add(state);
-			assert.equal(stateStore._states.size, 0, 'State was added to the store');
-		});
-
-		it('should not add a state with empty token', () => {
-			const state = {
-				entityID: entityID,
-				token: ''
-			};
-
-			stateStore.add(state);
-			assert.equal(stateStore._states.size, 0, 'State was added to the store');
-		});
-
-		it('should not add a state with empty ID', () => {
-			const state = {
-				entityID: '',
-				token: token
-			};
-
-			stateStore.add(state);
-			assert.equal(stateStore._states.size, 0, 'State was added to the store');
+		invalidStateTests.forEach((test) => {
+			it(`should add a state when state ${test.description}`, () => {
+				stateStore.add(test.state);
+				assert.equal(stateStore._states.size, 0, 'State was added to the store');
+			});
 		});
 
 		it('should add state to store', () => {
@@ -112,25 +78,24 @@ describe('State Store', () => {
 		});
 	});
 
+	const invalidStatePropertyTests = [
+		{ state: { entityID: '', token: defaultState.token }, description: 'entityID is empty' },
+		{ state: { entityID: defaultState.entityID, token: '' }, description: 'token is empty' },
+		{ state: { entityID: 'invalid', token: defaultState.token }, description: 'entityID does not match' },
+		{ state: { entityID: defaultState.entityID, token: 'invalid' }, description: 'token does not match' },
+		{ state: { entityID: defaultState.entityID, token: defaultState.token.toLocaleLowerCase() },
+			description: 'token case does not match' },
+	];
+
 	describe('Get States', () => {
-		it('should handle an undefined entityID', () => {
-			const foundState = stateStore.get(undefined, defaultState.token);
-			assert.isFalse(foundState, 'Undefined entity ID should return false');
-		});
 
-		it('should handle an undefined token', () => {
-			const foundState = stateStore.get(defaultState.entityID, undefined);
-			assert.isFalse(foundState, 'Undefined token should return false');
-		});
+		invalidStatePropertyTests.forEach((test) => {
+			it(`Return false when ${test.description}`, () => {
+				stateStore.add(defaultState);
 
-		it('should handle an empty entityID', () => {
-			const foundState = stateStore.get('', defaultState.token);
-			assert.isFalse(foundState, 'Empty entity ID should return false');
-		});
-
-		it('should handle an empty token', () => {
-			const foundState = stateStore.get(defaultState.entityID, '');
-			assert.isFalse(foundState, 'Empty token should return false');
+				const foundState = stateStore.get(test.state.entityID, test.state.token);
+				assert.isFalse(foundState, 'No matches should be found');
+			});
 		});
 
 		it('should handle call when nothing has been added', () => {
@@ -138,28 +103,10 @@ describe('State Store', () => {
 			assert.isFalse(foundState, 'Should not return anything if there are no states');
 		});
 
-		it('should not return a state if entityID does not match', () => {
-			stateStore.add(defaultState);
-			const foundState = stateStore.get('invalid', defaultState.token);
-			assert.isFalse(foundState, 'EntityID should not match a state');
-		});
-
-		it('should not return a state if token does not match', () => {
-			stateStore.add(defaultState);
-			const foundState = stateStore.get(defaultState.entityID, 'invalid');
-			assert.isFalse(foundState, 'Token should not match a state');
-		});
-
 		it('should ignore case on entityID', () => {
 			stateStore.add(defaultState);
 			const foundState = stateStore.get(defaultState.entityID.toLowerCase(), defaultState.token);
 			assert.equal(foundState, defaultState, 'Matched the wrong state');
-		});
-
-		it('should only match exact tokens', () => {
-			stateStore.add(defaultState);
-			const foundState = stateStore.get(defaultState.entityID, defaultState.token.toLowerCase());
-			assert.isFalse(foundState, 'Token should be an exact match');
 		});
 
 		it('should return the correct state when there are multiple states', () => {
@@ -212,41 +159,19 @@ describe('State Store', () => {
 	});
 
 	describe('Has State', () => {
-		it('should handle an undefined entityID', () => {
-			const foundState = stateStore.has(undefined, defaultState.token);
-			assert.isFalse(foundState, 'Undefined entityID should return false');
-		});
 
-		it('should handle an undefined token', () => {
-			const foundState = stateStore.has(defaultState.entityID, undefined);
-			assert.isFalse(foundState, 'Undefined token should return false');
-		});
+		invalidStatePropertyTests.forEach((test) => {
+			it(`Return false when ${test.description}`, () => {
+				stateStore.add(defaultState);
 
-		it('should handle an empty entityID', () => {
-			const foundState = stateStore.has('', defaultState.token);
-			assert.isFalse(foundState, 'Empty entityID should return false');
-		});
-
-		it('should handle an empty token', () => {
-			const foundState = stateStore.has(defaultState.entityID, '');
-			assert.isFalse(foundState, 'Empty token should return false');
+				const foundState = stateStore.has(test.state.entityID, test.state.token);
+				assert.isFalse(foundState, 'No matches should be found');
+			});
 		});
 
 		it('should handle call when nothing has been added', () => {
 			const foundState = stateStore.has(defaultState.entityID, defaultState.token);
 			assert.isFalse(foundState, 'Should not return anything if there are no states');
-		});
-
-		it('should not return a state if entityID does not match', () => {
-			stateStore.add(defaultState);
-			const foundState = stateStore.has('invalid', defaultState.token);
-			assert.isFalse(foundState, 'EntityID should not match a state');
-		});
-
-		it('should not return a state if token does not match', () => {
-			stateStore.add(defaultState);
-			const foundState = stateStore.has(defaultState.entityID, 'invalid');
-			assert.isFalse(foundState, 'Token should not match a state');
 		});
 
 		it('should return true when there is a match', () => {
@@ -259,12 +184,6 @@ describe('State Store', () => {
 			stateStore.add(defaultState);
 			const foundState = stateStore.has(defaultState.entityID.toLowerCase(), defaultState.token);
 			assert.isTrue(foundState, 'EntityID should not be case sensitive');
-		});
-
-		it('should only match exact tokens', () => {
-			stateStore.add(defaultState);
-			const foundState = stateStore.has(defaultState.entityID, defaultState.token.toLowerCase());
-			assert.isFalse(foundState, 'Token should be an exact match');
 		});
 	});
 
