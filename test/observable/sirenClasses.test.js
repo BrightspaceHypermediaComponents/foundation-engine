@@ -16,7 +16,7 @@ describe('call sirenClasses methods', () => {
 
 	it('SirenClasses has an observerMap attached', () => {
 		const obj = new SirenClasses();
-		const comp = { foo: 'bar' };
+		const comp = { foo: undefined };
 		const method = (val) => val;
 
 		obj.addObserver(comp, 'foo', { method });
