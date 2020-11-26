@@ -4,12 +4,15 @@ export class StateStore {
 	}
 
 	add(state) {
-		if (!state || !state.entityID || !state.token.toString()) {
+		if (!state || !state.entityID || !state.token?.toString()) {
 			return;
 		}
 
-		const tokenMap = this._initTokenMap(state.token);
-		tokenMap.set(state.entityID, state);
+		const lowerCaseEntityID = state.entityID.toLowerCase();
+		const tokenCache = state.token.toString();
+
+		const tokenMap = this._initTokenMap(tokenCache);
+		tokenMap.set(lowerCaseEntityID, state);
 	}
 
 	get(entityID, token) {
