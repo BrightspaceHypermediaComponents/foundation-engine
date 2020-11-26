@@ -16,9 +16,8 @@ describe('ObserverMap', () => {
 			};
 			const property = 'property';
 			const method = undefined;
-			const value = 'href';
 
-			observerMap.add(observer, property, method, value);
+			observerMap.add(observer, property, method);
 
 			assert(observerMap._observers.has(observer) === true);
 			const getProperty = observerMap._observers.get(observer);
@@ -33,8 +32,8 @@ describe('ObserverMap', () => {
 			const method = undefined;
 			const value = 'href';
 
-			observerMap.add(observer, property, method);
 			observerMap.setProperty(value);
+			observerMap.add(observer, property, method);
 
 			assert(observerMap.value === value);
 			assert(observer[property] === value);
@@ -62,15 +61,40 @@ describe('ObserverMap', () => {
 		const observer = {
 			'bar': 'foo'
 		};
+		const observer2 = {
+			'bar': 'foo'
+		};
+
 		const property = 'property';
 		const method = undefined;
-		const value = 'href';
 		const newValue = 'newHref';
 
-		observerMap.add(observer, property, method, value);
+		observerMap.add(observer, property, method);
+		observerMap.add(observer2, property, method);
 		observerMap.setProperty(newValue);
 
 		assert(observer[property] === newValue);
+		assert(observer2[property] === newValue);
+	});
+
+	it('should update all objects with value from method', async() => {
+		const observer = {
+			'bar': 'foo'
+		};
+		const observer2 = {
+			'bar': 'foo'
+		};
+
+		const property = 'property';
+		const method = (value) => { return `${value}-changed`; };
+		const newValue = 'newHref';
+
+		observerMap.add(observer, property, method);
+		observerMap.add(observer2, property, method);
+		observerMap.setProperty(newValue);
+
+		assert(observer[property] === `${newValue}-changed`);
+		assert(observer2[property] === `${newValue}-changed`);
 	});
 
 });
