@@ -32,7 +32,7 @@ describe('call sirenLink methods', () => {
 
 	it('SirenLink has link set', () => {
 		const link = new SirenLink();
-		link.href = { href: 'abc' };
+		link.href = 'abc';
 		assert.equal(link.href, 'abc', 'SirenLink link set incorrectly');
 		assert.equal(link._observers._observers.size, 0, 'SirenClass has observer when it should not');
 	});
@@ -43,8 +43,8 @@ describe('sirenLink with observers', () => {
 
 	beforeEach(() => {
 		link = new SirenLink({ id: 'foo', token: 'bar' });
-		link.href = { href: 'baz' };
-		obs = { foo: 'abc' };
+		link.href = 'baz';
+		obs = { foo: undefined };
 		method = (val) => val;
 	});
 
@@ -78,14 +78,14 @@ describe('sirenLink with observers', () => {
 	});
 
 	it('SirenLink with link has an object with route attached', () => {
-		link.addObserver(obs, 'hello', { route: 'abcde', method });
+		link.addObserver(obs, 'hello', { route: { value: 'abcde' }, method });
 
 		const map = link._observers._observers;
 		assert.equal(map.size, 0, 'SirenLink has incorrect number of observers');
 
 		const routes = link._routes;
 		assert.equal(routes.size, 1, 'incorrect number of routes stored in observer');
-		assert.equal(routes.get(obs).route, 'abcde', 'route set incorrectly for observer');
+		assert.equal(routes.get(obs).value, 'abcde', 'route set incorrectly for observer');
 
 		const methods = link._observers._methods;
 		assert.isFalse(methods.has(obs), 'method for observer is not stored');
@@ -103,15 +103,15 @@ describe('sirenLink with observers', () => {
 	});
 
 	it('SirenLink update route with same fields', () => {
-		link.addObserver(obs, 'hello', { route: 'abcde' });
-		link.addObserver(obs, 'hello', { route: 'fghij' });
+		link.addObserver(obs, 'hello', { route: { value: 'abcde' } });
+		link.addObserver(obs, 'hello', { route: { value: 'fghij' } });
 
 		const map = link._observers._observers;
 		assert.equal(map.size, 0, 'SirenLink has incorrect number of observers');
 
 		const routes = link._routes;
 		assert.equal(routes.size, 1, 'incorrect number of routes stored in observer');
-		assert.equal(routes.get(obs).route, 'fghij', 'route set incorrectly for observer');
+		assert.equal(routes.get(obs).value, 'fghij', 'route set incorrectly for observer');
 	});
 
 	it('SirenLink update route with unique fields', () => {
@@ -123,7 +123,7 @@ describe('sirenLink with observers', () => {
 
 		const routes = link._routes;
 		assert.equal(routes.size, 1, 'incorrect number of routes stored in observer');
-		assert.equal(routes.get(obs).route.id, 'fghij', 'route set incorrectly for observer');
+		assert.equal(routes.get(obs).id, 'fghij', 'route set incorrectly for observer');
 	});
 });
 

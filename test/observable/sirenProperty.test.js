@@ -14,7 +14,7 @@ describe('SirenProperty method calls', () => {
 
 	it('observerMap with method added SirenProperty', () => {
 		const obj = new SirenProperty({ id: '_field' });
-		const comp = { foo: 'bar' };
+		const comp = { foo: undefined };
 		const method = (val) => val;
 
 		obj.addObserver(comp, 'foo', { method });
