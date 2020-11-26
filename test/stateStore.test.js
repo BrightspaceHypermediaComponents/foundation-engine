@@ -4,6 +4,7 @@ import { StateStore } from '../state/stateStore.js';
 let stateStore;
 const entityID = 'HREF';
 const token = 'TOKEN';
+const entityLowerCase = entityID.toLowerCase();
 const defaultState = {
 	entityID: entityID,
 	token: token,
@@ -36,7 +37,7 @@ describe('State Store', () => {
 		it('should add state to store', () => {
 			stateStore.add(defaultState);
 			assert.equal(stateStore._states.size, 1, 'State was not added to the store');
-			assert.equal(stateStore._states.get(token).get(defaultState.entityID), defaultState,
+			assert.equal(stateStore._states.get(token).get(entityLowerCase), defaultState,
 				'Default state does not match');
 		});
 
@@ -51,9 +52,9 @@ describe('State Store', () => {
 
 			assert.equal(stateStore._states.size, 1, 'States were not be mapped together by token');
 			assert.equal(stateStore._states.get(token).size, 2, 'Expected 2 states in the token map');
-			assert.equal(stateStore._states.get(token).get(defaultState.entityID), defaultState,
+			assert.equal(stateStore._states.get(token).get(entityLowerCase), defaultState,
 				'Default state does not match');
-			assert.equal(stateStore._states.get(token).get(state2.entityID), state2,
+			assert.equal(stateStore._states.get(token).get(state2.entityID.toLowerCase()), state2,
 				'Second state does not match');
 		});
 
@@ -67,13 +68,13 @@ describe('State Store', () => {
 			stateStore.add(state2);
 
 			assert.equal(stateStore._states.size, 2, 'Tokens were not mapped together');
-			assert.equal(stateStore._states.get(defaultState.token).size, 1,
+			assert.equal(stateStore._states.get(token).size, 1,
 				'Default token has more entities than expected');
 			assert.equal(stateStore._states.get(state2.token).size, 1,
 				'State2 token has more entities than expected');
-			assert.equal(stateStore._states.get(token).get(defaultState.entityID), defaultState,
+			assert.equal(stateStore._states.get(token).get(entityLowerCase), defaultState,
 				'Default state does not match');
-			assert.equal(stateStore._states.get(state2.token).get(state2.entityID), state2,
+			assert.equal(stateStore._states.get(state2.token).get(state2.entityID.toLowerCase()), state2,
 				'Second state does not match');
 		});
 	});
