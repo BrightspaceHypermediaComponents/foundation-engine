@@ -26,8 +26,8 @@
     "eslint-plugin-html": "^6.1.0",
     "eslint-plugin-lit": "^1.2.2",
     "eslint-plugin-sort-class-members": "^1.8.0",
-    "karma-sauce-launcher": "^4",
-    "sinon": "^9.1.0"
+    "karma-sauce-launcher": "^4.1.5",
+    "sinon": "^9.2.1"
   },
   "dependencies": {
     "d2l-fetch": "github:Brightspace/d2l-fetch#semver:^2",
