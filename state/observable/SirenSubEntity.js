@@ -1,13 +1,7 @@
 import { fetch } from '../fetch.js';
-<<<<<<< HEAD
-import { getEntityIdFromSirenEntity } from './Common.js';
-import { Observable } from './Observable.js';
-import { stateFactory } from '../HypermediaState.js';
-=======
 import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 import { shouldAttachToken } from '../token.js';
->>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 
 export class SirenSubEntity extends Observable {
 	constructor({ id, token, state } = {}) {
@@ -85,11 +79,7 @@ export class SirenSubEntity extends Observable {
 		this.entityID = getEntityIDFromSirenEntity(subEntity);
 
 		if (this._token) {
-<<<<<<< HEAD
-			this._childState = await stateFactory(this.entityId, this._token);
-=======
 			this._childState = await this.createChildState(this.entityID, shouldAttachToken(this._token.rawToken, subEntity));
->>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 			this._childState.setSirenEntity(subEntity);
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);

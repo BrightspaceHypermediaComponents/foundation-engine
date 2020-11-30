@@ -7,7 +7,7 @@ export class SirenSubEntities extends Observable {
 		return { token };
 	}
 
-	constructor({ id, token, state }) {
+	constructor({ id, token, state } = {}) {
 		super();
 		this._state = state;
 		this._rel = id;

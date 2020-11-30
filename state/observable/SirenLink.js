@@ -1,7 +1,7 @@
 import { fetch } from '../fetch.js';
 import { Observable } from './Observable.js';
 import { shouldAttachToken } from '../token.js';
-import { stateFactory } from '../HypermediaState.js';
+//import { stateFactory } from '../HypermediaState.js';
 
 export class SirenLink extends Observable {
 	constructor({ id, token, state } = {}) {
@@ -17,19 +17,11 @@ export class SirenLink extends Observable {
 	}
 
 	set href(href) {
-<<<<<<< HEAD
-		if (!this.href !== href) {
-=======
 		if (this.href !== href) {
->>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 			this._observers.setProperty(href);
 		}
 	}
 
-<<<<<<< HEAD
-	// TODO: remove in US121366
-=======
->>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 	addObserver(observer, property, { route, method } = {}) {
 		if (route) {
 			this._addRoute(observer, route);
