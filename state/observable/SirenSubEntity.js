@@ -1,23 +1,30 @@
 import { fetch } from '../fetch.js';
+<<<<<<< HEAD
 import { getEntityIdFromSirenEntity } from './Common.js';
 import { Observable } from './Observable.js';
 import { stateFactory } from '../HypermediaState.js';
+=======
+import { getEntityIDFromSirenEntity } from './ObserverMap.js';
+import { Observable } from './Observable.js';
+import { shouldAttachToken } from '../token.js';
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 
 export class SirenSubEntity extends Observable {
-	constructor({ id, token }) {
+	constructor({ id, token, state } = {}) {
 		super();
+		this._state = state;
 		this._rel = id;
 		this._routes = new Map();
 		this._token = token;
 	}
 
-	get entityId() {
+	get entityID() {
 		return this._observers.value;
 	}
 
-	set entityId(entityId) {
-		if (!this.entityId !== entityId) {
-			this._observers.setProperty(entityId);
+	set entityID(entityID) {
+		if (this.entityID !== entityID) {
+			this._observers.setProperty(entityID);
 		}
 	}
 
@@ -32,6 +39,14 @@ export class SirenSubEntity extends Observable {
 
 	get childState() {
 		return this._childState;
+	}
+
+	deleteObserver(observer) {
+		if (this._route.has(observer)) {
+			this._deleteRoute(observer);
+		} else {
+			super.deleteObserver(observer);
+		}
 	}
 
 	get rel() {
@@ -54,27 +69,32 @@ export class SirenSubEntity extends Observable {
 		this._setSubEntity(subEntity);
 	}
 
-	_merge(sirenLink) {
-		if (!sirenLink || !(sirenLink instanceof SirenSubEntity)) {
+	_merge(entity) {
+		if (!entity || !(entity instanceof SirenSubEntity)) {
 			return;
 		}
 
-		sirenLink._observers.observers.forEach((observer, property) => {
+		entity._observers._observers.forEach((observer, property) => {
 			this.addObserver(observer, property);
 		});
 
-		this._token = this._token || sirenLink._token;
+		this._token = this._token || entity._token;
 	}
 
 	async _setSubEntity(subEntity) {
-		this.entityId = getEntityIdFromSirenEntity(subEntity);
+		this.entityID = getEntityIDFromSirenEntity(subEntity);
 
 		if (this._token) {
+<<<<<<< HEAD
 			this._childState = await stateFactory(this.entityId, this._token);
+=======
+			this._childState = await this.createChildState(this.entityID, shouldAttachToken(this._token.rawToken, subEntity));
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 			this._childState.setSirenEntity(subEntity);
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});
+
 			fetch(this._childState);
 		}
 	}

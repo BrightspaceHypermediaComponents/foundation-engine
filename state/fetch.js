@@ -2,7 +2,7 @@ import 'd2l-fetch/d2l-fetch.js';
 
 const d2lfetch = window.d2lfetch;
 
-export async function fetch(fetchable, bypassCache) {
+export function fetch(fetchable, bypassCache = false) {
 	if (fetchable.fetchStatus.pending) {
 		if (!bypassCache) {
 			return fetchable.fetchStatus.complete;
@@ -10,7 +10,18 @@ export async function fetch(fetchable, bypassCache) {
 		fetchable.fetchStatus.cancel();
 	}
 
-	fetchable.fetchStatus.start();
+	const responsePromise = fetchable.fetchStatus.start();
+
+	performServerFetch(fetchable, bypassCache);
+
+	responsePromise
+		.then(json => fetchable.onServerResponse(json))
+		.catch(error => fetchable.onServerResponse(null, error));
+
+	return responsePromise;
+}
+
+async function performServerFetch(fetchable, bypassCache) {
 	await fetchable.refreshToken();
 
 	const fetch = !fetchable.token.cookie ? d2lfetch : d2lfetch.removeTemp('auth');
@@ -28,14 +39,10 @@ export async function fetch(fetchable, bypassCache) {
 		}
 		fetchable.handleCachePriming(cachePrimingList(response));
 		const json = await response.json();
-		fetchable.onServerResponse(json);
-		fetchable.fetchStatus.done(json); // I decided to not include this call in onServerResponse so fetchable don't need to worry about calling super.onServerResponse();
+		fetchable.fetchStatus.done(json);
 	} catch (err) {
-		fetchable.onServerResponse(null, err);
 		fetchable.fetchStatus.done(null, err);
 	}
-
-	return fetchable.fetchStatus.complete;
 }
 
 function cachePrimingList(response) {

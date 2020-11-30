@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { observableTypes as ot, sirenObserverDefinedProperty, sirenObserverFactory } from './observable/sirenObserverFactory.js';
 import { fetch } from './fetch.js';
 import { Fetchable } from './Fetchable.js';
+=======
+import { Fetchable, FetchError } from './Fetchable.js';
+import { observableTypes as ot, sirenObservableFactory, sirenObserverDefinedProperty } from './observable/sirenObservableFactory.js';
+import { fetch } from './fetch.js';
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 import { getToken } from './token.js';
 import SirenParse from 'siren-parser';
 import { StateStore } from './StateStore.js';
@@ -19,8 +25,8 @@ const store = window.D2L.Foundation.StateStore;
  * @class HypermediaState
  */
 export class HypermediaState extends Fetchable(Object) {
-	constructor(entityId, token) {
-		super(entityId, token);
+	constructor(entityID, token) {
+		super(entityID, token);
 
 		this._decodedEntity = new Map();
 	}
@@ -41,6 +47,11 @@ export class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
+	createChildState(entityID, token) {
+		token = token === undefined ? this.token.rawToken : token;
+		return stateFactory(entityID, token);
+	}
+
 	dispose(component) {
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenComponent => {
@@ -49,13 +60,17 @@ export class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
-	get entityId() {
+	get entityID() {
 		return this.href;
 	}
 
 	async handleCachePriming(links) {
 		return Promise.all(links.map(async(link) => {
+<<<<<<< HEAD
 			const state = await stateFactory(link, this.token);
+=======
+			const state = await stateFactory(link, this.token.rawToken);
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 			return fetch(state, true);
 		}));
 	}
@@ -65,10 +80,19 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 
 	async onServerResponse(response, error) {
+<<<<<<< HEAD
 		if (!response) throw error;
+=======
+		if (error) throw new FetchError(error);
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 
 		const entity = await SirenParse(response);
 		this.setSirenEntity(entity);
+	}
+
+	processRawJsonSirenEntity(json, token) {
+		token = token === undefined ? this.token.rawToken : token;
+		return processRawJsonSirenEntity(json, token);
 	}
 
 	push() {
@@ -135,10 +159,16 @@ export class HypermediaState extends Fetchable(Object) {
 
 	_getSirenComponent(basicInfo) {
 		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
+<<<<<<< HEAD
 		if (typeMap.has(basicInfo.id)) {
 			return typeMap.get(basicInfo.id);
 		}
 		const sirenComponent = sirenObserverFactory(basicInfo);
+=======
+		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
+
+		const sirenComponent = sirenObservableFactory(basicInfo);
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 		typeMap.set(basicInfo.id, sirenComponent);
 		this._entity && sirenComponent.setSirenEntity(this._entity, typeMap);
 
@@ -146,6 +176,7 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 }
 
+<<<<<<< HEAD
 export async function stateFactory(entityId, token) {
 	token = await getToken(token);
 	if (await store.has(entityId, token)) {
@@ -153,6 +184,24 @@ export async function stateFactory(entityId, token) {
 	}
 	const state = new HypermediaState(entityId, token);
 	await store.add(state);
+=======
+export async function processRawJsonSirenEntity(json, rawToken) {
+	const entity = await SirenParse(json);
+	const entityID = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self').href;
+	if (!entityID) return;
+	const state = await stateFactory(entityID, rawToken);
+	state.setSirenEntity(entity);
+}
+
+export async function stateFactory(entityID, rawToken) {
+	const token = await getToken(rawToken);
+	if (store.has(entityID, token)) {
+		const state = store.get(entityID, token);
+		return state;
+	}
+	const state = new HypermediaState(entityID, token);
+	store.add(state);
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 	return state;
 }
 

@@ -1,41 +1,37 @@
-import { refreshToken } from './token.js';
-
 export class StateStore {
 	constructor() {
 		this._states = new Map();
 	}
 
-	async add(state) {
-		await state.refreshToken();
-		if (!state || !state.entityId || !state.token.toString()) {
+	add(state) {
+		if (!state || !state.entityID || !state.token?.toString()) {
 			return;
 		}
 
-		const tokenMap = this._initTokenMap(state.token);
-		tokenMap.set(state.entityId, state);
+		const lowerCaseEntityID = state.entityID.toLowerCase();
+		const tokenCache = state.token.toString();
+
+		const tokenMap = this._initTokenMap(tokenCache);
+		tokenMap.set(lowerCaseEntityID, state);
 	}
 
-	async get(entityID, token) {
-		await refreshToken(token);
-		const lowerCaseEntityId = entityID.toLowerCase();
+	get(entityID, token) {
+		const lowerCaseEntityID = entityID.toLowerCase();
 		const tokenCache = token.toString();
 
-		const state = this.has(entityID, token) && this._states.get(tokenCache).get(lowerCaseEntityId);
+		const state = this.has(entityID, token) && this._states.get(tokenCache).get(lowerCaseEntityID);
 
 		return state;
 	}
 
-	async has(entityID, token) {
-		await refreshToken(token);
-		const lowerCaseEntityId = entityID.toLowerCase();
+	has(entityID, token) {
+		const lowerCaseEntityID = entityID.toLowerCase();
 		const tokenCache = token.toString();
 
-		return this._states.has(tokenCache) && this._states.get(tokenCache).has(lowerCaseEntityId);
+		return this._states.has(tokenCache) && this._states.get(tokenCache).has(lowerCaseEntityID);
 	}
 
-	_initTokenMap(token) {
-		const tokenCache = token.toString();
-
+	_initTokenMap(tokenCache) {
 		if (!this._states.has(tokenCache)) {
 			this._states.set(tokenCache, new Map());
 		}

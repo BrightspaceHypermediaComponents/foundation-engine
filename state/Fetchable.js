@@ -45,6 +45,8 @@ class FetchStatus {
 			this._rejecter = reject;
 		});
 		this.pending = true;
+
+		return this.complete;
 	}
 }
 

@@ -1,4 +1,4 @@
-import { getEntityIdFromSirenEntity } from './Common.js';
+import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 import { SirenSubEntity } from './SirenSubEntity.js';
 
@@ -7,34 +7,27 @@ export class SirenSubEntities extends Observable {
 		return { token };
 	}
 
-	constructor({ id, token }) {
+	constructor({ id, token, state }) {
 		super();
+		this._state = state;
 		this._rel = id;
 		this._childSubEntities = new Map();
 		this._token = token;
-		this.entityIds = [];
+		this.entityIDs = [];
 	}
 
-	get entityIds() {
+	get entityIDs() {
 		return this._observers.value;
 	}
 
-	set entityIds(entityIds) {
-		if (!this.entityIds !== entityIds) {
-			this._observers.setProperty(entityIds || []);
+	set entityIDs(entityIDs) {
+		if (this.entityIDs !== entityIDs) {
+			this._observers.setProperty(entityIDs || []);
 		}
 	}
 
 	get childSubEntities() {
 		return this._childSubEntities;
-	}
-
-	deleteObserver(observer) {
-		if (this._route.has(observer)) {
-			this._deleteRoute(observer);
-		} else {
-			super.deleteObserver(observer);
-		}
 	}
 
 	get rel() {
@@ -52,17 +45,17 @@ export class SirenSubEntities extends Observable {
 		// There is a way to build a list from next/prev that is performant
 		// and will change based on the individual item update.
 		subEntities.forEach((sirenSubEntity) => {
-			const entityId = getEntityIdFromSirenEntity(sirenSubEntity);
+			const entityID = getEntityIDFromSirenEntity(sirenSubEntity);
 			// If we already set it up why do it again?
-			if (this.childSubEntities.has(entityId)) {
-				childSubEntities.set(entityId, this.childSubEntities.get(entityId));
-				this.childSubEntities.delete(entityId);
+			if (this.childSubEntities.has(entityID)) {
+				childSubEntities.set(entityID, this.childSubEntities.get(entityID));
+				this.childSubEntities.delete(entityID);
 				return;
 			}
 
 			const subEntity = new SirenSubEntity({ id: this.rel, token: this._token });
-			subEntity.entityId = entityId;
-			childSubEntities.set(entityId, subEntity);
+			subEntity.entityID = entityID;
+			childSubEntities.set(entityID, subEntity);
 		});
 
 		// These ones are no longer required.
@@ -70,11 +63,11 @@ export class SirenSubEntities extends Observable {
 
 		this._childSubEntities = childSubEntities;
 
-		const entityIds = [];
-		this.childSubEntities.forEach((_, entityId) => {
-			entityIds.push(entityId);
+		const entityIDs = [];
+		this.childSubEntities.forEach((_, entityID) => {
+			entityIDs.push(entityID);
 		});
 
-		this.entityIds = entityIds;
+		this.entityIDs = entityIDs;
 	}
 }

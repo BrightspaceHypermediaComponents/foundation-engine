@@ -1,14 +1,19 @@
-import { fetch } from '../fetch';
-import { Fetchable } from '../Fetchable.js';
+import { Fetchable, FetchError } from '../Fetchable.js';
+import { fetch } from '../fetch.js';
 import { Observable } from './Observable.js';
 
-const defaultAction = { has: false, perform: () => undefined, update: () => undefined };
+const defaultAction = { has: false, commit: () => undefined };
 
 export class SirenAction extends Fetchable(Observable) {
+	static definedProperty({ name: id, token }) {
+		return { id, token };
+	}
+
 	constructor({ id: name, token, state }) {
 		super(null, token);
 		this._action = defaultAction;
 		this._name = name;
+		this._readyToSend = false;
 		this._state = state;
 	}
 
@@ -16,16 +21,15 @@ export class SirenAction extends Fetchable(Observable) {
 		return this._observers.value || defaultAction;
 	}
 
-	set action({ has, perform, update }) {
-		if (!has || typeof perform !== 'function') {
-			perform = () => undefined;
-			update = () => undefined;
+	set action({ has, commit }) {
+		if (!has || typeof commit !== 'function') {
+			commit = () => undefined;
 		}
-		if (this.action.has !== has || this.action.perform !== perform) {
-			this._observers.setProperty({ has, perform, update });
+		if (this._action.has !== has || this._action.commit !== commit) {
+			this._observers.setProperty({ has, commit });
 		}
 
-		this._action = { has, perform, update };
+		this._action = { has, commit };
 	}
 
 	get headers() {
@@ -41,13 +45,39 @@ export class SirenAction extends Fetchable(Observable) {
 		return this._rawSirenAction && this._rawSirenAction.method;
 	}
 
+	onServerResponse(json, error) {
+		if (error) {
+			throw new FetchError(error);
+		}
+		if (!json) {
+			return;
+		}
+
+		this._state.processRawJsonSirenEntity(json);
+	}
+
+	async push() {
+		if (this._readyToSend) {
+			await fetch(this);
+			this.reset();
+		}
+	}
+
+	reset() {
+		this._href = this._rawSirenAction.href;
+		this._body = null;
+		this._readyToSend = false;
+	}
+
 	setBodyFromInput(input) {
 		if (this._rawSirenAction.type.indexOf('json') !== -1) {
 			this._body = JSON.stringify({ ...this._fields, ...input });
 		} else if (this.method !== 'GET' && this.method !== 'HEAD') {
 			const formData = new FormData();
 			const fields = { ...this._fields, ...input };
-			Object.keys(fields).forEach((name) => formData.append(name, fields[name]));
+			Object.keys(fields).forEach((name) => {
+				formData.append(name, fields[name]);
+			});
 			this._body = formData;
 		}
 		return this._body;
@@ -73,10 +103,16 @@ export class SirenAction extends Fetchable(Observable) {
 
 		this.action = {
 			has: true,
+<<<<<<< HEAD
 			perform: () => {
 				return fetch(this);
 			},
 			update: (observables) => {
+=======
+			commit: (observables) => {
+				this._prepareAction(observables);
+				this._readyToSend = true;
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 				return this._state.updateProperties(observables);
 			}
 		};
@@ -104,5 +140,12 @@ export class SirenAction extends Fetchable(Observable) {
 			});
 		}
 		return fields;
+	}
+
+	_prepareAction(observables) {
+		const input = {};
+		Object.keys(observables).forEach(field => input[field] = observables[field]?.value ? observables[field].value : observables[field]);
+		this.setQueryParams(input);
+		this.setBodyFromInput(input);
 	}
 }

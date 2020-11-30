@@ -10,6 +10,10 @@ export class Observable {
 		this._observers.add(observer, property, method);
 	}
 
+	createChildState(entityID, token) {
+		return this._state.createChildState(entityID, token);
+	}
+
 	deleteObserver(observer) {
 		this._observers.delete(observer);
 	}
@@ -21,7 +25,9 @@ export class Observable {
 	}
 
 	_deleteRoute(observer) {
-		this._childState.dispose(observer);
+		if (this._childState) {
+			this._childState.dispose(observer);
+		}
 		this._routes.delete(observer);
 	}
 }

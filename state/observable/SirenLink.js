@@ -4,8 +4,9 @@ import { shouldAttachToken } from '../token.js';
 import { stateFactory } from '../HypermediaState.js';
 
 export class SirenLink extends Observable {
-	constructor({ id, token }) {
+	constructor({ id, token, state } = {}) {
 		super();
+		this._state = state;
 		this._rel = id;
 		this._routes = new Map();
 		this._token = token;
@@ -16,17 +17,24 @@ export class SirenLink extends Observable {
 	}
 
 	set href(href) {
+<<<<<<< HEAD
 		if (!this.href !== href) {
+=======
+		if (this.href !== href) {
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 			this._observers.setProperty(href);
 		}
 	}
 
+<<<<<<< HEAD
 	// TODO: remove in US121366
+=======
+>>>>>>> 6a2506638eec0d7a49c0f577fd7e6b34e9c83d29
 	addObserver(observer, property, { route, method } = {}) {
 		if (route) {
 			this._addRoute(observer, route);
 		} else {
-			super.addObserver(observer, property, method);
+			super.addObserver(observer, property, { method });
 		}
 	}
 
@@ -62,10 +70,11 @@ export class SirenLink extends Observable {
 		}
 
 		if (this._token) {
-			this._childState = await stateFactory(link.href, shouldAttachToken(this._token, link));
+			this._childState = await this.createChildState(link.href, shouldAttachToken(this._token.rawToken, link));
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});
+
 			fetch(this._childState);
 		}
 	}
@@ -75,7 +84,7 @@ export class SirenLink extends Observable {
 			return;
 		}
 
-		sirenLink._observers.observers.forEach((observer, property) => {
+		sirenLink._observers._observers.forEach((observer, property) => {
 			this.addObserver(observer, property);
 		});
 

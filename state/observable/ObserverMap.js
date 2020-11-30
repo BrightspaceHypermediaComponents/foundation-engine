@@ -26,7 +26,9 @@ export class ObserverMap {
 			this._methods.set(observer, method);
 		}
 
-		this._setObserverProperty(observer, property);
+		if (this._value !== undefined) {
+			this._setObserverProperty(observer, property);
+		}
 	}
 
 	delete(observer) {
@@ -48,13 +50,13 @@ export class ObserverMap {
 
 	_setObserverProperty(observer, property) {
 		const method = this._methods.has(observer) && this._methods.get(observer);
-		const value = deepCopy(this._value);
+		const value = deepCopy(this.value);
 		observer[property] = method ? method(value) : value;
 	}
 
 }
 
-export function getEntityIdFromSirenEntity(entity) {
+export function getEntityIDFromSirenEntity(entity) {
 	const self = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self');
 	return  entity.href || (self && self.href);
 }
