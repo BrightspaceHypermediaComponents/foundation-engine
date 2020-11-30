@@ -1,5 +1,6 @@
 import { assert }  from '@open-wc/testing';
 import { SirenSubEntities } from '../../state/observable/SirenSubEntities.js';
+import sinon from 'sinon';
 
 describe.only('subEntities basic methods', () => {
 	beforeEach(() => {
@@ -30,9 +31,16 @@ describe.only('subEntities basic methods', () => {
 });
 
 describe.only('sirenSubEntities set sirenEntity', () =>  {
+	let sub;
+	beforeEach(() => {
+		sub = new SirenSubEntities();
+		const func = sinon.stub(sub, 'getSubEntitiesByRel');
+		func.yields(null);
+	});
+
 	it('childSubEntites are removed when empty sirenEntity is added', () => {
 		const subentites = new SirenSubEntities({ id: 'abc', token: '1234', state: 'hello' });
-		const sub = new SirenSubEntities();
+		//const sub = new SirenSubEntities();
 		subentites.setSirenEntity(sub);
 
 		assert(subentites.childSubEntities.size, 0);
