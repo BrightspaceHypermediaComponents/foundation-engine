@@ -1,7 +1,6 @@
 import { fetch } from '../fetch.js';
 import { Observable } from './Observable.js';
 import { shouldAttachToken } from '../token.js';
-//import { stateFactory } from '../HypermediaState.js';
 
 export class SirenLink extends Observable {
 	constructor({ id, token, state } = {}) {
