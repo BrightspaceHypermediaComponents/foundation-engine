@@ -1,4 +1,4 @@
-import { getToken, refreshToken } from './token.js';
+import { refreshToken } from './token.js';
 
 /**
  * FetchError

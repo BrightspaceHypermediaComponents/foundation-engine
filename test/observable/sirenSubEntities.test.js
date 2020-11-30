@@ -1,8 +1,10 @@
 import { assert }  from '@open-wc/testing';
+import SirenParse from 'siren-parser';
 import { SirenSubEntities } from '../../state/observable/SirenSubEntities.js';
-import sinon from 'sinon';
+import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
+import { testSubEntities } from './entities.js';
 
-describe.only('subEntities basic methods', () => {
+describe('subEntities basic methods', () => {
 	beforeEach(() => {
 
 	});
@@ -30,19 +32,53 @@ describe.only('subEntities basic methods', () => {
 	});
 });
 
-describe.only('sirenSubEntities set sirenEntity', () =>  {
-	let sub;
-	beforeEach(() => {
-		sub = new SirenSubEntities();
-		const func = sinon.stub(sub, 'getSubEntitiesByRel');
-		func.yields(null);
+describe('sirenSubEntities set sirenEntity', () =>  {
+	// testSubEntites are imported from ./entities.js for testing
+	it('entity with zero matching ids has been added as subentity', () => {
+		const subentites = new SirenSubEntities({ id: 'foo', token: '1234', state: 'hello' });
+		const entity = SirenParse(testSubEntities[1]);
+
+		subentites.setSirenEntity(entity);
+
+		assert.equal(subentites.childSubEntities.size, 0, 'SirenSubEntities should have 0 children');
+		assert.deepEqual(subentites.entityIDs, [], 'SirenSubEntities should have 0 entityIDs');
 	});
 
-	it('childSubEntites are removed when empty sirenEntity is added', () => {
-		const subentites = new SirenSubEntities({ id: 'abc', token: '1234', state: 'hello' });
-		//const sub = new SirenSubEntities();
-		subentites.setSirenEntity(sub);
+	it('entity with one matching id has been added as subentity', () => {
+		const subentites = new SirenSubEntities({ id: 'foo', token: '1234', state: 'hello' });
+		const entity = SirenParse(testSubEntities[0]);
 
-		assert(subentites.childSubEntities.size, 0);
+		subentites.setSirenEntity(entity);
+
+		assert.equal(subentites.childSubEntities.size, 1, 'SirenSubEntities should have 1 child');
+		assert.isTrue(subentites.childSubEntities.has('www.abc.com'), 'SirenSubEntities should have child stored');
+		const addedSubentity = subentites.childSubEntities.get('www.abc.com');
+		assert.instanceOf(addedSubentity, SirenSubEntity, 'SirenSubEntities child should be a SirenSubEntity');
+		assert.deepEqual(subentites.entityIDs, ['www.abc.com'], 'SirenSubEntities entityIDs should store one href');
+	});
+
+	it('entity with two matching ids has been added as subentity', () => {
+		const subentites = new SirenSubEntities({ id: 'foo', token: '1234', state: 'hello' });
+		const entity = SirenParse(testSubEntities[2]);
+
+		subentites.setSirenEntity(entity);
+
+		assert.equal(subentites.childSubEntities.size, 2, 'SirenSubEntities should have 2 children');
+		assert.isTrue(subentites.childSubEntities.has('www.def.com'), 'SirenSubEntities should store first child');
+		assert.isTrue(subentites.childSubEntities.has('www.xyz.com'), 'SirenSubEntities should store second child');
+		assert.deepEqual(subentites.entityIDs, ['www.def.com', 'www.xyz.com'], 'SirenSubEntities entityIDs should store two hrefs');
+	});
+
+	it('entity with two matching ids overwritten with one id', () => {
+		const subentites = new SirenSubEntities({ id: 'foo', token: '1234', state: 'hello' });
+		const entity1 = SirenParse(testSubEntities[2]);
+		const entity2 = SirenParse(testSubEntities[0]);
+
+		subentites.setSirenEntity(entity1);
+		subentites.setSirenEntity(entity2);
+
+		assert.equal(subentites.childSubEntities.size, 1, 'SirenSubEntities should have 1 child');
+		assert.isTrue(subentites.childSubEntities.has('www.abc.com'), 'SirenSubEntities should have child stored');
+		assert.deepEqual(subentites.entityIDs, ['www.abc.com'], 'SirenSubEntities entityIDs should store one href');
 	});
 });
