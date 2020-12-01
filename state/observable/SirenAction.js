@@ -9,7 +9,7 @@ export class SirenAction extends Fetchable(Observable) {
 		return { id, token };
 	}
 
-	constructor({ id: name, token, state } = {}) {
+	constructor({ id: name, token, state }) {
 		super(null, token);
 		this._action = defaultAction;
 		this._name = name;

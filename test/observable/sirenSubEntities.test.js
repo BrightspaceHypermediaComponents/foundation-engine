@@ -5,12 +5,8 @@ import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
 import { testSubEntities } from '../data/observable/entities.js';
 
 describe('subEntities basic methods', () => {
-	beforeEach(() => {
-
-	});
-
-	it('sirenSubEntites constructed from empty object', () => {
-		const obj = new SirenSubEntities();
+	it('sirenSubEntities constructed from empty object', () => {
+		const obj = new SirenSubEntities({});
 
 		assert.isUndefined(obj._state, 'subEntities state initialized by empty object');
 		assert.isUndefined(obj.rel, 'subEntities rel initialized by empty object');
