@@ -7,7 +7,7 @@ export class SirenEntity extends Observable {
 	}
 
 	set sirenEntity(sirenEntity) {
-		if (!this.sirenEntity !== sirenEntity) {
+		if (this.sirenEntity !== sirenEntity) {
 			this._observers.setProperty(sirenEntity);
 		}
 	}

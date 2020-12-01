@@ -1,5 +1,5 @@
 import { assert, expect }  from '@open-wc/testing';
-import { observableTypes as ot, sirenDefinedProperty, sirenObservableFactory } from '../state/observable/sirenObservablesFactory.js';
+import { observableTypes as ot, sirenObservableFactory, sirenObserverDefinedProperty } from '../state/observable/sirenObservableFactory.js';
 import { HypermediaState } from '../state/HypermediaState.js';
 import { SirenAction } from '../state/observable/SirenAction.js';
 import { SirenClasses } from '../state/observable/SirenClasses.js';
@@ -79,23 +79,23 @@ describe('observerFactory object creation', () => {
 	});
 });
 
-describe('creating sirenDefinedProperty incomplete objects', () => {
+describe('creating sirenObserverDefinedProperty incomplete objects', () => {
 
 	it('property is not created from empty object', () => {
 		const obj = {};
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 		assert.isUndefined(res, 'properties created from empty object');
 	});
 
 	it('property is not created from object with useless fields', () => {
 		const obj = { name: 'abc', token: 1234 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 		assert.isUndefined(res, 'properties created from object with no useful fields');
 	});
 
 	it('property with type is created from objects observable field', () => {
 		const obj = { observable: ot.link, token: 1234 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 		assert.exists(res, 'object was not created from valid properties');
 		assert.equal(res.type, ot.link, 'properties type is not set to observable');
 		assert.isUndefined(res.token, 'properties token is set without prime and route existing');
@@ -105,7 +105,7 @@ describe('creating sirenDefinedProperty incomplete objects', () => {
 
 	it('property with type and id is created from object with observable and rel fields', () => {
 		const obj = { rel: 'abcde', observable: ot.link, token: 1234 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 		assert.exists(res, 'object was not created from valid properties');
 		assert.equal(res.type, ot.link, 'properties type is not set to observable');
 		assert.isUndefined(res.token, 'properties token is set without prime and route existing');
@@ -115,19 +115,19 @@ describe('creating sirenDefinedProperty incomplete objects', () => {
 
 	it('property is not created from object with empty route', () => {
 		const obj = { route: [], token: 1234 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 		assert.isUndefined(res, 'property incorrectly created when empty route in object');
 	});
 
 	it('property is not created from object with one object with useless fields in route', () => {
 		const obj = { route: [{ id: 987 }], token: 1234 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 		assert.isUndefined(res, 'property incorrectly created when route in object with useless object');
 	});
 
 	it('property has observable from route and token from obj', () => {
 		const obj = { route: [{ observable: ot.link }], token: 1234 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 		assert.exists(res, 'property was not made from a valid object');
 
 		assert.equal(res.type, ot.link, 'properties type is not set to observable');
@@ -140,7 +140,7 @@ describe('creating sirenDefinedProperty incomplete objects', () => {
 
 	it('property has token and type from route', () => {
 		const obj = { route: [{ observable: ot.link, token: 7489 }] };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.exists(res, 'property was not made from a valid object');
 
@@ -154,7 +154,7 @@ describe('creating sirenDefinedProperty incomplete objects', () => {
 
 	it('property has token from routes object, route uses objs token', () => {
 		const obj = { route: [{ observable: ot.link, token: 7489 }], token: 1234 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.exists(res, 'property was not made from a valid object');
 
@@ -168,7 +168,7 @@ describe('creating sirenDefinedProperty incomplete objects', () => {
 
 	it('property has token from first object in route. route contains second object from original route and token from obj', () => {
 		const obj = { route: [{ observable: ot.link, token: 7489 }, { observable: ot.link, token: 42 }], token: 1234 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.exists(res, 'property was not made from a valid object');
 
@@ -182,7 +182,7 @@ describe('creating sirenDefinedProperty incomplete objects', () => {
 
 	it('property created and contains token due to prime existing', () => {
 		const obj = { prime: true, token: 1234, observable: ot.link };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.exists(res, 'property was not made from a valid object');
 
@@ -195,7 +195,7 @@ describe('creating sirenDefinedProperty incomplete objects', () => {
 
 	it('property created without token due to no token in obj', () => {
 		const obj = { prime: true, observable: ot.link };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.exists(res, 'property was not made from a valid object');
 
@@ -208,7 +208,7 @@ describe('creating sirenDefinedProperty incomplete objects', () => {
 
 	it('property created without token due to prime being false', () => {
 		const obj = { prime: false, token: 1234, observable: ot.link };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.exists(res, 'property was not made from a valid object');
 
@@ -220,11 +220,11 @@ describe('creating sirenDefinedProperty incomplete objects', () => {
 	});
 });
 
-describe('calling sirenDefinedProperty with observable objects', () => {
+describe('calling sirenObserverDefinedProperty with observable objects', () => {
 
 	it('property created for sirenLink', () => {
 		const obj = { type: String, observable: ot.link, rel: orgHref };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.equal(res.type, ot.link, 'property link was set incorrectly');
 		assert.equal(res.id, orgHref, 'property id is not objects rel');
@@ -235,7 +235,7 @@ describe('calling sirenDefinedProperty with observable objects', () => {
 	it('property created for sirenLink with a HypermediaState', () => {
 		const obj = { type: String, observable: ot.link, rel: orgHref };
 		const state = new HypermediaState(orgHref, 21312);
-		const res = sirenDefinedProperty(obj, state);
+		const res = sirenObserverDefinedProperty(obj, state);
 
 		assert.equal(res.type, ot.link, 'property link was set incorrectly');
 		assert.equal(res.state, state, 'property state was not set to provided HypermediaState');
@@ -245,7 +245,7 @@ describe('calling sirenDefinedProperty with observable objects', () => {
 
 	it('property created for sirenEntity. token does not exist', () => {
 		const obj = { type: String, observable: ot.entity, rel: orgHref, token: 123123  };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.equal(res.type, ot.entity, 'property type set to wrong observable');
 		assert.isNull(res.state, 'state was set when no HypermedidState provided');
@@ -255,7 +255,7 @@ describe('calling sirenDefinedProperty with observable objects', () => {
 
 	it('property created for sirenSubEntities where token exists', () => {
 		const obj = { type: String, observable: ot.subEntities, rel: orgHref, token: 123123 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.equal(res.type, ot.subEntities, 'property type set to wrong observable');
 		assert.isNull(res.state, 'state was set when no HypermedidState provided');
@@ -265,7 +265,7 @@ describe('calling sirenDefinedProperty with observable objects', () => {
 
 	it('property created for sirenSubEntity. token does not exist', () => {
 		const obj = { type: String, observable: ot.subEntity, rel: orgHref, token: 123123 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.equal(res.type, ot.subEntity, 'property type set to wrong observable');
 		assert.isNull(res.state, 'state was set when no HypermedidState provided');
@@ -275,7 +275,7 @@ describe('calling sirenDefinedProperty with observable objects', () => {
 
 	it('property created for sirenClasses. token does not exist', () => {
 		const obj = { type: String, observable: ot.classes, rel: orgHref, token: 123123 };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.equal(res.type, ot.classes, 'property type set to wrong observable');
 		assert.isNull(res.state, 'state was set when no HypermedidState provided');
@@ -283,19 +283,19 @@ describe('calling sirenDefinedProperty with observable objects', () => {
 		assert.isUndefined(res.token, 'property token should not be set in entity');
 	});
 
-	it('property created for sirenAction. token does not exist', () => {
-		const obj = { type: String, observable: ot.action, rel: orgHref, token: 123123 };
-		const res = sirenDefinedProperty(obj, null);
+	it('property created for sirenAction. token does exist', () => {
+		const obj = { type: String, observable: ot.action, name: orgHref, token: 123123 };
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.equal(res.type, ot.action, 'property type set to wrong observable');
 		assert.isNull(res.state, 'state was set when no HypermedidState provided');
 		assert.equal(res.id, orgHref, 'property id is not objects rel');
-		assert.isUndefined(res.token, 'property token should not be set in entity');
+		assert.equal(res.token, 123123, 'property token should be set in entity');
 	});
 
 	it('property created for sirenProperty. id exists', () => {
 		const obj = { type: String, observable: ot.property, token: 123123, name: '_hello' };
-		const res = sirenDefinedProperty(obj, null);
+		const res = sirenObserverDefinedProperty(obj, null);
 
 		assert.equal(res.type, ot.property, 'property type set to wrong observable');
 		assert.isNull(res.state, 'state was set when no HypermedidState provided');

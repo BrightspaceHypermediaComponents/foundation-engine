@@ -26,7 +26,9 @@ export class ObserverMap {
 			this._methods.set(observer, method);
 		}
 
-		this._setObserverProperty(observer, property);
+		if (this._value !== undefined) {
+			this._setObserverProperty(observer, property);
+		}
 	}
 
 	delete(observer) {
@@ -54,7 +56,7 @@ export class ObserverMap {
 
 }
 
-export function getEntityIdFromSirenEntity(entity) {
+export function getEntityIDFromSirenEntity(entity) {
 	const self = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self');
 	return  entity.href || (self && self.href);
 }

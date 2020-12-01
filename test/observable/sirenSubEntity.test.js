@@ -30,13 +30,13 @@ describe('sirenSubEntity method tests', () => {
 		assert.equal(sub._routes.size, 0, 'subEntity routes should be empty when constructed');
 	});
 
-	it('subEntity constructed from appropriate object and entityId set', () => {
+	it('subEntity constructed from appropriate object and entityID set', () => {
 		const sub = new SirenSubEntity({ id: 'foo', token: 'bar' });
-		sub.entityId = 'baz';
+		sub.entityID = 'baz';
 
 		assert.equal(sub.rel, 'foo', 'subEntity rel field initialized incorrectly');
 		assert.equal(sub._token, 'bar', 'subEntity token field initialized incorrectly');
-		assert.equal(sub.entityId, 'baz', 'subEntity rel field set incorrectly');
+		assert.equal(sub.entityID, 'baz', 'subEntity rel field set incorrectly');
 		assert.instanceOf(sub._routes, Map, 'routes should be a Map');
 		assert.equal(sub._routes.size, 0, 'subEntity routes should be empty when constructed');
 	});

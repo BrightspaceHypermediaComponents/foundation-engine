@@ -66,7 +66,8 @@ let gettingToken = null;
 
 export async function getToken(token) {
 	if (typeof (token) !== 'function') {
-		return new Token(token, token);
+		//todo: this is broken used to be new Token(token, token) which wouldn't work
+		return new Token(token, token || token.rawToken);
 	}
 	if (gettingToken) {
 		return gettingToken;

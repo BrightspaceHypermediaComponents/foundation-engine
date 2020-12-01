@@ -1,7 +1,7 @@
 import { componentStoreFactory, isPseudoTag } from '../../render/componentFactory.js';
 import { defaultTemplateProcessor, html, TemplateResult } from 'lit-html';
-import { fetch, stateFactory } from '../../state/store.js';
-import { observableTypes } from '../../state/HypermediaState.js';
+import { observableTypes, stateFactory } from '../../state/HypermediaState.js';
+import { fetch } from '../../state/fetch.js';
 import { until } from 'lit-html/directives/until.js';
 
 export function custom(tag, elementClass, pseudoTag, hypermediaClasses, options) {
