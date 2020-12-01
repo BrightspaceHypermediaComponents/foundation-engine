@@ -68,10 +68,7 @@ export class SirenSubEntity extends Observable {
 			return;
 		}
 
-		entity._observers._observers.forEach((observer, property) => {
-			this.addObserver(observer, property);
-		});
-
+		this._observers.merge(entity._observers);
 		this._token = this._token || entity._token;
 	}
 
