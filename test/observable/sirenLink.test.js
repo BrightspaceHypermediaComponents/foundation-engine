@@ -127,7 +127,7 @@ describe('sirenLink with observers', () => {
 	});
 });
 
-// describe('merging sirenLinks', () => {
+// describe.only('merging sirenLinks', () => {
 // 	let link1, link2, method1, method2, obs1, obs2;
 
 // 	beforeEach(() => {
