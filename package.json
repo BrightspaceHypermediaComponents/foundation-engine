@@ -1,11 +1,11 @@
 {
   "name": "@brightspace-hmc/foundation-engine",
   "version": "0.0.1",
-  "description": "engine for foundation-hmc",
+  "description": "engine for foundation hypermedia components",
   "scripts": {
-    "test": "npm run lint && npm run test:headless",
     "lint": "eslint . --ext .js,.html",
-    "test:headless": "karma start",
+    "test": "npm run lint && npm run test:headless",
+    "test:headless": "karma start --coverage",
     "test:sauce": "karma start karma.sauce.conf.js"
   },
   "repository": {
