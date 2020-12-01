@@ -2,7 +2,7 @@ import { assert }  from '@open-wc/testing';
 import SirenParse from 'siren-parser';
 import { SirenSubEntities } from '../../state/observable/SirenSubEntities.js';
 import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
-import { testSubEntities } from './entities.js';
+import { testSubEntities } from '../data/observable/entities.js';
 
 describe('subEntities basic methods', () => {
 	beforeEach(() => {
