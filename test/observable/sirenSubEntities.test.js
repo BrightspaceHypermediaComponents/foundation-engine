@@ -29,7 +29,7 @@ describe('subEntities basic methods', () => {
 });
 
 describe('sirenSubEntities set sirenEntity', () =>  {
-	// testSubEntites are imported from ./entities.js for testing
+	// testSubEntites are imported from ../data/observable/entities.js for testing
 	it('entity with zero matching ids has been added as subentity', () => {
 		const subentites = new SirenSubEntities({ id: 'foo', token: '1234', state: 'hello' });
 		const entity = SirenParse(testSubEntities[1]);

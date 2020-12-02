@@ -1,5 +1,7 @@
 import { assert }  from '@open-wc/testing';
 import { SirenLink } from '../../state/observable/SirenLink.js';
+import SirenParse from 'siren-parser';
+import { testLinks } from '../data/observable/entities.js';
 
 describe('call sirenLink methods', () => {
 	it('sirenLink constructed from no object', () => {
@@ -125,169 +127,38 @@ describe('sirenLink with observers', () => {
 		assert.equal(routes.size, 1, 'incorrect number of routes stored in observer');
 		assert.equal(routes.get(obs).id, 'fghij', 'route set incorrectly for observer');
 	});
+
+	describe('should call setSirenEntity', () => {
+		// testLinks are imported from ../data/observable/entities.js for testing
+		let link1, collection;
+		beforeEach(() => {
+			collection = new Map();
+			link1 = new SirenLink({ id: 'foo', token: 'bar' });
+
+		});
+
+		it('should update SirenLinks href to be the href from test data', () => {
+			const entity = SirenParse(testLinks[0]);
+
+			link1.setSirenEntity(entity);
+			assert.equal(link1.href, 'http://example.com', 'should be href from testLinks[0]');
+		});
+
+		it('should merge observer from collection link into link1', () => {
+			const entity = SirenParse(testLinks[0]);
+			const link2 = new SirenLink({ id: 'foo', token: '123' });
+			const observer = { foo: 'wow' };
+			link2.addObserver(observer, 'foo');
+			collection.set('foo', link2);
+
+			assert.equal(observer['foo'], 'wow', 'observer should have property set to initial value');
+
+			link1.setSirenEntity(entity, collection);
+
+			assert.equal(link1.href, 'http://example.com', 'should be href from testLinks[0]');
+			assert.isTrue(link1._observers._observers.has(observer));
+			assert.equal(observer['foo'], 'http://example.com', 'observer should have property setting Siren Entity');
+			assert.equal(collection.get('foo'), link1);
+		});
+	});
 });
-
-// describe.only('merging sirenLinks', () => {
-// 	let link1, link2, method1, method2, obs1, obs2;
-
-// 	beforeEach(() => {
-// 		link1 = new SirenLink({ id: 'foo', token: 'bar' });
-// 		link2 = new SirenLink({ id: 'abc', token: 'def' });
-// 		link1.link = { href: 'www.abc.com' };
-// 		link2.link = { href: 'www.xyz.com' };
-// 		method1 = (val) => { `${val}1`; };
-// 		method2 = (val) => { `${val}2`; };
-
-// 		obs1 = { name: '1234' };
-// 		obs2 = { id: '5678' };
-// 	});
-
-// 	it('Two SirenLinks with unique components without routes are merged',  () => {
-// 		link1.addObserver(obs1, 'name', { method: method1 });
-// 		link2.addObserver(obs2, 'id', { method: method2 });
-// 		link1._merge(link2);
-
-// 		// checking that link1 is updated correctly
-// 		assert.equal(link1._token, 'bar', 'link token was not left unchanged after merge');
-// 		assert.equal(link1.rel, 'foo', 'link rel was altered in merge');
-
-// 		const map = link1._observers._observers;
-// 		assert.equal(map.size, 2, 'link map has incorrect size after another link was merged into it');
-// 		assert.equal(map.get(obs1), 'name', 'observer maps to incorrect value');
-// 		assert.equal(map.get(obs2), 'id', 'observer maps to incorrect value');
-
-// 		const methods = link1._observers._methods;
-// 		assert.isTrue(methods.has(obs1), 'method for observer is not stored');
-// 		assert.equal(methods.get(obs1), method1, 'incorrect method stored for observer');
-// 		assert.equal(obs1['name'], 'www.abc.com1', 'observer applies method incorrectly');
-
-// 		assert.isTrue(methods.has(obs2), 'method for observer is not stored');
-// 		assert.equal(methods.get(obs2), method2, 'incorrect method stored for observer');
-// 		assert.equal(obs2['id'], 'www.xyz.com2', 'observer applies method incorrectly');
-
-// 		// checking link2 was not altered
-// 		const map2 = link2._observers._observers;
-// 		assert.equal(map2.size, 1, 'link map has incorrect size after another link was merge into it');
-// 		assert.equal(map2.get(obs2), 'id', 'observer maps to incorrect value');
-
-// 		const methods2 = link1._observers._methods;
-// 		assert.isTrue(methods2.has(obs2), 'method for observer is not stored');
-// 		assert.equal(methods2.get(obs2), method2, 'incorrect method stored for observer');
-// 		assert.equal(obs2['id'], 'id2', 'observer applies method incorrectly');
-// 	});
-
-// 	it('Two SirenLinks with unique components with routes are merged',  () => {
-// 		link1.addObserver(obs1, 'name', { route: { name: 'abcde' } });
-// 		link2.addObserver(obs2, 'id', { route: { id: 'fghij' } });
-// 		link1._merge(link2);
-
-// 		// checking that link1 is updated correctly
-// 		assert.equal(link1._token, 'bar', 'link token was not left unchanged after merge');
-
-// 		const map = link1._observers._observers;
-// 		assert.equal(map.size, 0, 'SirenLink has incorrect number of observers');
-
-// 		const routes = link1._routes;
-// 		assert.equal(routes.size, 2, 'incorrect number of routes stored in observer');
-// 		assert.equal(routes.get(obs1).route, { name: 'abcde' }, 'route set incorrectly for observer');
-// 		assert.equal(routes.get(obs2).route, { id: 'fghij' }, 'route set incorrectly for observer');
-
-// 		// checking link2 was not altered
-// 		const map2 = link2._observers._observers;
-// 		assert.equal(map2.size, 0, 'link map has incorrect size after another link was merge into it');
-// 		const routes2 = link1._routes;
-
-// 		assert.equal(routes2.size, 1, 'incorrect number of routes stored in observer');
-// 		assert.equal(routes2.get(obs2).route, { id: 'fghij' }, 'route set incorrectly for observer');
-// 	});
-
-// 	it('Two SirenLinks with unique components merged, one method, one route',  () => {
-// 		link1.addObserver(obs1, 'name', { route: { name: 'abcde' } });
-// 		link2.addObserver(obs2, 'id', { method: method1 });
-// 		link1._merge(link2);
-
-// 		// checking that link1 is updated correctly
-// 		assert.equal(link1._token, 'bar', 'link token was not left unchanged after merge');
-
-// 		const map = link1._observers._observers;
-// 		assert.equal(map.size, 1, 'SirenLink has incorrect number of observers');
-// 		assert.equal(map.get(obs2), 'id', 'observer maps to incorrect value');
-// 		assert.isFalse(map.get(obs1), 'observer maps to incorrect value when routed');
-
-// 		const methods = link1._observers._methods;
-// 		assert.isFalse(methods.has(obs1), 'method for observer is stored when no method present');
-
-// 		assert.isTrue(methods.has(obs2), 'method for observer is not stored');
-// 		assert.equal(methods.get(obs2), method1, 'incorrect method stored for observer');
-// 		assert.equal(obs2['id'], 'www.abc.com1', 'observer applies method incorrectly');
-
-// 		const routes = link1._routes;
-// 		assert.equal(routes.size, 2, 'incorrect number of routes stored in observer');
-// 		assert.equal(routes.get(obs1).route, { name: 'abcde' }, 'route set incorrectly for observer');
-// 		assert.equal(routes.get(obs2).route, { id: 'fghij' }, 'route set incorrectly for observer');
-
-// 		// checking link2 was not altered
-// 		const map2 = link2._observers._observers;
-// 		assert.equal(map2.size, 0, 'link map has incorrect size after another link was merge into it');
-
-// 		const methods2 = link2._observers._methods;
-// 		assert.isTrue(methods2.has(obs2), 'method for observer is not stored');
-// 		assert.equal(methods2.get(obs2), method1, 'incorrect method stored for observer');
-// 		assert.equal(obs2['id'], 'www.abc.com1', 'observer applies method incorrectly');
-
-// 		const routes2 = link1._routes;
-// 		assert.equal(routes2.size, 0, 'incorrect number of routes stored in observer');
-// 	});
-// });
-
-// describe('sirenLink set siren entity', () => {
-// 	let link1, link2, entity; // method1, method2, obs1, obs2,
-
-// 	beforeEach(() => {
-// 		link1 = new SirenLink({ id: 'foo', token: 'bar' });
-// 		link2 = new SirenLink({ id: 'abc', token: 'def' });
-// 		link1.link = { href: 'www.abc.com', rel: ['12345'] };
-// 		link2.link = { href: 'www.xyz.com', rel: ['67890'] };
-
-// 		// method1 = (val) => { `${val}1`; };
-// 		// method2 = (val) => { `${val}2`; };
-
-// 		// obs1 = new Component();
-// 		// obs2 = new Component();
-
-// 		const stub1 = sinon.stub(entity, 'hasLinkByRel');
-// 		stub1.callsFake(() => true);
-// 		const stub2 = sinon.stub(entity, 'getLinkByRel');
-// 		stub2.callsFake(() => 'foo');
-// 	});
-
-// 	it('sirenEntity without link set attempted and failed', () => {
-// 		const stub1 = sinon.stub(entity, 'hasLinkByRel');
-// 		stub1.callsFake(() => false);
-// 		entity = new SirenEntity();
-
-// 		link1.setSirenEntity(entity);
-
-// 		assert.equal(link1.rel, 'foo', 'SirenLink rel altered when linkless entity set');
-// 		assert.instanceOf(link1._routes, Map, 'SirenLink route is not a Map');
-// 		assert.equal(link1.routes.size, 0, 'SirenLink number of routes increased when linkless entity set');
-// 		assert.equal(link1._token, 'bar', 'SirenLink token altered when linkless entity set');
-// 		assert.isUndefined(link1.childState, 'SirenLink child state set with linkless entity');
-// 	});
-
-// 	it('sirenEntity without link set attempted and failed', () => {
-// 		const entityToSet = new SirenLink({ id: 'cat', token: 'meow' });
-// 		entityToSet.link = { href: 'testing', rel: ['12345'] };
-
-// 		const linkCollection = new Map();
-// 		linkCollection['12345'] = link2;
-
-// 		link1.addObserver(obs1, 'foo', { method: method1 });
-// 		link2.addObserver(obs2, 'bar', { method: method2 });
-// 		link1.setSirenEntity(entityToSet);
-
-// 		const observers = link1._observers._observers;
-// 		assert.equal(observers.size, 1, 'link has incorrect observers after set entity should add one');
-// 		assert.equal(observers.get());
-// 	});
-// });
