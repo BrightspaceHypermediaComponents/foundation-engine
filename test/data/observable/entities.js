@@ -23,3 +23,11 @@ export const testSubEntities = [`{
 	"href": "hello"
   }`
 ];
+
+export const testLinks = [`{
+	"links": [{
+	  "rel": ["foo"],
+	  "href": "http://example.com"
+	}]
+  }`
+];
