@@ -4,7 +4,7 @@ import { StateStore } from '../../state/StateStore.js';
 let stateStore;
 const entityID = 'HREF';
 const token = 'TOKEN';
-const entityLowerCase = entityID.toLowerCase();
+const entityIDLowerCase = entityID.toLowerCase();
 const defaultState = {
 	entityID: entityID,
 	token: token,
@@ -37,7 +37,7 @@ describe('State Store', () => {
 		it('should add state to store', () => {
 			stateStore.add(defaultState);
 			assert.equal(stateStore._states.size, 1, 'State was not added to the store');
-			assert.equal(stateStore._states.get(token).get(entityLowerCase), defaultState,
+			assert.equal(stateStore._states.get(token).get(entityIDLowerCase), defaultState,
 				'Default state does not match');
 		});
 
@@ -52,7 +52,7 @@ describe('State Store', () => {
 
 			assert.equal(stateStore._states.size, 1, 'States were not be mapped together by token');
 			assert.equal(stateStore._states.get(token).size, 2, 'Expected 2 states in the token map');
-			assert.equal(stateStore._states.get(token).get(entityLowerCase), defaultState,
+			assert.equal(stateStore._states.get(token).get(entityIDLowerCase), defaultState,
 				'Default state does not match');
 			assert.equal(stateStore._states.get(token).get(state2.entityID.toLowerCase()), state2,
 				'Second state does not match');
@@ -72,7 +72,7 @@ describe('State Store', () => {
 				'Default token has more entities than expected');
 			assert.equal(stateStore._states.get(state2.token).size, 1,
 				'State2 token has more entities than expected');
-			assert.equal(stateStore._states.get(token).get(entityLowerCase), defaultState,
+			assert.equal(stateStore._states.get(token).get(entityIDLowerCase), defaultState,
 				'Default state does not match');
 			assert.equal(stateStore._states.get(state2.token).get(state2.entityID.toLowerCase()), state2,
 				'Second state does not match');
@@ -106,8 +106,10 @@ describe('State Store', () => {
 
 		it('should ignore case on entityID', () => {
 			stateStore.add(defaultState);
-			const foundState = stateStore.get(defaultState.entityID.toLowerCase(), defaultState.token);
-			assert.equal(foundState, defaultState, 'Matched the wrong state');
+			[defaultState.entityID.toLowerCase(), defaultState.entityID.toUpperCase()].forEach((id) => {
+				const foundState = stateStore.get(id, defaultState.token);
+				assert.equal(foundState, defaultState, 'should find entity by entityId');
+			});
 		});
 
 		it('should return the correct state when there are multiple states', () => {
