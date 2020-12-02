@@ -1,5 +1,5 @@
 import { assert }  from '@open-wc/testing';
-import { StateStore } from '../state/stateStore.js';
+import { StateStore } from '../../state/stateStore.js';
 
 let stateStore;
 const entityID = 'HREF';
