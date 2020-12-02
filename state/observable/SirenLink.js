@@ -75,10 +75,7 @@ export class SirenLink extends Observable {
 			return;
 		}
 
-		sirenLink._observers._observers.forEach((observer, property) => {
-			this.addObserver(observer, property);
-		});
-
+		this._observers.merge(sirenLink._observers);
 		this._token = this._token || sirenLink._token;
 	}
 }
