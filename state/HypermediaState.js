@@ -36,8 +36,8 @@ export class HypermediaState extends Fetchable(Object) {
 			const basicInfo = sirenObserverDefinedProperty(propertyInfo, this);
 			if (!basicInfo) return;
 
-			const sirenComponent = this._getSirenComponent(basicInfo);
-			sirenComponent.addObserver(component, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
+			const sirenObservable = this._getSirenObservable(basicInfo);
+			sirenObservable.addObserver(component, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
 		});
 	}
 
@@ -48,8 +48,8 @@ export class HypermediaState extends Fetchable(Object) {
 
 	dispose(component) {
 		this._decodedEntity.forEach(typeMap => {
-			typeMap.forEach(sirenComponent => {
-				sirenComponent.delete(component);
+			typeMap.forEach(sirenObservable => {
+				sirenObservable.delete(component);
 			});
 		});
 	}
@@ -100,8 +100,8 @@ export class HypermediaState extends Fetchable(Object) {
 		}
 		this._entity = entity !== null ? entity : this._entity;
 		this._decodedEntity.forEach(typeMap => {
-			typeMap.forEach(sirenComponent => {
-				sirenComponent.setSirenEntity(this._entity, typeMap);
+			typeMap.forEach(sirenObservable => {
+				sirenObservable.setSirenEntity(this._entity, typeMap);
 			});
 		});
 	}
@@ -118,17 +118,17 @@ export class HypermediaState extends Fetchable(Object) {
 			const basicInfo = sirenObserverDefinedProperty(propertyInfo);
 			if (!basicInfo) return;
 
-			const sirenComponent = this._getSirenComponent(basicInfo);
-			sirenComponent && (sirenComponent.value = propertyInfo.value);
+			const sirenObservable = this._getSirenObservable(basicInfo);
+			sirenObservable && (sirenObservable.value = propertyInfo.value);
 		});
 	}
 
 	_childStates() {
 		let childStates = [];
 		this._decodedEntity.forEach(typeMap => {
-			typeMap.forEach(sirenComponent => {
-				childStates = [...childStates, ...(sirenComponent.childStates || [])];
-				sirenComponent.childState && childStates.push(sirenComponent.childState);
+			typeMap.forEach(sirenObservable => {
+				childStates = [...childStates, ...(sirenObservable.childStates || [])];
+				sirenObservable.childState && childStates.push(sirenObservable.childState);
 			});
 		});
 		return childStates;
@@ -143,15 +143,15 @@ export class HypermediaState extends Fetchable(Object) {
 		return map.get(identifier);
 	}
 
-	_getSirenComponent(basicInfo) {
+	_getSirenObservable(basicInfo) {
 		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
 		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
 
-		const sirenComponent = sirenObservableFactory(basicInfo);
-		typeMap.set(basicInfo.id, sirenComponent);
-		this._entity && sirenComponent.setSirenEntity(this._entity, typeMap);
+		const sirenObservable = sirenObservableFactory(basicInfo);
+		typeMap.set(basicInfo.id, sirenObservable);
+		this._entity && sirenObservable.setSirenEntity(this._entity, typeMap);
 
-		return sirenComponent;
+		return sirenObservable;
 	}
 }
 
