@@ -31,9 +31,7 @@ export class StateStore {
 		return this._states.has(tokenCache) && this._states.get(tokenCache).has(lowerCaseEntityID);
 	}
 
-	_initTokenMap(token) {
-		const tokenCache = token.toString();
-
+	_initTokenMap(tokenCache) {
 		if (!this._states.has(tokenCache)) {
 			this._states.set(tokenCache, new Map());
 		}
