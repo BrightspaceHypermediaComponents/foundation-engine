@@ -25,7 +25,7 @@ export class HypermediaState extends Fetchable(Object) {
 		this._decodedEntity = new Map();
 	}
 
-	addObservables(component, observables) {
+	addObservables(observer, observables) {
 		Object.keys(observables).forEach((name) => {
 			const propertyInfo = {
 				name,
@@ -37,7 +37,7 @@ export class HypermediaState extends Fetchable(Object) {
 			if (!basicInfo) return;
 
 			const sirenObservable = this._getSirenObservable(basicInfo);
-			sirenObservable.addObserver(component, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
+			sirenObservable.addObserver(observer, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
 		});
 	}
 
@@ -46,10 +46,10 @@ export class HypermediaState extends Fetchable(Object) {
 		return stateFactory(entityID, token);
 	}
 
-	dispose(component) {
+	dispose(observer) {
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
-				sirenObservable.delete(component);
+				sirenObservable.delete(observer);
 			});
 		});
 	}
@@ -174,6 +174,6 @@ export async function stateFactory(entityID, rawToken) {
 	return state;
 }
 
-export function dispose(state, component) {
-	state && state.dispose(component);
+export function dispose(state, observable) {
+	state && state.dispose(observable);
 }
