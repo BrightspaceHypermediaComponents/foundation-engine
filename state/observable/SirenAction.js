@@ -28,8 +28,6 @@ export class SirenAction extends Fetchable(Observable) {
 		if (this.action.has !== has || this.action.commit !== commit) {
 			this._observers.setProperty({ has, commit });
 		}
-
-		this._observers.value = { has, commit };
 	}
 
 	get headers() {
