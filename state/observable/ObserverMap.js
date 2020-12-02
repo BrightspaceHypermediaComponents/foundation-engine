@@ -36,9 +36,9 @@ export class ObserverMap {
 		return this._observers.delete(observer);
 	}
 
-	merge(map) {
-		map._observers.forEach((property, observer) => {
-			this.add(observer, property, map._methods.get(observer));
+	merge(observerMap) {
+		observerMap._observers.forEach((property, observer) => {
+			this.add(observer, property, observerMap._methods.get(observer));
 		});
 	}
 
