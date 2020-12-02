@@ -2,6 +2,10 @@ import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 import { SirenSubEntity } from './SirenSubEntity.js';
 
+/**
+ * Observable SirenSubEntities
+ * Reflects back an array of parsed siren entities to any observers
+ */
 export class SirenSubEntities extends Observable {
 	static definedProperty({ token }) {
 		return { token };
@@ -11,23 +15,23 @@ export class SirenSubEntities extends Observable {
 		super();
 		this._state = state;
 		this._rel = id;
-		this._childSubEntities = new Map();
+		this._entityMap = new Map();
 		this._token = token;
-		this.entityIDs = [];
+		this.entities = [];
 	}
 
-	get entityIDs() {
+	get entities() {
 		return this._observers.value;
 	}
 
-	set entityIDs(entityIDs) {
-		if (this.entityIDs !== entityIDs) {
-			this._observers.setProperty(entityIDs || []);
+	set entities(entities) {
+		if (this.entities !== entities) {
+			this._observers.setProperty(entities || []);
 		}
 	}
 
-	get childSubEntities() {
-		return this._childSubEntities;
+	get entityMap() {
+		return this._entityMap;
 	}
 
 	get rel() {
@@ -36,7 +40,7 @@ export class SirenSubEntities extends Observable {
 
 	setSirenEntity(sirenEntity) {
 		const subEntities = sirenEntity && sirenEntity.getSubEntitiesByRel(this._rel);
-		const childSubEntities = new Map();
+		const entityMap = new Map();
 
 		// This makes the assumption that the order returned by the collection
 		// matches the prev/next order for each item.
@@ -47,27 +51,29 @@ export class SirenSubEntities extends Observable {
 		subEntities.forEach((sirenSubEntity) => {
 			const entityID = getEntityIDFromSirenEntity(sirenSubEntity);
 			// If we already set it up why do it again?
-			if (this.childSubEntities.has(entityID)) {
-				childSubEntities.set(entityID, this.childSubEntities.get(entityID));
-				this.childSubEntities.delete(entityID);
+			if (this.entityMap.has(entityID)) {
+				entityMap.set(entityID, this.entityMap.get(entityID));
+				this.entityMap.delete(entityID);
 				return;
 			}
 
 			const subEntity = new SirenSubEntity({ id: this.rel, token: this._token });
-			subEntity.entityID = entityID;
-			childSubEntities.set(entityID, subEntity);
+			// todo: create a facade to make the subEntity easier to work with
+			sirenSubEntity.href = entityID;
+			subEntity.entity = sirenSubEntity;
+			entityMap.set(entityID, subEntity);
 		});
 
 		// These ones are no longer required.
-		this.childSubEntities.clear();
+		this.entityMap.clear();
 
-		this._childSubEntities = childSubEntities;
+		this._entityMap = entityMap;
 
-		const entityIDs = [];
-		this.childSubEntities.forEach((_, entityID) => {
-			entityIDs.push(entityID);
+		const entities = [];
+		this.entityMap.forEach((subEntity) => {
+			entities.push(subEntity.entity);
 		});
 
-		this.entityIDs = entityIDs;
+		this.entities = entities;
 	}
 }

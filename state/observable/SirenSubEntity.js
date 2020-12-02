@@ -3,6 +3,10 @@ import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 import { shouldAttachToken } from '../token.js';
 
+/**
+ * Observable SirenSubEntity object
+ * Reflects back the siren parsed entity to any observers
+ */
 export class SirenSubEntity extends Observable {
 	constructor({ id, token, state } = {}) {
 		super();
@@ -12,13 +16,13 @@ export class SirenSubEntity extends Observable {
 		this._token = token;
 	}
 
-	get entityID() {
+	get entity() {
 		return this._observers.value;
 	}
 
-	set entityID(entityID) {
-		if (this.entityID !== entityID) {
-			this._observers.setProperty(entityID);
+	set entity(subEntity) {
+		if (this.entity !== subEntity) {
+			this._observers.setProperty(subEntity);
 		}
 	}
 
@@ -73,10 +77,11 @@ export class SirenSubEntity extends Observable {
 	}
 
 	async _setSubEntity(subEntity) {
-		this.entityID = getEntityIDFromSirenEntity(subEntity);
+		const entityId = getEntityIDFromSirenEntity(subEntity);
+		this.entity = subEntity;
 
 		if (this._token) {
-			this._childState = await this.createChildState(this.entityID, shouldAttachToken(this._token.rawToken, subEntity));
+			this._childState = await this.createChildState(entityId, shouldAttachToken(this._token.rawToken, subEntity));
 			this._childState.setSirenEntity(subEntity);
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
