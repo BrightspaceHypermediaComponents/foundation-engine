@@ -36,7 +36,7 @@ describe('sirenSubEntity method tests', () => {
 
 		assert.equal(sub.rel, 'foo', 'subEntity rel field initialized incorrectly');
 		assert.equal(sub._token, 'bar', 'subEntity token field initialized incorrectly');
-		assert.deepEqual(sub.entity, { href: 'baz' }, 'subEntity rel field set incorrectly');
+		assert.deepEqual(sub.entity, { href: 'baz' }, 'subEntity entity should be set correctly');
 		assert.instanceOf(sub._routes, Map, 'routes should be a Map');
 		assert.equal(sub._routes.size, 0, 'subEntity routes should be empty when constructed');
 	});

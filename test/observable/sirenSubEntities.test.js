@@ -13,7 +13,7 @@ describe('subEntities basic methods', () => {
 		assert.isUndefined(obj._token, 'subEntities token initialized by empty object');
 		assert.instanceOf(obj.entityMap, Map, 'subEntities children should be a map');
 		assert.isArray(obj.entities, 'subEntities entities should be empty list');
-		assert.isEmpty(obj.entities, 'subEntites enitityIDS should start empty');
+		assert.isEmpty(obj.entities, 'subEntities list should start empty');
 	});
 
 	it('sirenSubEntites constructed from non-empty object', () => {
@@ -24,7 +24,7 @@ describe('subEntities basic methods', () => {
 		assert.equal(obj._token, '1234', 'subEntities token should be initialized');
 		assert.instanceOf(obj.entityMap, Map, 'subEntities children should be a map');
 		assert.isArray(obj.entities, 'subEntities entities should be empty list');
-		assert.isEmpty(obj.entities, 'subEntites enitityIDS should start empty');
+		assert.isEmpty(obj.entities, 'subEntities list should start empty');
 	});
 });
 
@@ -50,7 +50,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 		assert.isTrue(subentites.entityMap.has('www.abc.com'), 'SirenSubEntities should have child stored');
 		const addedSubentity = subentites.entityMap.get('www.abc.com');
 		assert.instanceOf(addedSubentity, SirenSubEntity, 'SirenSubEntities child should be a SirenSubEntity');
-		assert.deepEqual(subentites.entities, entity.entities, 'SirenSubEntities entities should store one href');
+		assert.deepEqual(subentites.entities, entity.entities, 'SirenSubEntities entities should store one entity');
 	});
 
 	it('entity with two matching ids has been added as subentity', () => {
@@ -62,7 +62,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 		assert.equal(subentites.entityMap.size, 2, 'SirenSubEntities should have 2 children');
 		assert.isTrue(subentites.entityMap.has('www.def.com'), 'SirenSubEntities should store first child');
 		assert.isTrue(subentites.entityMap.has('www.xyz.com'), 'SirenSubEntities should store second child');
-		assert.deepEqual(subentites.entities, entity.entities, 'SirenSubEntities entities should store two hrefs');
+		assert.deepEqual(subentites.entities, entity.entities, 'SirenSubEntities entities should store two entities');
 	});
 
 	it('entity with two matching ids overwritten with one id', () => {
@@ -75,6 +75,6 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 
 		assert.equal(subentites.entityMap.size, 1, 'SirenSubEntities should have 1 child');
 		assert.isTrue(subentites.entityMap.has('www.abc.com'), 'SirenSubEntities should have child stored');
-		assert.deepEqual(subentites.entities, entity2.entities, 'SirenSubEntities entities should store one href');
+		assert.deepEqual(subentites.entities, entity2.entities, 'SirenSubEntities entities should store one entity');
 	});
 });

@@ -41,6 +41,7 @@ export class SirenSubEntities extends Observable {
 	setSirenEntity(sirenEntity) {
 		const subEntities = sirenEntity && sirenEntity.getSubEntitiesByRel(this._rel);
 		const entityMap = new Map();
+		const entities = [];
 
 		// This makes the assumption that the order returned by the collection
 		// matches the prev/next order for each item.
@@ -50,29 +51,22 @@ export class SirenSubEntities extends Observable {
 		// and will change based on the individual item update.
 		subEntities.forEach((sirenSubEntity) => {
 			const entityID = getEntityIDFromSirenEntity(sirenSubEntity);
+			let subEntity;
 			// If we already set it up why do it again?
 			if (this.entityMap.has(entityID)) {
-				entityMap.set(entityID, this.entityMap.get(entityID));
-				this.entityMap.delete(entityID);
-				return;
+				subEntity = this.entityMap.get(entityID);
+			} else {
+				// todo: create a facade to make the subEntity easier to work with
+				subEntity = new SirenSubEntity({ id: this.rel, token: this._token });
+				subEntity.entity = sirenSubEntity;
 			}
-
-			const subEntity = new SirenSubEntity({ id: this.rel, token: this._token });
-			// todo: create a facade to make the subEntity easier to work with
-			sirenSubEntity.href = entityID;
-			subEntity.entity = sirenSubEntity;
 			entityMap.set(entityID, subEntity);
-		});
-
-		// These ones are no longer required.
-		this.entityMap.clear();
-
-		this._entityMap = entityMap;
-
-		const entities = [];
-		this.entityMap.forEach((subEntity) => {
 			entities.push(subEntity.entity);
 		});
+
+		// Clear the old entity map and reset it to the new one
+		this.entityMap.clear();
+		this._entityMap = entityMap;
 
 		this.entities = entities;
 	}

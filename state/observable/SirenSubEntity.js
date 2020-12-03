@@ -20,8 +20,13 @@ export class SirenSubEntity extends Observable {
 		return this._observers.value;
 	}
 
+	/**
+	 * @param {Entity} subEntity siren parsed entity to set to
+	 */
 	set entity(subEntity) {
 		if (this.entity !== subEntity) {
+			// todo: remove this when we have the facade for subEntity
+			subEntity.href = getEntityIDFromSirenEntity(subEntity);
 			this._observers.setProperty(subEntity);
 		}
 	}
