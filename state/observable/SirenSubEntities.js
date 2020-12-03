@@ -17,16 +17,15 @@ export class SirenSubEntities extends Observable {
 		this._rel = id;
 		this._entityMap = new Map();
 		this._token = token;
-		this.entities = [];
 	}
 
 	get entities() {
 		return this._observers.value;
 	}
 
-	set entities(entities) {
-		if (this.entities !== entities) {
-			this._observers.setProperty(entities || []);
+	set entities(sirenParsedEntities) {
+		if (this.entities !== sirenParsedEntities) {
+			this._observers.setProperty(sirenParsedEntities || []);
 		}
 	}
 
@@ -38,10 +37,10 @@ export class SirenSubEntities extends Observable {
 		return this._rel;
 	}
 
-	setSirenEntity(sirenEntity) {
-		const subEntities = sirenEntity && sirenEntity.getSubEntitiesByRel(this._rel);
+	setSirenEntity(sirenParsedEntity) {
+		const subEntities = sirenParsedEntity && sirenParsedEntity.getSubEntitiesByRel(this._rel);
 		const entityMap = new Map();
-		const entities = [];
+		const sirenParsedEntities = [];
 
 		// This makes the assumption that the order returned by the collection
 		// matches the prev/next order for each item.
@@ -61,13 +60,13 @@ export class SirenSubEntities extends Observable {
 				subEntity.entity = sirenSubEntity;
 			}
 			entityMap.set(entityID, subEntity);
-			entities.push(subEntity.entity);
+			sirenParsedEntities.push(subEntity.entity);
 		});
 
 		// Clear the old entity map and reset it to the new one
 		this.entityMap.clear();
 		this._entityMap = entityMap;
 
-		this.entities = entities;
+		this.entities = sirenParsedEntities;
 	}
 }

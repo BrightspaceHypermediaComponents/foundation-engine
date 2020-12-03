@@ -21,7 +21,7 @@ export class SirenSubEntity extends Observable {
 	}
 
 	/**
-	 * @param {Entity} subEntity siren parsed entity to set to
+	 * @param {Entity} subEntity siren-parser Entity to set to
 	 */
 	set entity(subEntity) {
 		if (this.entity !== subEntity) {

@@ -12,7 +12,7 @@ describe('subEntities basic methods', () => {
 		assert.isUndefined(obj.rel, 'subEntities rel initialized by empty object');
 		assert.isUndefined(obj._token, 'subEntities token initialized by empty object');
 		assert.instanceOf(obj.entityMap, Map, 'subEntities children should be a map');
-		assert.isArray(obj.entities, 'subEntities entities should be empty list');
+		assert.isArray(obj.entities, 'subEntities entities should be array type');
 		assert.isEmpty(obj.entities, 'subEntities list should start empty');
 	});
 
@@ -23,7 +23,7 @@ describe('subEntities basic methods', () => {
 		assert.equal(obj.rel, 'abc', 'subEntities rel should be initialized');
 		assert.equal(obj._token, '1234', 'subEntities token should be initialized');
 		assert.instanceOf(obj.entityMap, Map, 'subEntities children should be a map');
-		assert.isArray(obj.entities, 'subEntities entities should be empty list');
+		assert.isArray(obj.entities, 'subEntities entities should be an array type');
 		assert.isEmpty(obj.entities, 'subEntities list should start empty');
 	});
 });
