@@ -1,6 +1,7 @@
 import { assert }  from '@open-wc/testing';
 import { SirenLink } from '../../state/observable/SirenLink.js';
 import SirenParse from 'siren-parser';
+import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
 import { testLinks } from '../data/observable/entities.js';
 
 describe('call sirenLink methods', () => {
@@ -144,6 +145,14 @@ describe('sirenLink with observers', () => {
 			assert.equal(link1.href, 'http://example.com', 'should be href from testLinks[0]');
 		});
 
+		it('should not update SirenLinky', () => {
+			const entity = SirenParse(testLinks[1]);
+
+			link1.setSirenEntity(entity);
+
+			assert.isUndefined(link1.href, 'should be unset by entity not matching property');
+		});
+
 		it('should merge observer from collection link into link1', () => {
 			const entity = SirenParse(testLinks[0]);
 			const link2 = new SirenLink({ id: 'foo', token: '123' });
@@ -156,9 +165,21 @@ describe('sirenLink with observers', () => {
 			link1.setSirenEntity(entity, collection);
 
 			assert.equal(link1.href, 'http://example.com', 'should be href from testLinks[0]');
-			assert.isTrue(link1._observers._observers.has(observer));
+			assert.isTrue(link1._observers._observers.has(observer), 'should have observer attached');
 			assert.equal(observer['foo'], 'http://example.com', 'observer should have property setting Siren Entity');
 			assert.equal(collection.get('foo'), link1);
+		});
+
+		it('should merge nothing due to not being a SirenLink', () => {
+			const entity = SirenParse(testLinks[0]);
+			const subEntity = new SirenSubEntity({ id: 'foo', token: '123' });
+			const observer = { foo: 'wow' };
+			subEntity.addObserver(observer, 'foo');
+			collection.set('foo', subEntity);
+
+			link1.setSirenEntity(entity, collection);
+
+			assert.isFalse(link1._observers._observers.has(observer), 'should not have observer attached');
 		});
 	});
 });

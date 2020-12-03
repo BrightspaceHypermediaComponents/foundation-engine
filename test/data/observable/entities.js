@@ -29,5 +29,38 @@ export const testLinks = [`{
 	  "rel": ["foo"],
 	  "href": "http://example.com"
 	}]
+  }`, `{
+	"links": [{
+	  "rel": ["bar"],
+	  "href": "http://example.com"
+	}]
+  }`
+];
+
+export const testSubEntitys = [`{
+	"entities": [{
+        "rel": ["foo"],
+        "links": [{
+            "rel": ["self"],
+            "href": "www.subentity.com"
+		}],
+		"href": "www.foo.com"
+    }]
+  }`, `{
+	"entities": [{
+        "rel": ["foo"],
+        "links": [{
+            "rel": ["self"],
+            "href": "www.subentity.com"
+		}]
+    }]
+  }`, `{
+	"entities": [{
+        "rel": ["bar"],
+        "links": [{
+            "rel": ["self"],
+            "href": "www.subentity.com"
+		}]
+    }]
   }`
 ];
