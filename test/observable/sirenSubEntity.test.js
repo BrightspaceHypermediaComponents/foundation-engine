@@ -110,7 +110,7 @@ describe('sirenSubEntity method tests', () => {
 		});
 
 		it('should update SirenSubEntitys href to be the href from test data', () => {
-			const entity = SirenParse(testSubEntitys[0]);
+			const entity = SirenParse(testSubEntitys.entityWithHref);
 
 			subEntity1.setSirenEntity(entity);
 
@@ -118,7 +118,7 @@ describe('sirenSubEntity method tests', () => {
 		});
 
 		it('should update SirenSubEntitys href to be the href from link in test data', () => {
-			const entity = SirenParse(testSubEntitys[1]);
+			const entity = SirenParse(testSubEntitys.entityWithoutHref);
 
 			subEntity1.setSirenEntity(entity);
 
@@ -126,7 +126,7 @@ describe('sirenSubEntity method tests', () => {
 		});
 
 		it('should not update SirenSubEntity', () => {
-			const entity = SirenParse(testSubEntitys[2]);
+			const entity = SirenParse(testSubEntitys.barEntity);
 
 			subEntity1.setSirenEntity(entity);
 
@@ -135,7 +135,7 @@ describe('sirenSubEntity method tests', () => {
 		});
 
 		it('should merge observer from collection entity into subEntity1', () => {
-			const entity = SirenParse(testSubEntitys[0]);
+			const entity = SirenParse(testSubEntitys.entityWithHref);
 			const subentity2 = new SirenSubEntity({ id: 'foo', token: '123' });
 			const observer = { foo: 'bar' };
 			subentity2.addObserver(observer, 'foo');

@@ -139,14 +139,14 @@ describe('sirenLink with observers', () => {
 		});
 
 		it('should update SirenLinks href to be the href from test data', () => {
-			const entity = SirenParse(testLinks[0]);
+			const entity = SirenParse(testLinks.fooRel);
 
 			link1.setSirenEntity(entity);
 			assert.equal(link1.href, 'http://example.com', 'should be href from testLinks[0]');
 		});
 
 		it('should not update SirenLinky', () => {
-			const entity = SirenParse(testLinks[1]);
+			const entity = SirenParse(testLinks.barRel);
 
 			link1.setSirenEntity(entity);
 
@@ -154,7 +154,7 @@ describe('sirenLink with observers', () => {
 		});
 
 		it('should merge observer from collection link into link1', () => {
-			const entity = SirenParse(testLinks[0]);
+			const entity = SirenParse(testLinks.fooRel);
 			const link2 = new SirenLink({ id: 'foo', token: '123' });
 			const observer = { foo: 'wow' };
 			link2.addObserver(observer, 'foo');
@@ -171,7 +171,7 @@ describe('sirenLink with observers', () => {
 		});
 
 		it('should merge nothing due to not being a SirenLink', () => {
-			const entity = SirenParse(testLinks[0]);
+			const entity = SirenParse(testLinks.fooRel);
 			const subEntity = new SirenSubEntity({ id: 'foo', token: '123' });
 			const observer = { foo: 'wow' };
 			subEntity.addObserver(observer, 'foo');

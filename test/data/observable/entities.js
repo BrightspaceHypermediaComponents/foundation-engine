@@ -1,4 +1,4 @@
-export const testSubEntities = [`{
+export const testSubEntities = { fooEntity:`{
   "entities": [{"rel": ["foo"], "href": "www.abc.com"}],
   "links": [{
 	"rel": ["self"],
@@ -6,7 +6,7 @@ export const testSubEntities = [`{
   }],
   "href": "hello"
 }`,
-`{
+barEntity: `{
   "entities": [{"rel": ["bar"], "href": "www.abc.com"}],
   "links": [{
 	"rel": ["self"],
@@ -14,7 +14,7 @@ export const testSubEntities = [`{
   }],
   "href": "hello"
 }`,
-`{
+multipleSubEntities: `{
 	"entities": [{"rel": ["foo"], "href": "www.def.com"},{"rel": ["foo"], "href": "www.xyz.com"}],
 	"links": [{
 	  "rel": ["self"],
@@ -22,22 +22,22 @@ export const testSubEntities = [`{
 	}],
 	"href": "hello"
   }`
-];
+};
 
-export const testLinks = [`{
+export const testLinks = { fooRel: `{
 	"links": [{
 	  "rel": ["foo"],
 	  "href": "http://example.com"
 	}]
-  }`, `{
+  }`, barRel: `{
 	"links": [{
 	  "rel": ["bar"],
 	  "href": "http://example.com"
 	}]
   }`
-];
+};
 
-export const testSubEntitys = [`{
+export const testSubEntitys = { entityWithHref: `{
 	"entities": [{
         "rel": ["foo"],
         "links": [{
@@ -46,7 +46,7 @@ export const testSubEntitys = [`{
 		}],
 		"href": "www.foo.com"
     }]
-  }`, `{
+  }`, entityWithoutHref:`{
 	"entities": [{
         "rel": ["foo"],
         "links": [{
@@ -54,7 +54,7 @@ export const testSubEntitys = [`{
             "href": "www.subentity.com"
 		}]
     }]
-  }`, `{
+  }`, barEntity: `{
 	"entities": [{
         "rel": ["bar"],
         "links": [{
@@ -63,4 +63,4 @@ export const testSubEntitys = [`{
 		}]
     }]
   }`
-];
+};
