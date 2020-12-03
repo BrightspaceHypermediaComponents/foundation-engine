@@ -16,13 +16,12 @@ describe('ObserverMap', () => {
 			};
 			const property = 'property';
 			const method = undefined;
-			const value = 'href';
 
-			observerMap.add(observer, property, method, value);
+			observerMap.add(observer, property, method);
 
-			assert(observerMap._observers.has(observer) === true);
+			assert.isTrue(observerMap._observers.has(observer), 'Observer not add to map');
 			const getProperty = observerMap._observers.get(observer);
-			assert(getProperty === property);
+			assert.equal(getProperty, property, 'Returned property does not match');
 		});
 
 		it('should set value when adding a observer', async() => {
@@ -33,11 +32,11 @@ describe('ObserverMap', () => {
 			const method = undefined;
 			const value = 'href';
 
-			observerMap.add(observer, property, method);
 			observerMap.setProperty(value);
+			observerMap.add(observer, property, method);
 
-			assert(observerMap.value === value);
-			assert(observer[property] === value);
+			assert.equal(observerMap.value, value, 'Property was not set on observerMap');
+			assert.equal(observer[property], value, 'Observer propert was not set');
 		});
 
 	});
@@ -54,22 +53,48 @@ describe('ObserverMap', () => {
 		observerMap.setProperty(value);
 		observerMap.delete(observer);
 
-		assert(observerMap._observers.has(observer) === false);
-		assert(observer[property] === value); //should this be removed
+		assert.isFalse(observerMap._observers.has(observer), 'Observer was not deleted');
+		assert.equal(observer[property], value, 'Property no longer exists'); //should this be removed
 	});
 
 	it('should update all object with new value', async() => {
 		const observer = {
 			'bar': 'foo'
 		};
+		const observer2 = {
+			'bar': 'foo'
+		};
+
 		const property = 'property';
 		const method = undefined;
 		const newValue = 'newHref';
 
 		observerMap.add(observer, property, method);
+		observerMap.add(observer2, property, method);
 		observerMap.setProperty(newValue);
 
-		assert(observer[property] === newValue);
+		assert.equal(observer[property], newValue, 'Observer property was not updated');
+		assert.equal(observer2[property], newValue, 'Observer2 property was not updated');
+	});
+
+	it('should update all objects with value from method', async() => {
+		const observer = {
+			'bar': 'foo'
+		};
+		const observer2 = {
+			'bar': 'foo'
+		};
+
+		const property = 'property';
+		const method = (value) => { return `${value}-changed`; };
+		const newValue = 'newHref';
+
+		observerMap.add(observer, property, method);
+		observerMap.add(observer2, property, method);
+		observerMap.setProperty(newValue);
+
+		assert.equal(observer[property], `${newValue}-changed`, 'Observer property was not updated using the method');
+		assert.equal(observer2[property], `${newValue}-changed`, 'Observer2 property was not updated using the method');
 	});
 
 	describe('should merge observers', () => {
