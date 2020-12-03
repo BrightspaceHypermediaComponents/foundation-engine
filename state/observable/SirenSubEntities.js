@@ -20,7 +20,7 @@ export class SirenSubEntities extends Observable {
 	}
 
 	get entities() {
-		return this._observers.value;
+		return this._observers.value || [];
 	}
 
 	set entities(sirenParsedEntities) {
