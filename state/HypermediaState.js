@@ -32,7 +32,6 @@ export class HypermediaState extends Fetchable(Object) {
 				token: this.token,
 				...observables[name]
 			};
-
 			const basicInfo = sirenObserverDefinedProperty(propertyInfo, this);
 			if (!basicInfo) return;
 
