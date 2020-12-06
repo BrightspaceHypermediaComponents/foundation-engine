@@ -46,8 +46,11 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 
 	dispose(observer) {
+		console.log('+++++++++++++++++++++++++++++++++');
+		console.log(JSON.stringify(this._decodedEntity));
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
+				console.log(JSON.stringify(sirenObservable));
 				sirenObservable.delete(observer);
 			});
 		});
@@ -81,6 +84,7 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 
 	push() {
+		// should it be async and await for action.push()? SyrenAction class push method id async.
 		this._childStates().forEach(childState => childState.push());
 		const actions = this._getMap(this._decodedEntity, observableTypes.action);
 		actions.forEach(action => action.push());
@@ -100,6 +104,10 @@ export class HypermediaState extends Fetchable(Object) {
 		this._entity = entity !== null ? entity : this._entity;
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
+				console.log('######################################');
+				console.log(this._entity);
+				console.log(typeMap);
+				console.log('######################################');
 				sirenObservable.setSirenEntity(this._entity, typeMap);
 			});
 		});
@@ -114,11 +122,16 @@ export class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenObserverDefinedProperty(propertyInfo);
+			const basicInfo = sirenObserverDefinedProperty(propertyInfo); // should it be like in addObservables:  sirenObserverDefinedProperty(propertyInfo, this);
 			if (!basicInfo) return;
 
 			const sirenObservable = this._getSirenObservable(basicInfo);
-			sirenObservable && (sirenObservable.value = propertyInfo.value);
+			console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+			console.log(basicInfo); // Object{id: undefined, route: undefined, token: undefined, type: 3, state: undefined}
+			console.log(sirenObservable); // SirenClasses{_observers: ObserverMap{_observers: Map{}, _methods: WeakMap{}}}
+			console.log(sirenObservable.value); // undefined
+			console.log(propertyInfo.value); // undefined
+			sirenObservable && (sirenObservable.value = propertyInfo.value); // does: x.undefined = y.undefined
 		});
 	}
 
