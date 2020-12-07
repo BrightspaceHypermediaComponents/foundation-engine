@@ -15,19 +15,115 @@ function uniqueId() {
 	return `${Date.now()}`;
 }
 
-describe.skip('HypermediaState', () => {
-	it('can create state for entity', () => {
-		const state = new HypermediaState('foo', 'bar');
-		assert.equal(state.entityID, 'foo');
+function assertAreSimilar(actual, expected) {
+	// converting object to json and then parsing in again leave only comparable properties.
+	assert.deepEqual(JSON.parse(JSON.stringify(actual)), JSON.parse(JSON.stringify(expected)));
+}
+
+describe.only('HypermediaState', () => {
+	it('#constructor - can create HypermediaState object', () => {
+		const id = 'id';
+		const token = 'token';
+		const state = new HypermediaState(id, token);
+		assert.equal(state.entityID, id);
+		assert.equal(state.href, id);
+		assert.equal(state.token, token);
 	});
 
-	it('addObservables - add one', () => {
-		const observable = {
-			classes: { type: Array, observable: observableTypes.classes }
-		};
-		const observer = { classes: [] };
-		const state = new HypermediaState('foo', 'bar');
-		state.addObservables(observer, observable);
+	it('#constructor - why it is allowed to create invalid HypermediaState object ?', () => {
+		const state = new HypermediaState();
+		assert.equal(state.entityID, undefined);
+		assert.equal(state.href, undefined);
+		assert.equal(state.token, undefined);
+	});
+
+	describe.only('Scenario: addObserver and setSirenEntity', () => {
+
+		it('should create correct observable type and assign values to observer', () => {
+
+			const observer = {};
+			const entityHref = `http://entity-${uniqueId()}`;
+			const state = new HypermediaState(entityHref, 'token');
+			const selfHref = entityHref;
+			const nextHref = `${selfHref}/next`;
+			const entity = {
+				class: [ 'foo-class-1', 'foo-class-2' ],
+				properties: {
+					name: 'entity-name',
+					description: 'entity-description'
+				},
+				entities: [
+					{
+						class: [ 'foo-sub-class' ],
+						rel: [ 'sub1' ],
+						href: 'http://foo/sub1'
+					},
+					{
+						class: [ 'foo-sub-entity-2' ],
+						rel: [ 'sub2' ],
+						href: 'http://foo/sub2'
+					},
+					{
+						class: [ 'item1' ],
+						rel: [ 'item' ],
+						href: 'http://foo/item1'
+					},
+					{
+						class: [ 'item2' ],
+						rel: [ 'item' ],
+						href: 'http://foo/item2'
+					}
+				],
+				actions: [
+					{
+						href: `${selfHref}/put/`,
+						name: 'do-put',
+						method: 'PUT',
+						fields: [{ type: 'hidden', name: 'field-name', value: 'field-value' }],
+						type: 'application/x-www-form-urlencoded'
+					},
+					{
+						href: `${selfHref}/get/`,
+						name: 'do-get',
+						method: 'GET',
+						fields: [],
+						type: 'application/x-www-form-urlencoded'
+					}
+				],
+				links: [
+					{ rel: [ 'next' ], href: nextHref },
+					{ rel: [ 'self' ], href: selfHref }
+				]
+			};
+			const observables = {
+				class: { observable: observableTypes.classes },
+				name: { observable: observableTypes.property },
+				description: { observable: observableTypes.property },
+				subEntity1: { observable: observableTypes.subEntity, rel: 'sub1' },
+				subEntity2: { observable: observableTypes.subEntity, rel: 'sub2' },
+				actionPut: { observable: observableTypes.action, name: 'do-put' },
+				actionGet: {  observable: observableTypes.action, name: 'do-get' },
+				linkNext: { observable: observableTypes.link, rel: 'next' },
+				linkSelf: { observable: observableTypes.link, rel: 'self' },
+				subEntities: { observable: observableTypes.subEntities, rel: 'item' },
+				entity: { observable: observableTypes.entity }
+			};
+
+			state.addObservables(observer, observables);
+			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
+			console.log(JSON.stringify(observer, null, 2));
+			assert.deepEqual(observer.class, entity.class);
+			assert.deepEqual(observer.name, entity.properties.name);
+			assert.deepEqual(observer.description, entity.properties.description);
+			assertAreSimilar(observer.subEntity1, entity.entities[0]);
+			assertAreSimilar(observer.subEntity2, entity.entities[1]);
+			assertAreSimilar(observer.actionGet, { has: true });
+			assertAreSimilar(observer.actionPut, { has: true });
+			assert.equal(observer.linkNext, entity.links[0].href);
+			assert.equal(observer.linkSelf, entity.links[1].href);
+			assertAreSimilar(observer.subEntities, [entity.entities[2], entity.entities[3]]);
+			assertAreSimilar(observer.entity, entity);
+		});
 	});
 
 	it('addObservables - add duplicate ???', () => {
@@ -80,7 +176,7 @@ describe.skip('HypermediaState', () => {
 		assert.equal(anotherState.entityID, 'anotherFoo');
 	});
 
-	it.skip('can dispose observer', () => {
+	it('can dispose observer', () => {
 		const observable = {
 			classes: { type: Array, observable: observableTypes.classes }
 		};
@@ -100,13 +196,13 @@ describe.skip('HypermediaState', () => {
 		*/
 	});
 
-	it.skip('handleCachePriming - questions about design', () => {
+	it('handleCachePriming - questions about design', () => {
 		//1. why it is part of the class instance methods, it should be a class static method'
 		//2. Why it calls stateFactory? should it instead get state as parameter?
 
 	});
 
-	it.skip('handleCachePriming - unhandled error', async() => {
+	it('handleCachePriming - unhandled error', async() => {
 		const state = new HypermediaState('foo', 'bar');
 		await state.handleCachePriming(['here', 'there']);
 		/*
@@ -122,7 +218,7 @@ describe.skip('HypermediaState', () => {
 		*/
 	});
 
-	describe.only('handleCachePriming', () => {
+	describe('handleCachePriming', () => {
 		beforeEach(() => {
 			fetchMock.reset();
 		});
@@ -339,7 +435,7 @@ describe.skip('HypermediaState', () => {
 		state.setSirenEntity(entityWithHref);
 	});
 
-	it.only('push - should call push for observables of SirenAction type', () => {
+	it('push - should call push for observables of SirenAction type', () => {
 		const observable = {
 			observableAction: {
 				type: Object,
@@ -399,7 +495,7 @@ describe.skip('HypermediaState', () => {
 
 });
 
-describe.skip('stateFactory', () => {
+describe.only('stateFactory', () => {
 	it('can create state and add it to the window.D2L.Foundation.StateStore', async() => {
 		const id = uniqueId();
 		const state = await stateFactory(id, 'bar');
@@ -431,7 +527,7 @@ describe.skip('stateFactory', () => {
 	});
 });
 
-describe.skip('processRawJsonSirenEntity', () => {
+describe.only('processRawJsonSirenEntity', () => {
 
 	it('should parse json and add entity to store', async() => {
 		const href = `http://foo-${uniqueId()}`;
@@ -486,7 +582,7 @@ describe.skip('processRawJsonSirenEntity', () => {
 	});
 });
 
-describe.skip('dispose', () => {
+describe.only('dispose', () => {
 	it('can dispose state', () => {
 		const state = new HypermediaState('entityID', 'token');
 		const observable = {
@@ -570,6 +666,7 @@ describe.only('fetch integration test', () => {
 		console.log(`observer: ${JSON.stringify(observer)}`);
 		await state.push();
 		await state.reset();
+		console.log(`observer: ${JSON.stringify(observer)}`);
 
 	});
 });

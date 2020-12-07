@@ -33,7 +33,7 @@ export class HypermediaState extends Fetchable(Object) {
 				token: this.token,
 				...observables[name]
 			};
-			console.log(`addObservables: name: ${name}; propertyInfo: ${JSON.stringify(propertyInfo)}`);
+			//console.log(`addObservables: name: ${name}; propertyInfo: ${JSON.stringify(propertyInfo)}`);
 			const basicInfo = sirenObserverDefinedProperty(propertyInfo, this);
 			console.log(basicInfo);
 			if (!basicInfo) return;
@@ -49,11 +49,11 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 
 	dispose(observer) {
-		console.log('+++++++++++++++++++++++++++++++++');
-		console.log(JSON.stringify(this._decodedEntity));
+		//console.log('+++++++++++++++++++++++++++++++++');
+		//console.log(JSON.stringify(this._decodedEntity));
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
-				console.log(JSON.stringify(sirenObservable));
+				//console.log(JSON.stringify(sirenObservable));
 				sirenObservable.delete(observer);
 			});
 		});
@@ -75,7 +75,7 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 
 	async onServerResponse(response, error) {
-		console.log(`onServerResponse: ${JSON.stringify(response)}`);
+		//console.log(`onServerResponse: ${JSON.stringify(response)}`);
 		if (error) throw new FetchError(error);
 
 		const entity = await SirenParse(response);
@@ -89,11 +89,11 @@ export class HypermediaState extends Fetchable(Object) {
 
 	push() {
 		// should it be async and await for action.push()? SyrenAction class push method id async.
-		console.log('---------------------------------------------------');
-		console.log(`push childstates: ${JSON.stringify(this._childStates())}`);
+		////console.log('---------------------------------------------------');
+		//console.log(`push childstates: ${JSON.stringify(this._childStates())}`);
 		this._childStates().forEach(childState => childState.push());
 		const actions = this._getMap(this._decodedEntity, observableTypes.action);
-		console.log(`push actions: ${JSON.stringify(actions)}`);
+		//console.log(`push actions: ${JSON.stringify(actions)}`);
 		actions.forEach(action => action.push());
 	}
 
@@ -105,14 +105,14 @@ export class HypermediaState extends Fetchable(Object) {
 	}
 
 	setSirenEntity(entity = null) {
-		console.log(`setSirenEntity called with ${JSON.stringify(entity)}`);
+		//console.log(`setSirenEntity called with ${JSON.stringify(entity)}`);
 		if (entity && entity.href) {
 			return;
 		}
 		this._entity = entity !== null ? entity : this._entity;
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
-				console.log(`sirenObservable: ${sirenObservable.constructor.name}, typeMap: ${JSON.stringify(typeMap)}, entity: ${JSON.stringify(this._entity)}`);
+				//console.log(`sirenObservable: ${sirenObservable.constructor.name}, typeMap: ${JSON.stringify(typeMap)}, entity: ${JSON.stringify(this._entity)}`);
 				sirenObservable.setSirenEntity(this._entity, typeMap);
 			});
 		});
@@ -131,11 +131,11 @@ export class HypermediaState extends Fetchable(Object) {
 			if (!basicInfo) return;
 
 			const sirenObservable = this._getSirenObservable(basicInfo);
-			console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-			console.log(basicInfo); // Object{id: undefined, route: undefined, token: undefined, type: 3, state: undefined}
-			console.log(sirenObservable); // SirenClasses{_observers: ObserverMap{_observers: Map{}, _methods: WeakMap{}}}
-			console.log(sirenObservable.value); // undefined
-			console.log(propertyInfo.value); // undefined
+			//console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+			//console.log(basicInfo); // Object{id: undefined, route: undefined, token: undefined, type: 3, state: undefined}
+			//console.log(sirenObservable); // SirenClasses{_observers: ObserverMap{_observers: Map{}, _methods: WeakMap{}}}
+			//console.log(sirenObservable.value); // undefined
+			//console.log(propertyInfo.value); // undefined
 			sirenObservable && (sirenObservable.value = propertyInfo.value); // does: x.undefined = y.undefined
 		});
 	}
@@ -145,9 +145,9 @@ export class HypermediaState extends Fetchable(Object) {
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
 				childStates = [...childStates, ...(sirenObservable.childStates || [])];
-				console.log(`%%% _childStates: ${childStates.length}`);
-				console.log(`%%% sirenObservable.childState: ${sirenObservable.childState}`);
-				console.log(`%%% sirenObservable class name: ${sirenObservable.constructor.name}`);
+				//console.log(`%%% _childStates: ${childStates.length}`);
+				//console.log(`%%% sirenObservable.childState: ${sirenObservable.childState}`);
+				//console.log(`%%% sirenObservable class name: ${sirenObservable.constructor.name}`);
 				sirenObservable.childState && childStates.push(sirenObservable.childState);
 			});
 		});
@@ -184,7 +184,7 @@ export async function processRawJsonSirenEntity(json, rawToken) {
 }
 
 export async function stateFactory(entityID, rawToken) {
-	console.log('<<<<<<<<<<<<<<<<<<<<<<<<<');
+	//console.log('<<<<<<<<<<<<<<<<<<<<<<<<<');
 	const token = await getToken(rawToken);
 	if (store.has(entityID, token)) {
 		const state = store.get(entityID, token);
