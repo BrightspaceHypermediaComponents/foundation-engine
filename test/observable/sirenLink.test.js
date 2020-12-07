@@ -1,8 +1,8 @@
 import { assert }  from '@open-wc/testing';
+import { linkTests } from '../data/observable/entities.js';
 import { SirenLink } from '../../state/observable/SirenLink.js';
 import SirenParse from 'siren-parser';
 import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
-import { linkTests } from '../data/observable/entities.js';
 
 describe('call sirenLink methods', () => {
 	it('sirenLink constructed from no object', () => {
