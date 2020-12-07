@@ -49,7 +49,7 @@ export class HypermediaState extends Fetchable(Object) {
 	dispose(observer) {
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
-				sirenObservable.delete(observer);
+				sirenObservable.deleteObserver(observer);
 			});
 		});
 	}
