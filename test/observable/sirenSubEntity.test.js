@@ -2,7 +2,7 @@ import { assert }  from '@open-wc/testing';
 //import { SirenClasses } from '../../state/observable/SirenClasses.js';
 import SirenParse from 'siren-parser';
 import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
-import { testSubEntitys } from '../data/observable/entities.js';
+import { subEntityTests } from '../data/observable/entities.js';
 
 describe('sirenSubEntity method tests', () => {
 	describe('construction, settors, and gettors', () => {
@@ -103,7 +103,7 @@ describe('sirenSubEntity method tests', () => {
 	});
 
 	describe('setSirenEntity', () => {
-		// testSubEntitys are imported from ../data/observable/entities.js for testing
+		// subEntityTests are imported from ../data/observable/entities.js for testing
 		let subEntity1, collection;
 		beforeEach(() => {
 			collection = new Map();
@@ -111,7 +111,7 @@ describe('sirenSubEntity method tests', () => {
 		});
 
 		it('should update SirenSubEntitys href to be the href from test data', () => {
-			const entity = SirenParse(testSubEntitys.entityWithHref);
+			const entity = SirenParse(subEntityTests.entityWithHref);
 
 			subEntity1.setSirenEntity(entity);
 
@@ -119,15 +119,15 @@ describe('sirenSubEntity method tests', () => {
 		});
 
 		it('should update SirenSubEntitys href to be the href from link in test data', () => {
-			const entity = SirenParse(testSubEntitys.entityWithoutHref);
+			const entity = SirenParse(subEntityTests.entityWithoutHref);
 
 			subEntity1.setSirenEntity(entity);
 
-			assert.equal(subEntity1.entity.href, 'www.subentity.com', 'should be href from testSubEntitys[1].link');
+			assert.equal(subEntity1.entity.href, 'www.subentity.com', 'should be href from entity without href link');
 		});
 
 		it('should not update SirenSubEntity', () => {
-			const entity = SirenParse(testSubEntitys.barEntity);
+			const entity = SirenParse(subEntityTests.barEntity);
 
 			subEntity1.setSirenEntity(entity);
 
@@ -136,7 +136,7 @@ describe('sirenSubEntity method tests', () => {
 		});
 
 		it('should merge observer from collection entity into subEntity1', () => {
-			const entity = SirenParse(testSubEntitys.entityWithHref);
+			const entity = SirenParse(subEntityTests.entityWithHref);
 			const subentity2 = new SirenSubEntity({ id: 'foo', token: '123' });
 			const observer = { foo: 'bar' };
 			subentity2.addObserver(observer, 'foo');

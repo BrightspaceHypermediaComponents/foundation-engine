@@ -2,7 +2,7 @@ import { assert }  from '@open-wc/testing';
 import SirenParse from 'siren-parser';
 import { SirenSubEntities } from '../../state/observable/SirenSubEntities.js';
 import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
-import { testSubEntities } from '../data/observable/entities.js';
+import { subEntitiesTests } from '../data/observable/entities.js';
 
 describe('subEntities basic methods', () => {
 	it('sirenSubEntities constructed from empty object', () => {
@@ -32,7 +32,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 	// testSubEntites are imported from ../data/observable/entities.js for testing
 	it('entity with zero matching ids has been added as subentity', () => {
 		const subentites = new SirenSubEntities({ id: 'foo', token: '1234', state: 'hello' });
-		const entity = SirenParse(testSubEntities.barEntity);
+		const entity = SirenParse(subEntitiesTests.barEntity);
 
 		subentites.setSirenEntity(entity);
 
@@ -42,7 +42,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 
 	it('entity with one matching id has been added as subentity', () => {
 		const subentites = new SirenSubEntities({ id: 'foo', token: '1234', state: 'hello' });
-		const entity = SirenParse(testSubEntities.fooEntity);
+		const entity = SirenParse(subEntitiesTests.fooEntity);
 
 		subentites.setSirenEntity(entity);
 
@@ -55,7 +55,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 
 	it('entity with two matching ids has been added as subentity', () => {
 		const subentites = new SirenSubEntities({ id: 'foo', token: '1234', state: 'hello' });
-		const entity = SirenParse(testSubEntities.multipleSubEntities);
+		const entity = SirenParse(subEntitiesTests.multipleSubEntities);
 
 		subentites.setSirenEntity(entity);
 
@@ -67,8 +67,8 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 
 	it('entity with two matching ids overwritten with one id', () => {
 		const subentites = new SirenSubEntities({ id: 'foo', token: '1234', state: 'hello' });
-		const entity1 = SirenParse(testSubEntities.multipleSubEntities);
-		const entity2 = SirenParse(testSubEntities.fooEntity);
+		const entity1 = SirenParse(subEntitiesTests.multipleSubEntities);
+		const entity2 = SirenParse(subEntitiesTests.fooEntity);
 
 		subentites.setSirenEntity(entity1);
 		subentites.setSirenEntity(entity2);

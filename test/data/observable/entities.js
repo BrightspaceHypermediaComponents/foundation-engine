@@ -1,4 +1,4 @@
-export const testSubEntities = { fooEntity:`{
+export const subEntitiesTests = { fooEntity:`{
   "entities": [{"rel": ["foo"], "href": "www.abc.com"}],
   "links": [{
 	"rel": ["self"],
@@ -24,7 +24,7 @@ multipleSubEntities: `{
   }`
 };
 
-export const testLinks = { fooRel: `{
+export const linkTests = { fooRel: `{
 	"links": [{
 	  "rel": ["foo"],
 	  "href": "http://example.com"
@@ -37,7 +37,7 @@ export const testLinks = { fooRel: `{
   }`
 };
 
-export const testSubEntitys = { entityWithHref: `{
+export const subEntityTests = { entityWithHref: `{
 	"entities": [{
         "rel": ["foo"],
         "links": [{
