@@ -51,7 +51,10 @@ export class SirenAction extends Fetchable(Observable) {
 			return;
 		}
 
-		this._state.processRawJsonSirenEntity(json);
+		const entity = this._state.processRawJsonSirenEntity(json);
+		if (!entity) {
+			// entiity has no self
+		}
 	}
 
 	async push() {
@@ -99,14 +102,7 @@ export class SirenAction extends Fetchable(Observable) {
 		this._href = this._rawSirenAction.href;
 		this._fields = this._decodeFields(this._rawSirenAction);
 
-		this.action = {
-			has: true,
-			commit: (observables) => {
-				this._prepareAction(observables);
-				this._readyToSend = true;
-				return this._state.updateProperties(observables);
-			}
-		};
+		this._updateAction();
 	}
 
 	// Doesn't support field names with the same name.
@@ -138,5 +134,49 @@ export class SirenAction extends Fetchable(Observable) {
 		Object.keys(observables).forEach(field => input[field] = observables[field]?.value ? observables[field].value : observables[field]);
 		this.setQueryParams(input);
 		this.setBodyFromInput(input);
+	}
+
+	_updateAction() {
+		this.action = {
+			has: true,
+			commit: (observables) => {
+				this._prepareAction(observables);
+				this._readyToSend = true;
+				return this._state.updateProperties(observables);
+			}
+		};
+	}
+}
+
+export class SirenSummonAction extends SirenAction {
+	constructor({ id: name, token, state }) {
+		super({ name, token, state });
+	}
+
+	set action({ has, prime, summon }) {
+		if (!has || typeof summon !== 'function') {
+			summon = () => undefined;
+		}
+		if (this.action.has !== has || this.action.summon !== summon || this.action.prime !== prime) {
+			this._observers.setProperty({ has, prime, summon });
+		}
+	}
+
+	onServerResponse(json, error) {
+		const v = super.onServerResponse(json, error);
+	}
+	// overriding superclass push method to do nothing
+	push() {}
+
+	_updateAction() {
+		this.action = {
+			prime: true,
+			has: true,
+			commit: (observables) => {
+				this._prepareAction(observables);
+				this._readyToSend = true;
+				return this._state.updateProperties(observables);
+			}
+		};
 	}
 }
