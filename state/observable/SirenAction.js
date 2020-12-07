@@ -52,8 +52,9 @@ export class SirenAction extends Fetchable(Observable) {
 		}
 
 		const entity = this._state.processRawJsonSirenEntity(json);
-		if (!entity) {
-			// entiity has no self
+		if (entity) {
+			// parsed SirenEntity returned means the entity is selfless?
+			//this.setSirenEntity(entity);
 		}
 	}
 
@@ -138,39 +139,6 @@ export class SirenAction extends Fetchable(Observable) {
 
 	_updateAction() {
 		this.action = {
-			has: true,
-			commit: (observables) => {
-				this._prepareAction(observables);
-				this._readyToSend = true;
-				return this._state.updateProperties(observables);
-			}
-		};
-	}
-}
-
-export class SirenSummonAction extends SirenAction {
-	constructor({ id: name, token, state }) {
-		super({ name, token, state });
-	}
-
-	set action({ has, prime, summon }) {
-		if (!has || typeof summon !== 'function') {
-			summon = () => undefined;
-		}
-		if (this.action.has !== has || this.action.summon !== summon || this.action.prime !== prime) {
-			this._observers.setProperty({ has, prime, summon });
-		}
-	}
-
-	onServerResponse(json, error) {
-		const v = super.onServerResponse(json, error);
-	}
-	// overriding superclass push method to do nothing
-	push() {}
-
-	_updateAction() {
-		this.action = {
-			prime: true,
 			has: true,
 			commit: (observables) => {
 				this._prepareAction(observables);
