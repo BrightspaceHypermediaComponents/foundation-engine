@@ -2,6 +2,10 @@ import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 import { SirenSubEntity } from './SirenSubEntity.js';
 
+/**
+ * Observable SirenSubEntities
+ * Reflects back an array of parsed siren entities to any observers
+ */
 export class SirenSubEntities extends Observable {
 	static definedProperty({ token }) {
 		return { token };
@@ -11,32 +15,32 @@ export class SirenSubEntities extends Observable {
 		super();
 		this._state = state;
 		this._rel = id;
-		this._childSubEntities = new Map();
+		this._entityMap = new Map();
 		this._token = token;
-		this.entityIDs = [];
 	}
 
-	get entityIDs() {
-		return this._observers.value;
+	get entities() {
+		return this._observers.value || [];
 	}
 
-	set entityIDs(entityIDs) {
-		if (this.entityIDs !== entityIDs) {
-			this._observers.setProperty(entityIDs || []);
+	set entities(sirenParsedEntities) {
+		if (this.entities !== sirenParsedEntities) {
+			this._observers.setProperty(sirenParsedEntities || []);
 		}
 	}
 
-	get childSubEntities() {
-		return this._childSubEntities;
+	get entityMap() {
+		return this._entityMap;
 	}
 
 	get rel() {
 		return this._rel;
 	}
 
-	setSirenEntity(sirenEntity) {
-		const subEntities = sirenEntity && sirenEntity.getSubEntitiesByRel(this._rel);
-		const childSubEntities = new Map();
+	setSirenEntity(sirenParsedEntity) {
+		const subEntities = sirenParsedEntity && sirenParsedEntity.getSubEntitiesByRel(this._rel);
+		const entityMap = new Map();
+		const sirenParsedEntities = [];
 
 		// This makes the assumption that the order returned by the collection
 		// matches the prev/next order for each item.
@@ -46,28 +50,23 @@ export class SirenSubEntities extends Observable {
 		// and will change based on the individual item update.
 		subEntities.forEach((sirenSubEntity) => {
 			const entityID = getEntityIDFromSirenEntity(sirenSubEntity);
+			let subEntity;
 			// If we already set it up why do it again?
-			if (this.childSubEntities.has(entityID)) {
-				childSubEntities.set(entityID, this.childSubEntities.get(entityID));
-				this.childSubEntities.delete(entityID);
-				return;
+			if (this.entityMap.has(entityID)) {
+				subEntity = this.entityMap.get(entityID);
+			} else {
+				// todo: create a facade to make the subEntity easier to work with
+				subEntity = new SirenSubEntity({ id: this.rel, token: this._token });
+				subEntity.entity = sirenSubEntity;
 			}
-
-			const subEntity = new SirenSubEntity({ id: this.rel, token: this._token });
-			subEntity.entityID = entityID;
-			childSubEntities.set(entityID, subEntity);
+			entityMap.set(entityID, subEntity);
+			sirenParsedEntities.push(subEntity.entity);
 		});
 
-		// These ones are no longer required.
-		this.childSubEntities.clear();
+		// Clear the old entity map and reset it to the new one
+		this.entityMap.clear();
+		this._entityMap = entityMap;
 
-		this._childSubEntities = childSubEntities;
-
-		const entityIDs = [];
-		this.childSubEntities.forEach((_, entityID) => {
-			entityIDs.push(entityID);
-		});
-
-		this.entityIDs = entityIDs;
+		this.entities = sirenParsedEntities;
 	}
 }
