@@ -8,12 +8,14 @@ import fetchMock from 'fetch-mock/esm/client.js';
 import SirenParse from 'siren-parser';
 import { SirenAction } from '../../state/observable/SirenAction';
 import {HypermediaStateMixin} from '../../framework/lit/HypermediaStateMixin';
+import { SirenLink } from '../../state/observable/SirenLink';
+import {fetch} from '../../state/fetch';
 
 function uniqueId() {
 	return `${Date.now()}`;
 }
 
-describe.only('HypermediaState', () => {
+describe.skip('HypermediaState', () => {
 	it('can create state for entity', () => {
 		const state = new HypermediaState('foo', 'bar');
 		assert.equal(state.entityID, 'foo');
@@ -120,7 +122,7 @@ describe.only('HypermediaState', () => {
 		*/
 	});
 
-	describe('handleCachePriming', () => {
+	describe.only('handleCachePriming', () => {
 		beforeEach(() => {
 			fetchMock.reset();
 		});
@@ -221,6 +223,7 @@ describe.only('HypermediaState', () => {
 			classes: { type: Array, observable: observableTypes.classes }
 		};
 		const observer = { classes: [] };
+
 		state.addObservables(observer, observable);
 		state.push();
 	});
@@ -336,13 +339,67 @@ describe.only('HypermediaState', () => {
 		state.setSirenEntity(entityWithHref);
 	});
 
-	it('push - what is does?', () => {
+	it.only('push - should call push for observables of SirenAction type', () => {
+		const observable = {
+			observableAction: {
+				type: Object,
+				observable: observableTypes.action,
+				name: 'action-name'
+			},
+		/*	observableLinks: {
+				type: Object,
+				//observable: observableTypes.link,
+				name: 'link',
+				route: [{ observable: observableTypes.link, rel: 'https://api.brightspace.com/rels/specialization' }]
+			}*/
+
+		};
+		const state = new HypermediaState('foo', 'bar');
+		const observer = {};
+		state.addObservables(observer, observable);
+		//state.push();
+
+	});
+
+	it('push - should call push for childState of each observable', async() => {
+		const href = `http://foo-${uniqueId()}`;
+		const json = `{
+			"class": [ "foo" ],
+			"properties": {
+				"bar": 42
+			},
+			"entities": [
+			  {
+				"class": [ "sub-foo" ],
+				"rel": [ "self" ],
+				"href": "http://foo/sub"
+			  }
+			],
+			"actions": [
+				{
+					"href": "http://api.x.io/do/put/",
+					"name": "do-put",
+					"method": "PUT",
+					"fields": [{"type": "hidden", "name": "action-field", "value": "action-fvalue"}]
+				}
+			],
+			"links": [
+			  { "rel": [ "self" ], "href": "${href}" }
+			]
+		  }`;
+		const entity = await SirenParse(json);
+		const state = new HypermediaState('foo', { rawToken: 'token' });
+		const link = new SirenLink({ id: 'self', token: { rawToken: 'token' }, state });
+		await link.setSirenEntity(entity);
+		const observer = {};
+		state.addObservables(observer, link);
+		state.push();
 
 	});
 
 });
 
-describe.only('stateFactory', () => {
+describe.skip('stateFactory', () => {
 	it('can create state and add it to the window.D2L.Foundation.StateStore', async() => {
 		const id = uniqueId();
 		const state = await stateFactory(id, 'bar');
@@ -374,7 +431,7 @@ describe.only('stateFactory', () => {
 	});
 });
 
-describe.only('processRawJsonSirenEntity', () => {
+describe.skip('processRawJsonSirenEntity', () => {
 
 	it('should parse json and add entity to store', async() => {
 		const href = `http://foo-${uniqueId()}`;
@@ -429,7 +486,7 @@ describe.only('processRawJsonSirenEntity', () => {
 	});
 });
 
-describe.only('dispose', () => {
+describe.skip('dispose', () => {
 	it('can dispose state', () => {
 		const state = new HypermediaState('entityID', 'token');
 		const observable = {
@@ -453,5 +510,66 @@ describe.only('dispose', () => {
 	});
 	it('dispose - questions', () => {
 		// 1. stateFactory is adding state to the StateStore. When disposing state does it need to remove it from the store
+	});
+});
+
+describe.only('fetch integration test', () => {
+	beforeEach(() => {
+		fetchMock.reset();
+	});
+	it('fetch and push entity', async() => {
+		const selfHref = `http://foo-${uniqueId()}`;
+		const nextHref = `${selfHref}/next`;
+		const entity = {
+			class: [ 'foo-class' ],
+			properties: {
+				bar: 42
+			},
+			entities: [
+				{
+					// is it a bug that observer only gets href, and no class ?
+					class: [ 'foo-sub-entity-1' ],
+					rel: [ 'sub1' ],
+					href: 'http://foo/sub1'
+				},
+				{ // Is it a bug that this is entity is not assigned to observer
+					class: [ 'foo-sub-entity-2' ],
+					rel: [ 'sub2' ],
+					href: 'http://foo/sub2'
+				}
+			],
+			actions: [
+				{
+					href: 'http://api.x.io/do/put/',
+					name: 'do-put',
+					method: 'PUT',
+					fields: [{ type: 'hidden', name: 'field-name', value: 'field-value' }]
+				}
+			],
+			links: [
+				{ rel: [ 'next' ], href: nextHref },
+				{ rel: [ 'self' ], href: selfHref }
+			]
+		};
+		const mock = fetchMock
+			.mock(selfHref, JSON.stringify(entity));
+
+		const state = await stateFactory(selfHref, 'token');
+		const observable = {
+			class: { type: Array, observable: observableTypes.classes },
+			bar: { type: Number, observable: observableTypes.property },
+			action: { type: Object, observable: observableTypes.action, name: 'do-put' },
+			subEntity1: { type: Array, observable: observableTypes.subEntity, rel: 'sub1' },
+			subEntity2: { type: Array, observable: observableTypes.subEntity, rel: 'sub2' },
+			linkNext: { type: Object, observable: observableTypes.link, rel: 'next' },
+			linkSelf: { type: Object, observable: observableTypes.link, rel: 'self' },
+		};
+		const observer = {};
+		state.addObservables(observer, observable);
+		await fetch(state);
+		console.log(`observer: ${JSON.stringify(observer)}`);
+		await state.push();
+		await state.reset();
+
 	});
 });

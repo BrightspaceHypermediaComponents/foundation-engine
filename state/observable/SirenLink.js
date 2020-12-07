@@ -47,6 +47,7 @@ export class SirenLink extends Observable {
 
 	async setSirenEntity(sirenEntity, linkCollectionMap) {
 		const link = sirenEntity && sirenEntity.hasLinkByRel(this.rel) && sirenEntity.getLinkByRel(this.rel);
+		console.log(`@@@ ${JSON.stringify(this._token)}`);
 		if (!link) return;
 
 		this.href = link.href;
@@ -62,6 +63,7 @@ export class SirenLink extends Observable {
 
 		if (this._token) {
 			this._childState = await this.createChildState(link.href, shouldAttachToken(this._token.rawToken, link));
+			console.log('@@@' + JSON.stringify(this._childState));
 			this._routes.forEach((route, observer) => {
 				this._childState.addObservables(observer, route);
 			});
