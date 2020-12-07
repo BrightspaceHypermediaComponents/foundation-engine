@@ -174,6 +174,6 @@ export async function stateFactory(entityID, rawToken) {
 	return state;
 }
 
-export function dispose(state, observable) {
-	state && state.dispose(observable);
+export function dispose(state, observer) {
+	state && state.dispose(observer);
 }
