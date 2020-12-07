@@ -115,7 +115,7 @@ describe('sirenSubEntity method tests', () => {
 
 			subEntity1.setSirenEntity(entity);
 
-			assert.equal(subEntity1.entityID, 'www.foo.com', 'should be href from testSubEntitys[0].class');
+			assert.equal(subEntity1.entity.href, 'www.foo.com', 'should be updated by to test data');
 		});
 
 		it('should update SirenSubEntitys href to be the href from link in test data', () => {
@@ -123,7 +123,7 @@ describe('sirenSubEntity method tests', () => {
 
 			subEntity1.setSirenEntity(entity);
 
-			assert.equal(subEntity1.entityID, 'www.subentity.com', 'should be href from testSubEntitys[1].link');
+			assert.equal(subEntity1.entity.href, 'www.subentity.com', 'should be href from testSubEntitys[1].link');
 		});
 
 		it('should not update SirenSubEntity', () => {
@@ -131,7 +131,7 @@ describe('sirenSubEntity method tests', () => {
 
 			subEntity1.setSirenEntity(entity);
 
-			assert.isUndefined(subEntity1.entityID, 'should be unset by entity not matching property');
+			assert.isUndefined(subEntity1.entity, 'should be unset by entity not matching property');
 			assert.instanceOf(collection, Map);
 		});
 
@@ -146,10 +146,11 @@ describe('sirenSubEntity method tests', () => {
 
 			subEntity1.setSirenEntity(entity, collection);
 
-			assert.equal(subEntity1.entityID, 'www.foo.com', 'should be href from testSubEntitys[0]');
+			assert.equal(subEntity1.entity.href, 'www.foo.com', 'should be href from entityWithHref');
 			assert.isTrue(subEntity1._observers._observers.has(observer), 'should have observer attached');
-			assert.equal(observer['foo'], 'www.foo.com', 'observer should have property setting Siren Entity');
-			assert.equal(collection.get('foo'), subEntity1);
+			assert.equal(observer['foo'].href, 'www.foo.com', 'observer should have property setting Siren Entity');
+			assert.deepEqual(observer['foo'].rel, [ 'foo' ], 'observer should have property setting Siren Entity');
+			assert.equal(collection.get('foo'), subEntity1, 'collection should be updated to store subEntity1');
 		});
 	});
 });
