@@ -99,6 +99,7 @@ describe('sirenSubEntity method tests', () => {
 			const routes = subentity._routes;
 			assert.equal(routes.size, 0, 'incorrect number of routes stored in observer');
 		});
+
 	});
 
 	describe('setSirenEntity', () => {
