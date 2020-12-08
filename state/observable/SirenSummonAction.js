@@ -31,7 +31,7 @@ export class SirenSummonAction extends Routable(SirenAction) {
 			summon: (observables) => {
 				this._prepareAction(observables);
 				this._readyToSend = true;
-				return this._state.updateProperties(observables);
+				return fetch(this);
 			}
 		};
 	}
