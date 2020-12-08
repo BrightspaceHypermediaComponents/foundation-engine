@@ -3,10 +3,10 @@ import { dispose, HypermediaState, processRawJsonSirenEntity, stateFactory } fro
 import { assert } from '@open-wc/testing';
 import { fetch } from '../../state/fetch';
 import { FetchError } from '../../state/Fetchable';
-import { fetchMock } from 'fetch-mock/esm/client.js';
+import fetchMock from 'fetch-mock/esm/client.js';
 import { observableTypes } from '../../state/observable/sirenObservableFactory';
-import { sinon } from 'sinon/pkg/sinon-esm.js';
-import { SirenParse } from 'siren-parser';
+import sinon from 'sinon/pkg/sinon-esm.js';
+import SirenParse from 'siren-parser';
 
 function uniqueId() {
 	return `${Date.now()}`;
