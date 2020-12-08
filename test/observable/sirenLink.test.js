@@ -1,7 +1,8 @@
 import { assert }  from '@open-wc/testing';
+import { linkTests } from '../data/observable/entities.js';
 import { SirenLink } from '../../state/observable/SirenLink.js';
 import SirenParse from 'siren-parser';
-import { testLinks } from '../data/observable/entities.js';
+import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
 
 describe('call sirenLink methods', () => {
 	it('sirenLink constructed from no object', () => {
@@ -129,7 +130,7 @@ describe('sirenLink with observers', () => {
 	});
 
 	describe('should call setSirenEntity', () => {
-		// testLinks are imported from ../data/observable/entities.js for testing
+		// linkTests are imported from ../data/observable/entities.js for testing
 		let link1, collection;
 		beforeEach(() => {
 			collection = new Map();
@@ -138,14 +139,22 @@ describe('sirenLink with observers', () => {
 		});
 
 		it('should update SirenLinks href to be the href from test data', () => {
-			const entity = SirenParse(testLinks[0]);
+			const entity = SirenParse(linkTests.fooRel);
 
 			link1.setSirenEntity(entity);
-			assert.equal(link1.href, 'http://example.com', 'should be href from testLinks[0]');
+			assert.equal(link1.href, 'http://example.com', 'should be href from fooRel');
+		});
+
+		it('should not update SirenLink', () => {
+			const entity = SirenParse(linkTests.barRel);
+
+			link1.setSirenEntity(entity);
+
+			assert.isUndefined(link1.href, 'should be unset by entity not matching property');
 		});
 
 		it('should merge observer from collection link into link1', () => {
-			const entity = SirenParse(testLinks[0]);
+			const entity = SirenParse(linkTests.fooRel);
 			const link2 = new SirenLink({ id: 'foo', token: '123' });
 			const observer = { foo: 'wow' };
 			link2.addObserver(observer, 'foo');
@@ -155,10 +164,22 @@ describe('sirenLink with observers', () => {
 
 			link1.setSirenEntity(entity, collection);
 
-			assert.equal(link1.href, 'http://example.com', 'should be href from testLinks[0]');
-			assert.isTrue(link1._observers._observers.has(observer));
+			assert.equal(link1.href, 'http://example.com', 'should be href from foo.Rel');
+			assert.isTrue(link1._observers._observers.has(observer), 'should have observer attached');
 			assert.equal(observer['foo'], 'http://example.com', 'observer should have property setting Siren Entity');
 			assert.equal(collection.get('foo'), link1);
+		});
+
+		it('should merge nothing due to not being a SirenLink', () => {
+			const entity = SirenParse(linkTests.fooRel);
+			const subEntity = new SirenSubEntity({ id: 'foo', token: '123' });
+			const observer = { foo: 'wow' };
+			subEntity.addObserver(observer, 'foo');
+			collection.set('foo', subEntity);
+
+			link1.setSirenEntity(entity, collection);
+
+			assert.isFalse(link1._observers._observers.has(observer), 'should not have observer attached');
 		});
 	});
 });
