@@ -51,11 +51,7 @@ export class SirenAction extends Fetchable(Observable) {
 			return;
 		}
 
-		const entity = this._state.processRawJsonSirenEntity(json);
-		if (entity) {
-			// parsed SirenEntity returned means the entity is selfless?
-			//this.setSirenEntity(entity);
-		}
+		return this._state.processRawJsonSirenEntity(json);
 	}
 
 	async push() {
