@@ -1,15 +1,12 @@
 
-import { HypermediaState, stateFactory, dispose, processRawJsonSirenEntity } from '../../state/HypermediaState';
-import {observableTypes} from '../../state/observable/sirenObservableFactory';
+import { dispose, HypermediaState, processRawJsonSirenEntity, stateFactory } from '../../state/HypermediaState';
+import { assert } from '@open-wc/testing';
+import { fetch } from '../../state/fetch';
 import { FetchError } from '../../state/Fetchable';
-import { assert, expect } from '@open-wc/testing';
-import sinon from 'sinon/pkg/sinon-esm.js';
-import fetchMock from 'fetch-mock/esm/client.js';
-import SirenParse from 'siren-parser';
-import { SirenAction } from '../../state/observable/SirenAction';
-import {HypermediaStateMixin} from '../../framework/lit/HypermediaStateMixin';
-import { SirenLink } from '../../state/observable/SirenLink';
-import {fetch} from '../../state/fetch';
+import { fetchMock } from 'fetch-mock/esm/client.js';
+import { observableTypes } from '../../state/observable/sirenObservableFactory';
+import { sinon } from 'sinon/pkg/sinon-esm.js';
+import { SirenParse } from 'siren-parser';
 
 function uniqueId() {
 	return `${Date.now()}`;
@@ -343,8 +340,8 @@ describe('HypermediaState class', () => {
 			const observable = {
 				actionPut: { observable: observableTypes.action, name: 'do-put' },
 				// why need route to pass token to observable ?. Without token link does not create a child state
-				linkSelf: { observable: observableTypes.link, rel: 'self', route: [{ abc: 'need route to pass token to '}] },
-				subEntity: { observable: observableTypes.subEntity, rel: 'item', route: [{ abc: 'need route to pass token to '}] }
+				linkSelf: { observable: observableTypes.link, rel: 'self', route: [{ abc: 'need route to pass token to ' }] },
+				subEntity: { observable: observableTypes.subEntity, rel: 'item', route: [{ abc: 'need route to pass token to ' }] }
 			};
 			const entity = {
 				class:['foo'],
@@ -677,38 +674,6 @@ describe('fetch integration test', () => {
 
 	it('FetchErro should be thown and setSirenEntity should not be called', async() => {
 		const selfHref = `http://foo-${uniqueId()}`;
-		const nextHref = `${selfHref}/next`;
-		const entity = {
-			class: [ 'foo-class' ],
-			properties: {
-				bar: 42
-			},
-			entities: [
-				{
-					// is it a bug that observer only gets href, and no class ?
-					class: [ 'foo-sub-entity-1' ],
-					rel: [ 'sub1' ],
-					href: 'http://foo/sub1'
-				},
-				{ // Is it a bug that this is entity is not assigned to observer
-					class: [ 'foo-sub-entity-2' ],
-					rel: [ 'sub2' ],
-					href: 'http://foo/sub2'
-				}
-			],
-			actions: [
-				{
-					href: 'http://api.x.io/do/put/',
-					name: 'do-put',
-					method: 'PUT',
-					fields: [{ type: 'hidden', name: 'field-name', value: 'field-value' }]
-				}
-			],
-			links: [
-				{ rel: [ 'next' ], href: nextHref },
-				{ rel: [ 'self' ], href: selfHref }
-			]
-		};
 		const mock = fetchMock
 			.mock(selfHref, 500);
 
