@@ -278,9 +278,6 @@ describe('HypermediaState class', () => {
 			assert.isTrue(mockLink.called(link2));
 			assert.equal(window.D2L.Foundation.StateStore.get(link1, 'bar').entityID, link1);
 			assert.equal(window.D2L.Foundation.StateStore.get(link2, 'bar').entityID, link2);
-			/* 	Implementation of handleCachePriming uses promise.All to fetch all links.
-				it is an accidental way to overload backend server
-			*/
 		});
 
 		it('should create state per link and throw FetchError on error', async() => {
