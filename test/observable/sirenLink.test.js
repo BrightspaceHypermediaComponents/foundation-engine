@@ -145,7 +145,7 @@ describe('sirenLink with observers', () => {
 			assert.equal(link1.href, 'http://example.com', 'should be href from fooRel');
 		});
 
-		it('should not update SirenLinky', () => {
+		it('should not update SirenLink', () => {
 			const entity = SirenParse(linkTests.barRel);
 
 			link1.setSirenEntity(entity);
@@ -164,7 +164,7 @@ describe('sirenLink with observers', () => {
 
 			link1.setSirenEntity(entity, collection);
 
-			assert.equal(link1.href, 'http://example.com', 'should be href from linkTests[0]');
+			assert.equal(link1.href, 'http://example.com', 'should be href from foo.Rel');
 			assert.isTrue(link1._observers._observers.has(observer), 'should have observer attached');
 			assert.equal(observer['foo'], 'http://example.com', 'observer should have property setting Siren Entity');
 			assert.equal(collection.get('foo'), link1);
