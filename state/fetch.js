@@ -3,7 +3,6 @@ import 'd2l-fetch/d2l-fetch.js';
 const d2lfetch = window.d2lfetch;
 
 export async function fetch(fetchable, bypassCache = false) {
-	console.log(`fetching ${JSON.stringify(fetchable)}`);
 	if (fetchable.fetchStatus.pending) {
 		if (!bypassCache) {
 			return fetchable.fetchStatus.complete;
