@@ -114,13 +114,13 @@ describe('HypermediaState class', () => {
 			assertAreSimilar(observer.entity, entity);
 		});
 
-		it.skip('#addObservables - add with route - does not work as expected.', async() => {
+		it('#addObservables - obsever gets routed property', async() => {
 			const observable = {
-				class: { observable: observableTypes.classes },
-				name: {
+				mainEntityClass: { observable: observableTypes.classes },
+				linkedEntityProperty: {
 					observable: observableTypes.property,
 					route: [
-						{ observable: observableTypes.link, rel: 'sub'  }
+						{ observable: observableTypes.link, rel: 'linked'  }
 					]
 				}
 			};
@@ -128,28 +128,34 @@ describe('HypermediaState class', () => {
 			const entityHref = `http://entity-${uniqueId()}`;
 			const linkedHref = `${entityHref}/linked`;
 			const observer = {};
-			const state = new HypermediaState(entityHref, { rawToken:'token' });
+
 			const entity = {
-				class: ['foo'],
-				links: [{ rel: [ 'linked' ], href: linkedHref }]
+				class: ['main-entity-class'],
+				links: [{ rel: [ 'linked' ], href: linkedHref }, { rel:['self'], href: entityHref }]
 			};
 			const linkedEntity = {
-				class: ['linked'],
-				properties: { name: 'linked-name' },
+				class: ['linked-entity-class'],
+				properties: { linkedEntityProperty: 'linked-entity-name' },
 				links: [{ rel:['self'], href: linkedHref }]
 			};
 
+			const state = new HypermediaState(entityHref, { rawToken:'token' });
 			const mock = fetchMock
 				.mock(entityHref, JSON.stringify(entity))
 				.mock(linkedHref, JSON.stringify(linkedEntity));
 
 			state.addObservables(observer, observable);
-			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
-			await fetch(state);
 
-			assert.isTrue(mock.called(entityHref));
-			assert.isTrue(mock.called(linkedHref));
-			assert.deepEqual(observer, { class: ['foo'], name: 'property of subentity' });
+			await fetch(state);
+			// need a delay for onServerResponse callback to fetch&process main entity  then fetch&process liked entity
+			await (new Promise(resolve => setTimeout(() => resolve(), 20)));
+
+			assert.isTrue(mock.called(entityHref), `should fetch ${entityHref}`);
+			assert.isTrue(mock.called(linkedHref), `should fetch ${linkedHref}`);
+			assert.deepEqual(observer, {
+				mainEntityClass: ['main-entity-class'],
+				linkedEntityProperty: 'linked-entity-name'
+			}, 'class should be observed from main entity and property should be fetched from linked entity');
 		});
 
 		it('addObservables after setSirenEntity', () => {
@@ -376,7 +382,7 @@ describe('HypermediaState class', () => {
 				Solution that I don't like: put delay before continuing.
 				Solution that someone may not like: await for observables to finish with setSirenEntity.
 			*/
-			await (new Promise(resolve => setTimeout(() => resolve(), 100)));
+			await (new Promise(resolve => setTimeout(() => resolve(), 20)));
 
 			// create spies for observables
 			const putActionObservable = state._getSirenObservable({ type: observableTypes.action, id: 'do-put' });
