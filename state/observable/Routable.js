@@ -1,4 +1,3 @@
-
 export const Routable = superclass => class extends superclass {
 	constructor({ id, token, state }) {
 		super({ id, token, state });
@@ -13,6 +12,12 @@ export const Routable = superclass => class extends superclass {
 		this._childState = state;
 	}
 
+	/**
+	 * @param {Object} observer
+	 * @param {string} property
+	 * @param {} route
+	 * @param {function} method
+	 */
 	addObserver(observer, property, { route, method } = {}) {
 		if (route) {
 			this._addRoute(observer, route);
@@ -21,17 +26,15 @@ export const Routable = superclass => class extends superclass {
 		}
 	}
 
-	// ideally these would be here too
-	// _addRoute(observer, route) {
-	// 	const currentRoute = this._routes.has(observer) ? this._routes.get(observer) : {};
-	// 	this._routes.set(observer, { ...currentRoute, ...route });
-	// }
+	_addRoute(observer, route) {
+		const currentRoute = this._routes.has(observer) ? this._routes.get(observer) : {};
+		this._routes.set(observer, { ...currentRoute, ...route });
+	}
 
-	// _deleteRoute(observer) {
-	// 	if (this._childState) {
-	// 		this._childState.dispose(observer);
-	// 	}
-	// 	this._routes.delete(observer);
-	// }
+	_deleteRoute(observer) {
+		if (this._childState) {
+			this._childState.dispose(observer);
+		}
+		this._routes.delete(observer);
+	}
 };
-

@@ -11,7 +11,7 @@ export class SirenAction extends Fetchable(Observable) {
 
 	constructor({ id: name, token, state }) {
 		super(null, token);
-		this._action = defaultAction;
+		this.action = defaultAction;
 		this._name = name;
 		this._readyToSend = false;
 		this._state = state;

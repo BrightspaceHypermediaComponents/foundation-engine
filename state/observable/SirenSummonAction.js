@@ -1,18 +1,25 @@
-import { Routable } from 'Routable.js';
-import { SirenAction } from 'SirenAction.js';
+import { Routable } from './Routable.js';
+import { SirenAction } from './SirenAction.js';
+
+const defaultAction = { has: true, summon: () => undefined };
 
 export class SirenSummonAction extends Routable(SirenAction) {
 	constructor({ id: name, token, state, prime }) {
-		super({ name, token, state });
+		super({ id: name, token, state });
 		this._prime = prime;
+		this.action = defaultAction;
 	}
 
-	set action({ has, prime, summon }) {
+	get action() {
+		return this._observers.value || defaultAction;
+	}
+
+	set action({ has, summon }) {
 		if (!has || typeof summon !== 'function') {
 			summon = () => undefined;
 		}
-		if (this.action.has !== has || this.action.summon !== summon || this.action.prime !== prime) {
-			this._observers.setProperty({ has, prime, summon });
+		if (this.action.has !== has || this.action.summon !== summon) {
+			this._observers.setProperty({ has, summon });
 		}
 	}
 
