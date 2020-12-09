@@ -354,13 +354,14 @@ describe('HypermediaState class', () => {
 
 	describe('push and reset methods', () => {
 		const methods = ['push', 'reset'];
-		let state, putActionSpy, getActionSpy, linkChildStateSpy, subEntityChilStateSpy;
+		let state, putActionSpy, getActionSpy, linkChildStateSpy, subEntityChilStateSpy, linkPrimeChildStateSpy;
 		before(async() => {
 			const entityHref = `http://entity-${uniqueId()}`;
 			const observable = {
 				actionPut: { observable: observableTypes.action, name: 'do-put' },
-				// why need route to pass token to observable ?. Without token link does not create a child state
+				// need route or prime to pass token to observable so SirenLink observable will fetch the link and will create child state
 				linkSelf: { observable: observableTypes.link, rel: 'self', route: [{ abc: 'need route to pass token to ' }] },
+				linkPrime: { observable: observableTypes.link, rel: 'prime', prime: true },
 				subEntity: { observable: observableTypes.subEntity, rel: 'item', route: [{ abc: 'need route to pass token to ' }] }
 			};
 			const entity = {
@@ -386,7 +387,7 @@ describe('HypermediaState class', () => {
 						type: 'application/x-www-form-urlencoded'
 					}
 				],
-				links: [{ rel: [ 'self' ], href: entityHref }]
+				links: [{ rel: [ 'self' ], href: entityHref }, { rel: [ 'prime' ], href: `${entityHref}/prime` }]
 			};
 			state = new HypermediaState(entityHref, { rawToken: 'token' });
 			const observer = {};
@@ -405,11 +406,13 @@ describe('HypermediaState class', () => {
 			const putActionObservable = state._getSirenObservable({ type: observableTypes.action, id: 'do-put' });
 			const getActionObservable = state._getSirenObservable({ type: observableTypes.action, id: 'do-get' });
 			const linkObservable = state._getSirenObservable({ type: observableTypes.link, id: 'self' });
+			const linkPrimeObservable = state._getSirenObservable({ type: observableTypes.link, id: 'prime' });
 			const subEntityObservable = state._getSirenObservable({ type: observableTypes.subEntity, id: 'item' });
 			putActionSpy = sinon.spy(putActionObservable);
 			getActionSpy = sinon.spy(getActionObservable);
 			linkChildStateSpy = sinon.spy(linkObservable.childState);
 			subEntityChilStateSpy = sinon.spy(subEntityObservable.childState);
+			linkPrimeChildStateSpy = sinon.spy(linkPrimeObservable.childState);
 		});
 
 		methods.forEach((method) => {
@@ -420,6 +423,7 @@ describe('HypermediaState class', () => {
 				//verify shild states where pushed or reset
 				assert.isTrue(linkChildStateSpy[method].calledOnce);
 				assert.isTrue(subEntityChilStateSpy[method].calledOnce);
+				assert.isTrue(linkPrimeChildStateSpy[method].calledOnce);
 
 				// verify entity actions where pushed or reset
 				assert.isTrue(putActionSpy[method].calledOnce);
@@ -628,10 +632,6 @@ describe('dispose function', () => {
 		const spy = sinon.spy(state);
 		dispose(state, observer);
 		assert.isTrue(spy.dispose.called);
-	});
-	it('dispose - question about dispose purpose', () => {
-		// 1. stateFactory is adding state to the StateStore.
-		// When disposing state does it need to remove it from the store ?
 	});
 });
 
