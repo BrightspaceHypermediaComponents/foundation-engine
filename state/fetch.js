@@ -33,7 +33,7 @@ export function fetch(fetchable, bypassCache = false) {
 
 /**
  * This method is a helper for fetch. It handles the actual sending of the request.
- * @param {Fetchabe} fetchable Is an object that inherients from the class fetchable. This is the object that will be fetched.
+ * @param {Fetchable} fetchable Is an object that inherients from the class fetchable. This is the object that will be fetched.
  * @param {boolean} bypassCache Default is `false`. If bypassCache is true then it will cancel any pending request
  *                              and send a new request to the server with no-cache headers.
  * @returns {Promise} This promise will resolve when fetchable is fetched
