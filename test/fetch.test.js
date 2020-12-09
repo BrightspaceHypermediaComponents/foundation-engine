@@ -86,6 +86,13 @@ describe('fetch', () => {
 		expect(responseOne).to.equal(responseTwo);
 	});
 
+	it('does not add cache headers if it is not bypassing', async() => {
+		const fetchable = new FetchableObject(hrefGoodStatus, token);
+		const response = await fetch(fetchable);
+		expect(response.request.headers.get('pragma')).to.be.null;
+		expect(response.request.headers.get('cache-control')).to.be.null;
+	});
+
 	it('bypassing the cache adds correct headers', async() => {
 		const fetchable = new FetchableObject(hrefGoodStatus, token);
 		const response = await fetch(fetchable, true);
