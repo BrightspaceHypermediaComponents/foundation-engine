@@ -6,7 +6,7 @@ const d2lfetch = window.d2lfetch;
  * This method sends request to the server. It returns the results to fetchable.onServerResponse and the returned promise.
  * This method also handles cachePrimer header from the server with links with the rel, https://api.brightspace.com/rels/cache-primer.
  * A list of the links that need to be primed are sent to fetchable.handleCachePriming method.
- * @param {Fetchabe} fetchable Is an object that inherients from the class fetchable. This is the object that will be fetched.
+ * @param {Fetchable} fetchable Is an object that inherients from the class fetchable. This is the object that will be fetched.
  * @param {boolean} bypassCache Default is `false`. If bypassCache is true then it will cancel any pending request
  *                              and send a new request to the server with no-cache headers.
  * @returns {Promise} This promise will resolve to a json object, or null if the request is canceled.
