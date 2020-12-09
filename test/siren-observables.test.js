@@ -8,6 +8,7 @@ import { SirenLink } from '../state/observable/SirenLink.js';
 import { SirenProperty } from '../state/observable/SirenProperty.js';
 import { SirenSubEntities } from '../state/observable/SirenSubEntities.js';
 import { SirenSubEntity } from '../state/observable/SirenSubEntity.js';
+import { SirenSummonAction } from '../state/observable/SirenSummonAction.js';
 
 const orgHref = 'https://api.brightspace.com/rels/organization';
 
@@ -68,8 +69,16 @@ describe('observerFactory object creation', () => {
 		assert.instanceOf(basicInfo, SirenSubEntity, 'Object created was not a SirenSubEntity');
 	});
 
+	it('ObservableFactory creates SirenSummonAction', () => {
+		const propertyInfo = {
+			type: ot.summonAction
+		};
+		const basicInfo = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(basicInfo, SirenSummonAction, 'Object created was not a SirenSubEntity');
+	});
+
 	it('ObservableFactory fails to create class of type that does not exist', () => {
-		const propertyInfo = { type: 8 };
+		const propertyInfo = { type: -1 };
 		expect(() => { sirenObservableFactory(propertyInfo); }).to.throw('Bad siren component');
 	});
 
