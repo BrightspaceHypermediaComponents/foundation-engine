@@ -24,11 +24,15 @@ export function fetch(fetchable, bypassCache = false) {
 
 	performServerFetch(fetchable, bypassCache);
 
-	responsePromise
-		.then(json => fetchable.onServerResponse(json))
-		.catch(error => fetchable.onServerResponse(null, error));
-
-	return responsePromise;
+	return responsePromise
+		.then(json => {
+			fetchable.onServerResponse(json);
+			return json;
+		})
+		.catch(error => {
+			fetchable.onServerResponse(null, error);
+			throw error;
+		});
 }
 
 /**
