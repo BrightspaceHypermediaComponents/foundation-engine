@@ -14,11 +14,10 @@ class FetchableObject extends Fetchable(Object) {
 	}
 }
 
-let token;
+let token, fetchstub;
 
 const hrefGoodStatus = 'http://resource-with-good-status.d2l';
 const hrefBadStatus = 'http://resource-with-bad-status.d2l';
-
 const headerResponse = { Link: '' };
 const clearHeaderResponse = () => headerResponse.Link = '';
 
@@ -40,6 +39,11 @@ before(async() => {
 	sandbox = sinon.createSandbox();
 	sandbox.stub(window.d2lfetch, 'removeTemp').callsFake((middleware) => middleware);
 	token = await getToken('someToken');
+	fetchstub = sandbox.stub(window.d2lfetch, 'fetch')
+		.callsFake(async(href, { body, headers, method }) => {
+			await aTimeout(100); // lets cause a bit of a delay
+			return responses[href]({ request: { body, headers, method } });
+		});
 });
 
 after(() => {
@@ -47,16 +51,8 @@ after(() => {
 });
 
 describe('fetch', () => {
-	let fetchstub;
-	beforeEach(() => {
-		fetchstub = sandbox.stub(window.d2lfetch, 'fetch')
-			.callsFake(async(href, { body, headers, method }) => {
-				await aTimeout(100); // lets cause a bit of a delay
-				return responses[href]({ request: { body, headers, method } });
-			});
-	});
 	afterEach(() => {
-		fetchstub.restore();
+		fetchstub.resetHistory();
 	});
 
 	it('should fetch an fetchable object that exists', async() => {
