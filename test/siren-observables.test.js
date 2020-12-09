@@ -10,7 +10,6 @@ import { SirenSubEntity } from '../state/observable/SirenSubEntity.js';
 import { SirenSummonAction } from '../state/observable/SirenSummonAction.js';
 import { stateFactory } from '../state/HypermediaState.js';
 
-
 const orgHref = 'https://api.brightspace.com/rels/organization';
 
 describe('observerFactory object creation', () => {
