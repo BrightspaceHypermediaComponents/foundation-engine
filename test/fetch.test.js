@@ -22,7 +22,6 @@ class FetchableObject extends Fetchable(Object) {
 	resetLinks() {
 		this.links = undefined;
 	}
-
 }
 
 let token, fetchStub, removeTempStub;
