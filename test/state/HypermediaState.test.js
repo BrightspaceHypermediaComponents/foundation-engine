@@ -686,6 +686,7 @@ describe('fetch integration test', () => {
 		state.addObservables(observer, observable);
 		const spy = sinon.spy(state);
 		await fetch(state);
+		await (new Promise(resolve => setTimeout(() => resolve(), 20)));
 		assert.isTrue(spy.onServerResponse.called);
 		assert.isTrue(spy.setSirenEntity.called);
 		assert.isTrue(mock.called(selfHref));
@@ -693,7 +694,7 @@ describe('fetch integration test', () => {
 		assert.deepEqual(observer.name, entity.properties.name);
 	});
 
-	it('FetchErro should be thown and setSirenEntity should not be called', async() => {
+	it('FetchError should be thown and setSirenEntity should not be called', async() => {
 		const selfHref = `http://foo-${uniqueId()}`;
 		const mock = fetchMock
 			.mock(selfHref, 500);
@@ -703,14 +704,15 @@ describe('fetch integration test', () => {
 		let processingError;
 		try {
 			await fetch(state);
+			await (new Promise(resolve => setTimeout(() => resolve(), 200)));
 		} catch (e) {
 			processingError = e;
 		}
 
 		assert.isTrue(mock.called(selfHref));
 		assert.instanceOf(processingError, FetchError, 'should thow FetchError object');
-		assert.isTrue(spy.onServerResponse.called);
 		assert.isTrue(spy.setSirenEntity.notCalled);
+		assert.isTrue(spy.onServerResponse.called);
 	});
 
 });

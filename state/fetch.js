@@ -2,7 +2,7 @@ import 'd2l-fetch/d2l-fetch.js';
 
 const d2lfetch = window.d2lfetch;
 
-export async function fetch(fetchable, bypassCache = false) {
+export function fetch(fetchable, bypassCache = false) {
 	if (fetchable.fetchStatus.pending) {
 		if (!bypassCache) {
 			return fetchable.fetchStatus.complete;
@@ -12,7 +12,7 @@ export async function fetch(fetchable, bypassCache = false) {
 
 	const responsePromise = fetchable.fetchStatus.start();
 
-	await performServerFetch(fetchable, bypassCache); // needed to add await to see the test working properly.
+	performServerFetch(fetchable, bypassCache);
 
 	responsePromise
 		.then(json => fetchable.onServerResponse(json))
