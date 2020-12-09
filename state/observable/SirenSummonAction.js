@@ -33,7 +33,6 @@ export class SirenSummonAction extends Routable(SirenAction) {
 
 	_updateAction() {
 		this.action = {
-			prime: this._prime,
 			has: true,
 			summon: (observables) => {
 				this._prepareAction(observables);

@@ -51,7 +51,7 @@ export class SirenAction extends Fetchable(Observable) {
 			return;
 		}
 
-		return this._state.processRawJsonSirenEntity(json);
+		this._state.processRawJsonSirenEntity(json);
 	}
 
 	async push() {
