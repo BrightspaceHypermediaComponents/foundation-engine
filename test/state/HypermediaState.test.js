@@ -429,7 +429,7 @@ describe('HypermediaState class', () => {
 		});
 	});
 
-	describe('supdateProperties method', () => {
+	describe('updateProperties method', () => {
 
 		it('should update observable value property', () => {
 			const stateToken = { rawToken: 'bar' };
