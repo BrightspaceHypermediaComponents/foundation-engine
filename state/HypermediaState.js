@@ -15,10 +15,9 @@ const store = window.D2L.Foundation.StateStore;
 
 /**
  *
- * @export
  * @class HypermediaState
  */
-export class HypermediaState extends Fetchable(Object) {
+class HypermediaState extends Fetchable(Object) {
 	constructor(entityID, token) {
 		super(entityID, token);
 
