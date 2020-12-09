@@ -76,7 +76,7 @@ describe('fetch', () => {
 		}
 	});
 
-	it('fetching the same href at the same time will only fetch run one fetch and return the same promise', async() => {
+	it('fetching the same href at the same time will only run one fetch and return the same promise', async() => {
 		//Being super verbose and step wise on purpose!
 		const fetchableOne = new FetchableObject(hrefGoodStatus, token);
 		const promiseOne = fetch(fetchableOne);
