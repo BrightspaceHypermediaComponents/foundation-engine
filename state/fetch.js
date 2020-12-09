@@ -61,6 +61,7 @@ async function performServerFetch(fetchable, bypassCache) {
 		fetchable.fetchStatus.done(null, err);
 	}
 }
+
 /**
  * This method constructs a array of links that we need to start handling!
  * @param {Response} response A successful response from the server. One with response.ok = true.
