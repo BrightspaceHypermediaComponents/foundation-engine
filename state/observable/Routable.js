@@ -1,3 +1,8 @@
+/**
+ * Routable mixin
+ * Behaviour interface for objects that are routable
+ * @mixin
+ */
 export const Routable = superclass => class extends superclass {
 	constructor({ id, token, state }) {
 		super({ id, token, state });
@@ -18,7 +23,6 @@ export const Routable = superclass => class extends superclass {
 	 * @param {Object} obj
 	 * @param {Object} obj.route - An object containing information on the route to go through
 	 * @param {function} obj.method - A function that will mutate the value before setting the property
-	 * @param {function} method
 	 */
 	addObserver(observer, property, { route, method } = {}) {
 		if (route) {
