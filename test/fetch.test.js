@@ -6,10 +6,6 @@ import { default as sinon } from 'sinon/pkg/sinon-esm.js';
 
 let sandbox;
 class FetchableObject extends Fetchable(Object) {
-	constructor(href, token) {
-		super(href, token);
-		this.onServerResponseCalled = new Promise((resolve) => this._resolver = resolve);
-	}
 	get body() { return 'body'; }
 	handleCachePriming(links) {
 		this.links = links;
@@ -17,7 +13,6 @@ class FetchableObject extends Fetchable(Object) {
 	onServerResponse(json, error) {
 		this.json = json;
 		this.error = error;
-		this._resolver(true);
 	}
 	resetLinks() {
 		this.links = undefined;
@@ -78,7 +73,7 @@ describe('fetch', () => {
 		const fetchable = new FetchableObject(hrefGoodStatus, token);
 		const onServerResponseSpy = sandbox.spy(fetchable, 'onServerResponse');
 		await fetch(fetchable);
-		await fetchable.onServerResponseCalled;
+
 		expect(onServerResponseSpy.calledOnce).to.be.true;
 		expect(fetchable.error).to.be.undefined;
 		expect(fetchable.json.request.body).to.equal('body');
@@ -107,7 +102,7 @@ describe('fetch', () => {
 		} catch (error) {
 			processError = error;
 		}
-		await fetchable.onServerResponseCalled;
+
 		expect(onServerResponseSpy.calledOnce).to.be.true;
 		expect(fetchable.json).to.be.null;
 		expect(fetchable.error).to.include(FetchError);
@@ -115,12 +110,11 @@ describe('fetch', () => {
 		expect(processError).to.equal(processError);
 	});
 
-	it('fetching the same href at the same time will only run one fetch and return the same promise', async() => {
+	it('fetching the same href at the same time will only run one fetch and return the same promise results', async() => {
 		//Being super verbose and step wise on purpose!
 		const fetchableOne = new FetchableObject(hrefGoodStatus, token);
 		const promiseOne = fetch(fetchableOne);
 		const promiseTwo = fetch(fetchableOne);
-		expect(promiseOne).to.equal(promiseTwo);
 
 		const responseOne = await promiseOne;
 		const responseTwo = await promiseTwo;
