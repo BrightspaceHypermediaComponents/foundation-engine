@@ -4,7 +4,7 @@ import { Routable } from '../../state/observable/Routable.js';
 
 class Tester extends Routable(Observable) { }
 
-describe.only('adding and removing observers', () => {
+describe('adding and removing observers', () => {
 	let subentity, obs;
 
 	beforeEach(() => {
