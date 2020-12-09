@@ -1,7 +1,7 @@
 import { assert }  from '@open-wc/testing';
 import { SirenSummonAction } from '../../state/observable/SirenSummonAction.js';
 
-describe.only('SirenSummonAction', () => {
+describe('SirenSummonAction', () => {
 	it('construction', () => {
 		const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
 
