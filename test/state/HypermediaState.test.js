@@ -455,7 +455,7 @@ describe('HypermediaState class', () => {
 			//
 		});
 
-		it('should not update observable type is not supported', () => {
+		it('should not update observable type that is not supported', () => {
 			const stateToken = { rawToken: 'bar' };
 			const state = new HypermediaState('foo', stateToken);
 			const observables = {
