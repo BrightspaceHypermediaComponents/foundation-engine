@@ -1,5 +1,5 @@
 
-import { dispose, HypermediaState, processRawJsonSirenEntity, stateFactory } from '../../state/HypermediaState';
+import { dispose, processRawJsonSirenEntity, stateFactory } from '../../state/HypermediaState';
 import { assert } from '@open-wc/testing';
 import { fetch } from '../../state/fetch';
 import { FetchError } from '../../state/Fetchable';
@@ -19,20 +19,13 @@ function assertAreSimilar(actual, expected) {
 
 describe('HypermediaState class', () => {
 	describe('constructor', () => {
-		it('can create HypermediaState object', () => {
-			const id = 'id';
+		it('can create HypermediaState object', async() => {
+			const id = uniqueId();
 			const token = 'token';
-			const state = new HypermediaState(id, token);
+			const state = await stateFactory(id, token);
 			assert.equal(state.entityID, id);
 			assert.equal(state.href, id);
 			assert.equal(state.token, token);
-		});
-
-		it('why it is allowed to create invalid HypermediaState object ?', () => {
-			const state = new HypermediaState();
-			assert.equal(state.entityID, undefined);
-			assert.equal(state.href, undefined);
-			assert.equal(state.token, undefined);
 		});
 	});
 
@@ -42,7 +35,7 @@ describe('HypermediaState class', () => {
 
 			const observer = {};
 			const entityHref = `http://entity-${uniqueId()}`;
-			const state = new HypermediaState(entityHref, 'token');
+			const state = await stateFactory(entityHref, 'token');
 			const selfHref = entityHref;
 			const nextHref = `${selfHref}/next`;
 			const entity = {
@@ -139,7 +132,7 @@ describe('HypermediaState class', () => {
 				links: [{ rel:['self'], href: linkedHref }]
 			};
 
-			const state = new HypermediaState(entityHref, { rawToken:'token' });
+			const state = await stateFactory(entityHref, 'token');
 			const mock = fetchMock
 				.mock(entityHref, JSON.stringify(entity))
 				.mock(linkedHref, JSON.stringify(linkedEntity));
@@ -158,7 +151,7 @@ describe('HypermediaState class', () => {
 			}, 'class should be observed from main entity and property should be fetched from linked entity');
 		});
 
-		it('observable with method', () => {
+		it('observable with method', async() => {
 			const observer = {};
 			const observable = {
 				value: { observable: observableTypes.property, method: (x) => { observer.sqrt = x * x; return x;} }
@@ -169,13 +162,13 @@ describe('HypermediaState class', () => {
 				}
 			};
 
-			const state = new HypermediaState('foo', 'bar');
+			const state = await stateFactory(uniqueId(), 'bar');
 			state.addObservables(observer, observable);
 			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
 			assert.deepEqual(observer, { sqrt: 4, value: 2 });
 		});
 
-		it('addObservables after setSirenEntity', () => {
+		it('addObservables after setSirenEntity', async() => {
 			const observable = {
 				classes: { observable: observableTypes.classes }
 			};
@@ -183,15 +176,14 @@ describe('HypermediaState class', () => {
 				class: ['class1']
 			};
 			const observer = {};
-			const state = new HypermediaState('foo', 'bar');
+			const state = await stateFactory(uniqueId(), 'bar');
 			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
 			state.addObservables(observer, observable);
 			assert.deepEqual(observer, { classes: entity.class });
 		});
 
 		it('question: what is intent for calling setSirenEntity without parameter', async() => {
-			const stateToken = { rawToken: 'bar' };
-			const state = new HypermediaState('foo', stateToken);
+			const state = await stateFactory(uniqueId(), 'bar');
 			const observable = {
 				classes: { type: Array, observable: observableTypes.classes }
 			};
@@ -215,7 +207,7 @@ describe('HypermediaState class', () => {
 			assert.equal(stateEntityBefore, stateEntityAfter);
 		});
 
-		it('observer should recieve updates when siren entity is updated', () => {
+		it('observer should recieve updates when siren entity is updated', async() => {
 			const observable = {
 				classes: { observable: observableTypes.classes }
 			};
@@ -226,7 +218,7 @@ describe('HypermediaState class', () => {
 				class: ['class1', 'class2']
 			};
 			const observer = {};
-			const state = new HypermediaState('foo', 'bar');
+			const state = await stateFactory(uniqueId(), 'bar');
 			state.addObservables(observer, observable);
 			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
 			assert.deepEqual(observer, { classes: entity.class });
@@ -243,7 +235,7 @@ describe('HypermediaState class', () => {
 			const entityWithHref = {
 				href: 'foo'
 			};
-			const state = new HypermediaState('foo', 'bar');
+			const state = await stateFactory(uniqueId(), 'bar');
 			state.setSirenEntity(entityWithHref);
 			const spy = sinon.spy(state._decodedEntity);
 			assert.isTrue(spy.forEach.notCalled);
@@ -252,7 +244,7 @@ describe('HypermediaState class', () => {
 
 	describe('createChildState method', () => {
 		it('Why it is named createChildState when there is no actual object relations?', async() => {
-			const state = new HypermediaState('foo', 'bar');
+			const state = await stateFactory(uniqueId(), 'bar');
 			const anotherState = await state.createChildState('anotherFoo', 'anotherBar');
 			assert.equal(anotherState.entityID, 'anotherFoo');
 			assert.equal(anotherState.token, 'anotherBar');
@@ -260,7 +252,7 @@ describe('HypermediaState class', () => {
 	});
 
 	describe('dispose method', () => {
-		it('disposed observer does not recieve updates', () => {
+		it('disposed observer does not recieve updates', async() => {
 			const observable = {
 				classes: { observable: observableTypes.classes }
 			};
@@ -271,7 +263,7 @@ describe('HypermediaState class', () => {
 				class: ['class1', 'class2']
 			};
 			const observer = {};
-			const state = new HypermediaState('foo', 'bar');
+			const state = await stateFactory(uniqueId(), 'bar');
 			state.addObservables(observer, observable);
 			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
 			assert.deepEqual(observer, { classes: entity.class });
@@ -293,7 +285,7 @@ describe('HypermediaState class', () => {
 			const mockLink = fetchMock
 				.mock(link1, {})
 				.mock(link2, {});
-			const state = new HypermediaState('foo', { rawToken: 'bar' });
+			const state = await stateFactory(uniqueId(), 'bar');
 			assert.isFalse(window.D2L.Foundation.StateStore.get(link1, 'bar'));
 			assert.isFalse(window.D2L.Foundation.StateStore.get(link2, 'bar'));
 			await state.handleCachePriming([link1, link2]);
@@ -309,7 +301,7 @@ describe('HypermediaState class', () => {
 			const mockLink = fetchMock
 				.mock(link1, 500)
 				.mock(link2, {});
-			const state = new HypermediaState('foo', { rawToken: 'bar' });
+			const state = await stateFactory(uniqueId(), 'bar');
 			assert.isFalse(window.D2L.Foundation.StateStore.get(link1, 'bar'));
 			assert.isFalse(window.D2L.Foundation.StateStore.get(link2, 'bar'));
 			let processingError;
@@ -330,21 +322,21 @@ describe('HypermediaState class', () => {
 	});
 
 	describe('hasServerResponseCached method', () => {
-		it('returns false when entity is not set', () => {
-			const state = new HypermediaState('foo', 'bar');
+		it('returns false when entity is not set', async() => {
+			const state = await stateFactory(uniqueId(), 'bar');
 			const isCached = state.hasServerResponseCached();
 			assert.isFalse(isCached);
 		});
 
-		it('returns true when entity is set', () => {
-			const state = new HypermediaState('foo', 'bar');
+		it('returns true when entity is set', async() => {
+			const state = await stateFactory(uniqueId(), 'bar');
 			state.setSirenEntity(SirenParse(JSON.stringify({ class: ['foo'] })));
 			const isCached = state.hasServerResponseCached();
 			assert.isTrue(isCached);
 		});
 
-		it('returns true after entity is reset', () => {
-			const state = new HypermediaState('foo', 'bar');
+		it('returns true after entity is reset', async() => {
+			const state = await stateFactory(uniqueId(), 'bar');
 			state.setSirenEntity(SirenParse(JSON.stringify({ class: ['foo'] })));
 			assert.isTrue(state.hasServerResponseCached());
 			state.reset();
@@ -354,13 +346,12 @@ describe('HypermediaState class', () => {
 
 	describe('push and reset methods', () => {
 		const methods = ['push', 'reset'];
-		let state, putActionSpy, getActionSpy, linkChildStateSpy, subEntityChilStateSpy, linkPrimeChildStateSpy;
+		let state, putActionSpy, getActionSpy, subEntityChilStateSpy, linkPrimeChildStateSpy;
 		before(async() => {
 			const entityHref = `http://entity-${uniqueId()}`;
 			const observable = {
 				actionPut: { observable: observableTypes.action, name: 'do-put' },
 				// need route or prime to pass token to observable so SirenLink observable will fetch the link and will create child state
-				linkSelf: { observable: observableTypes.link, rel: 'self', route: [{ abc: 'need route to pass token to ' }] },
 				linkPrime: { observable: observableTypes.link, rel: 'prime', prime: true },
 				subEntity: { observable: observableTypes.subEntity, rel: 'item', route: [{ abc: 'need route to pass token to ' }] }
 			};
@@ -389,28 +380,23 @@ describe('HypermediaState class', () => {
 				],
 				links: [{ rel: [ 'self' ], href: entityHref }, { rel: [ 'prime' ], href: `${entityHref}/prime` }]
 			};
-			state = new HypermediaState(entityHref, { rawToken: 'token' });
+
+			state = await stateFactory(entityHref, 'token');
 			const observer = {};
 
 			state.addObservables(observer, observable);
 			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
-			/*
-				state.setSirenEntity does not await for observables.setSirenEntity
-				and the SirenLink.childState is not created yet because it is calling async method createChildState
-				Solution that I don't like: put delay before continuing.
-				Solution that someone may not like: await for observables to finish with setSirenEntity.
-			*/
+
+			//need to await until asyncroneous callbacks are resolved, before proceeding
 			await (new Promise(resolve => setTimeout(() => resolve(), 20)));
 
 			// create spies for observables
 			const putActionObservable = state._getSirenObservable({ type: observableTypes.action, id: 'do-put' });
 			const getActionObservable = state._getSirenObservable({ type: observableTypes.action, id: 'do-get' });
-			const linkObservable = state._getSirenObservable({ type: observableTypes.link, id: 'self' });
 			const linkPrimeObservable = state._getSirenObservable({ type: observableTypes.link, id: 'prime' });
 			const subEntityObservable = state._getSirenObservable({ type: observableTypes.subEntity, id: 'item' });
 			putActionSpy = sinon.spy(putActionObservable);
 			getActionSpy = sinon.spy(getActionObservable);
-			linkChildStateSpy = sinon.spy(linkObservable.childState);
 			subEntityChilStateSpy = sinon.spy(subEntityObservable.childState);
 			linkPrimeChildStateSpy = sinon.spy(linkPrimeObservable.childState);
 		});
@@ -418,10 +404,9 @@ describe('HypermediaState class', () => {
 		methods.forEach((method) => {
 			it(`should call ${method} method for childStates and for action observables`, async() => {
 				// push or reset state
-				state[method]();
+				await state[method]();
 
 				//verify shild states where pushed or reset
-				assert.isTrue(linkChildStateSpy[method].calledOnce);
 				assert.isTrue(subEntityChilStateSpy[method].calledOnce);
 				assert.isTrue(linkPrimeChildStateSpy[method].calledOnce);
 
@@ -435,9 +420,8 @@ describe('HypermediaState class', () => {
 
 	describe('updateProperties method', () => {
 
-		it('should update observable value property', () => {
-			const stateToken = { rawToken: 'bar' };
-			const state = new HypermediaState('foo', stateToken);
+		it('should update observable value property', async() => {
+			const state = await stateFactory(uniqueId(), 'bar');
 			const observables = {
 				description: { observable: observableTypes.property }
 			};
@@ -459,9 +443,8 @@ describe('HypermediaState class', () => {
 			//
 		});
 
-		it('should not update observable type that is not supported', () => {
-			const stateToken = { rawToken: 'bar' };
-			const state = new HypermediaState('foo', stateToken);
+		it('should not update observable type that is not supported', async() => {
+			const state = await stateFactory(uniqueId(), 'bar');
 			const observables = {
 				classes: { type: Array, observable: 'unupported' }
 			};
@@ -475,9 +458,8 @@ describe('HypermediaState class', () => {
 
 	describe('processRawJsonSirenEntity method', () => {
 		it('should create state with passed token', async() => {
-			const stateToken = { rawToken: 'bar' };
 			const tokenForNewState = 'token';
-			const state = new HypermediaState('foo', stateToken);
+			const state = await stateFactory(uniqueId(), 'bar');
 			const href = `http://foo-${uniqueId()}`;
 			assert.isFalse(window.D2L.Foundation.StateStore.get(href, tokenForNewState), 'state should not exist yet');
 			const json = `{
@@ -505,10 +487,10 @@ describe('HypermediaState class', () => {
 		});
 
 		it('should create state with existing token', async() => {
-			const stateToken = { rawToken: 'bar' };
-			const state = new HypermediaState('foo', stateToken);
+			const state = await stateFactory(uniqueId(), 'bar');
+			const rawToken = 'bar';
 			const href = `http://foo-${uniqueId()}`;
-			assert.isFalse(window.D2L.Foundation.StateStore.get(href, stateToken.rawToken), 'state should not exist yet');
+			assert.isFalse(window.D2L.Foundation.StateStore.get(href, rawToken), 'state should not exist yet');
 			const json = `{
 				"class": [ "foo" ],
 				"properties": {
@@ -528,9 +510,9 @@ describe('HypermediaState class', () => {
 				]
 				}`;
 			await state.processRawJsonSirenEntity(json);
-			const newState = window.D2L.Foundation.StateStore.get(href, stateToken.rawToken);
+			const newState = window.D2L.Foundation.StateStore.get(href, rawToken);
 			assert.equal(newState.entityID, href);
-			assert.equal(newState.token.rawToken, stateToken.rawToken);
+			assert.equal(newState.token.rawToken, rawToken);
 		});
 	});
 });
@@ -539,7 +521,6 @@ describe('stateFactory function', () => {
 	it('can create state and add it to the window.D2L.Foundation.StateStore', async() => {
 		const id = uniqueId();
 		const state = await stateFactory(id, 'bar');
-		assert.isTrue(state instanceof HypermediaState);
 		assert.equal(state.entityID, id);
 		const stateInStore = window.D2L.Foundation.StateStore.get(id, 'bar');
 		assert.equal(state, stateInStore);
@@ -622,8 +603,8 @@ describe('processRawJsonSirenEntity function', () => {
 });
 
 describe('dispose function', () => {
-	it('can dispose state', () => {
-		const state = new HypermediaState('entityID', 'token');
+	it('can dispose state', async() => {
+		const state = await stateFactory(uniqueId(), 'token');
 		const observable = {
 			classes: { type: Array, observable: observableTypes.classes }
 		};
