@@ -114,7 +114,7 @@ describe('HypermediaState class', () => {
 			assertAreSimilar(observer.entity, entity);
 		});
 
-		it('#addObservables - obsever gets routed property', async() => {
+		it('observable with route', async() => {
 			const observable = {
 				mainEntityClass: { observable: observableTypes.classes },
 				linkedEntityProperty: {
@@ -158,6 +158,23 @@ describe('HypermediaState class', () => {
 			}, 'class should be observed from main entity and property should be fetched from linked entity');
 		});
 
+		it('observable with method', () => {
+			const observer = {};
+			const observable = {
+				value: { observable: observableTypes.property, method: (x) => { observer.sqrt = x * x; return x;} }
+			};
+			const entity = {
+				properties: {
+					value: 2
+				}
+			};
+
+			const state = new HypermediaState('foo', 'bar');
+			state.addObservables(observer, observable);
+			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
+			assert.deepEqual(observer, { sqrt: 4, value: 2 });
+		});
+
 		it('addObservables after setSirenEntity', () => {
 			const observable = {
 				classes: { observable: observableTypes.classes }
@@ -172,7 +189,7 @@ describe('HypermediaState class', () => {
 			assert.deepEqual(observer, { classes: entity.class });
 		});
 
-		it('what is intent for calling setSirenEntity without parameter', async() => {
+		it('question: what is intent for calling setSirenEntity without parameter', async() => {
 			const stateToken = { rawToken: 'bar' };
 			const state = new HypermediaState('foo', stateToken);
 			const observable = {
@@ -394,6 +411,7 @@ describe('HypermediaState class', () => {
 			linkChildStateSpy = sinon.spy(linkObservable.childState);
 			subEntityChilStateSpy = sinon.spy(subEntityObservable.childState);
 		});
+
 		methods.forEach((method) => {
 			it(`should call ${method} method for childStates and for action observables`, async() => {
 				// push or reset state
