@@ -1,6 +1,5 @@
 import { assert, expect }  from '@open-wc/testing';
 import { observableTypes as ot, sirenObservableFactory, sirenObserverDefinedProperty } from '../state/observable/sirenObservableFactory.js';
-import { HypermediaState } from '../state/HypermediaState.js';
 import { SirenAction } from '../state/observable/SirenAction.js';
 import { SirenClasses } from '../state/observable/SirenClasses.js';
 import { SirenEntity } from '../state/observable/SirenEntity.js';
@@ -9,6 +8,7 @@ import { SirenProperty } from '../state/observable/SirenProperty.js';
 import { SirenSubEntities } from '../state/observable/SirenSubEntities.js';
 import { SirenSubEntity } from '../state/observable/SirenSubEntity.js';
 import { SirenSummonAction } from '../state/observable/SirenSummonAction.js';
+import { stateFactory } from '../state/HypermediaState.js';
 
 const orgHref = 'https://api.brightspace.com/rels/organization';
 
@@ -243,7 +243,7 @@ describe('calling sirenObserverDefinedProperty with observable objects', () => {
 
 	it('property created for sirenLink with a HypermediaState', () => {
 		const obj = { type: String, observable: ot.link, rel: orgHref };
-		const state = new HypermediaState(orgHref, 21312);
+		const state = stateFactory(orgHref, 21312);
 		const res = sirenObserverDefinedProperty(obj, state);
 
 		assert.equal(res.type, ot.link, 'property link was set incorrectly');
