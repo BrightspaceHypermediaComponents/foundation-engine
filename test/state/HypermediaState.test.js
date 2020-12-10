@@ -182,7 +182,7 @@ describe('HypermediaState class', () => {
 			assert.deepEqual(observer, { classes: entity.class });
 		});
 
-		it('question: what is intent for calling setSirenEntity without parameter', async() => {
+		it('can call setSirenEntity without parameter', async() => {
 			const state = await stateFactory(uniqueId(), 'bar');
 			const observable = {
 				classes: { type: Array, observable: observableTypes.classes }
@@ -195,10 +195,6 @@ describe('HypermediaState class', () => {
 			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
 			assert.deepEqual(observer, { classes: ['foo'] });
 
-			// whhen calling setSirenEntity without param it just reaplies stored entity to observervable.
-			// Each observable will behave differently.
-			// For example ClassessObservable will not reaaply same value to observer if entity is not changed.
-			// What it the intent?
 			observer.classes.shift();
 			assert.deepEqual(observer, { classes: [] });
 			const stateEntityBefore = state._entity;
@@ -226,12 +222,7 @@ describe('HypermediaState class', () => {
 			assert.deepEqual(observer, { classes: updatedEntity.class });
 		});
 
-		it('setSirentEntity - why could not continue if entity has href ?', async() => {
-			// setSirentEntity partial code snippet:
-			// if (entity && entity.href) {
-			//	return;
-			//}
-
+		it('setSirentEntity - should not continue if entity has href property', async() => {
 			const entityWithHref = {
 				href: 'foo'
 			};
@@ -243,7 +234,7 @@ describe('HypermediaState class', () => {
 	});
 
 	describe('createChildState method', () => {
-		it('Why it is named createChildState when there is no actual object relations?', async() => {
+		it('can create new state by calling state.createChildState ', async() => {
 			const state = await stateFactory(uniqueId(), 'bar');
 			const anotherState = await state.createChildState('anotherFoo', 'anotherBar');
 			assert.equal(anotherState.entityID, 'anotherFoo');
@@ -279,7 +270,7 @@ describe('HypermediaState class', () => {
 			fetchMock.reset();
 		});
 
-		it('Should crete state per link and fetch data', async() => {
+		it('Should create state per link and fetch data', async() => {
 			const link1 = `http://link1-${uniqueId()}`;
 			const link2 = `http://link2-${uniqueId()}`;
 			const mockLink = fetchMock
@@ -433,14 +424,6 @@ describe('HypermediaState class', () => {
 			state.updateProperties(observables);
 			assert.equal(observablObj.value, 'abc');
 			assert.deepEqual(observer, { description: 'abc' });
-
-			// this method needs comment in the code about how it is intended to be used.
-			// My observation:
-			// component calls commit method on an action and passess some observable of property type as parameter and value to be set.
-			// this observable is got updated without actually pushing update to server.
-			// https://github.com/BrightspaceHypermediaComponents/foundation-components/blob/85b5410e28eb0eec93b1ba00baecf482999e621c/components/activity/name/custom/d2l-activity-name-learning-path.js#L34
-			// https://github.com/BrightspaceHypermediaComponents/foundation-engine/blob/06c8381f7656ad07a5bb0fb8dcb39202f1287074/state/observable/SirenAction.js#L104
-			//
 		});
 
 		it('should not update observable type that is not supported', async() => {
@@ -631,12 +614,11 @@ describe('fetch integration test', () => {
 			},
 			entities: [
 				{
-					// is it a bug that observer only gets href, and no class ?
 					class: [ 'foo-sub-entity-1' ],
 					rel: [ 'sub1' ],
 					href: 'http://foo/sub1'
 				},
-				{ // Is it a bug that this is entity is not assigned to observer
+				{
 					class: [ 'foo-sub-entity-2' ],
 					rel: [ 'sub2' ],
 					href: 'http://foo/sub2'
