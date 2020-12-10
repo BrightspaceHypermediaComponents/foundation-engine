@@ -40,22 +40,23 @@ const responses = {
 	[hrefBadStatus]: () => { return { status: 400, ok: false }; }
 };
 
-before(async() => {
-	sandbox = sinon.createSandbox();
-	removeTempStub = sandbox.stub(window.d2lfetch, 'removeTemp').callsFake(() => window.d2lfetch);
-	token = await getToken('someToken');
-	fetchStub = sandbox.stub(window.d2lfetch, 'fetch')
-		.callsFake(async(href, { body, headers, method }) => {
-			await aTimeout(100); // lets cause a bit of a delay
-			return responses[href]({ request: { body, headers, method } });
-		});
-});
-
-after(() => {
-	sandbox.restore();
-});
-
 describe('fetch', () => {
+
+	before(async() => {
+		sandbox = sinon.createSandbox();
+		removeTempStub = sandbox.stub(window.d2lfetch, 'removeTemp').callsFake(() => window.d2lfetch);
+		token = await getToken('someToken');
+		fetchStub = sandbox.stub(window.d2lfetch, 'fetch')
+			.callsFake(async(href, { body, headers, method }) => {
+				await aTimeout(100); // lets cause a bit of a delay
+				return responses[href]({ request: { body, headers, method } });
+			});
+	});
+
+	after(() => {
+		sandbox.restore();
+	});
+
 	afterEach(() => {
 		fetchStub.resetHistory();
 		removeTempStub.resetHistory();
