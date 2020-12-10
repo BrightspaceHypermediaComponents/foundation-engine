@@ -2,6 +2,16 @@ import 'd2l-fetch/d2l-fetch.js';
 
 const d2lfetch = window.d2lfetch;
 
+/**
+ * This method sends request to the server. It returns the results to fetchable.onServerResponse and the returned promise.
+ * This method also handles cachePrimer header from the server with links with the rel, https://api.brightspace.com/rels/cache-primer.
+ * A list of the links that need to be primed are sent to fetchable.handleCachePriming method.
+ * @param {Fetchable} fetchable Is an object that inherits from the class fetchable. This is the object that will be fetched.
+ * @param {boolean} bypassCache Default is `false`. If bypassCache is true then it will cancel any pending request
+ *                              and send a new request to the server with no-cache headers.
+ * @returns {Promise} This promise will resolve to a json object, or null if the request is canceled.
+ * 					  If there was an error in fetching then this promised is rejected with an error message.
+ */
 export function fetch(fetchable, bypassCache = false) {
 	if (fetchable.fetchStatus.pending) {
 		if (!bypassCache) {
@@ -14,13 +24,24 @@ export function fetch(fetchable, bypassCache = false) {
 
 	performServerFetch(fetchable, bypassCache);
 
-	responsePromise
-		.then(json => fetchable.onServerResponse(json))
-		.catch(error => fetchable.onServerResponse(null, error));
-
-	return responsePromise;
+	return responsePromise
+		.then(json => {
+			fetchable.onServerResponse(json);
+			return json;
+		})
+		.catch(error => {
+			fetchable.onServerResponse(null, error);
+			throw error;
+		});
 }
 
+/**
+ * This method is a helper for fetch. It handles the actual sending of the request.
+ * @param {Fetchable} fetchable Is an object that inherits from the class fetchable. This is the object that will be fetched.
+ * @param {boolean} bypassCache Default is `false`. If bypassCache is true then it will cancel any pending request
+ *                              and send a new request to the server with no-cache headers.
+ * @returns {Promise} This promise will resolve when fetchable is fetched
+ */
 async function performServerFetch(fetchable, bypassCache) {
 	await fetchable.refreshToken();
 
@@ -45,6 +66,11 @@ async function performServerFetch(fetchable, bypassCache) {
 	}
 }
 
+/**
+ * This method constructs a array of links that we need to start handling!
+ * @param {Response} response A successful response from the server. One with response.ok = true.
+ * @returns {Array} An array of strings that represents links we need to handle.
+ */
 function cachePrimingList(response) {
 	const linkHeaderValues = response.headers && response.headers.get('Link');
 	if (!linkHeaderValues) {
