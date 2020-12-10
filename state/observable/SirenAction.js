@@ -49,10 +49,10 @@ export class SirenAction extends Fetchable(Observable) {
 			throw new FetchError(error);
 		}
 		if (!json) {
-			return;
+			return null;
 		}
 
-		this._state.processRawJsonSirenEntity(json);
+		return this._state.processRawJsonSirenEntity(json);
 	}
 
 	async push() {

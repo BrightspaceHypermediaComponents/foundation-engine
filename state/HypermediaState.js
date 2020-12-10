@@ -157,9 +157,11 @@ class HypermediaState extends Fetchable(Object) {
 export async function processRawJsonSirenEntity(json, rawToken) {
 	const entity = await SirenParse(json);
 	const entityID = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self').href;
-	if (!entityID) return;
-	const state = await stateFactory(entityID, rawToken);
-	state.setSirenEntity(entity);
+	if (entityID) {
+		const state = await stateFactory(entityID, rawToken);
+		state.setSirenEntity(entity);
+	}
+	return entity;
 }
 
 export async function stateFactory(entityID, rawToken) {
