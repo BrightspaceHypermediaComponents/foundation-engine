@@ -7,9 +7,15 @@ import fetchMock from 'fetch-mock/esm/client.js';
 import { observableTypes } from '../../state/observable/sirenObservableFactory';
 import sinon from 'sinon/pkg/sinon-esm.js';
 import SirenParse from 'siren-parser';
+import { waitUntil } from '@open-wc/testing-helpers';
 
 function uniqueId() {
 	return `${Date.now()}`;
+}
+
+function wait(condition, message = condition.toString()) {
+	const options = { interval: 3, timeout: 10 };
+	return waitUntil(condition, message, options);
 }
 
 function assertAreSimilar(actual, expected) {
@@ -140,11 +146,9 @@ describe('HypermediaState class', () => {
 			state.addObservables(observer, observable);
 
 			await fetch(state);
-			// need a delay for onServerResponse callback to fetch&process main entity  then fetch&process liked entity
-			await (new Promise(resolve => setTimeout(() => resolve(), 20)));
 
-			assert.isTrue(mock.called(entityHref), `should fetch ${entityHref}`);
-			assert.isTrue(mock.called(linkedHref), `should fetch ${linkedHref}`);
+			await wait(() => mock.called(entityHref));
+			await wait(() => mock.called(linkedHref));
 			assert.deepEqual(observer, {
 				mainEntityClass: ['main-entity-class'],
 				linkedEntityProperty: 'linked-entity-name'
@@ -378,14 +382,15 @@ describe('HypermediaState class', () => {
 			state.addObservables(observer, observable);
 			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
 
-			//need to await until asyncroneous callbacks are resolved, before proceeding
-			await (new Promise(resolve => setTimeout(() => resolve(), 20)));
-
 			// create spies for observables
 			const putActionObservable = state._getSirenObservable({ type: observableTypes.action, id: 'do-put' });
 			const getActionObservable = state._getSirenObservable({ type: observableTypes.action, id: 'do-get' });
 			const linkPrimeObservable = state._getSirenObservable({ type: observableTypes.link, id: 'prime' });
 			const subEntityObservable = state._getSirenObservable({ type: observableTypes.subEntity, id: 'item' });
+			await wait(() => putActionObservable !== undefined);
+			await wait(() => getActionObservable !== undefined);
+			await wait(() => linkPrimeObservable !== undefined);
+			await wait(() => subEntityObservable !== undefined);
 			putActionSpy = sinon.spy(putActionObservable);
 			getActionSpy = sinon.spy(getActionObservable);
 			subEntityChilStateSpy = sinon.spy(subEntityObservable.childState);
@@ -398,12 +403,12 @@ describe('HypermediaState class', () => {
 				await state[method]();
 
 				//verify shild states where pushed or reset
-				assert.isTrue(subEntityChilStateSpy[method].calledOnce);
-				assert.isTrue(linkPrimeChildStateSpy[method].calledOnce);
+				await wait(() => subEntityChilStateSpy[method].calledOnce);
+				await wait(() => linkPrimeChildStateSpy[method].calledOnce);
 
 				// verify entity actions where pushed or reset
-				assert.isTrue(putActionSpy[method].calledOnce);
-				assert.isTrue(getActionSpy[method].calledOnce);
+				await wait(() => putActionSpy[method].calledOnce);
+				await wait(() => getActionSpy[method].calledOnce);
 			});
 
 		});
@@ -649,10 +654,10 @@ describe('fetch integration test', () => {
 		state.addObservables(observer, observable);
 		const spy = sinon.spy(state);
 		await fetch(state);
-		await (new Promise(resolve => setTimeout(() => resolve(), 20)));
-		assert.isTrue(spy.onServerResponse.called);
-		assert.isTrue(spy.setSirenEntity.called);
-		assert.isTrue(mock.called(selfHref));
+
+		await wait(() => mock.called(selfHref));
+		await wait(() => spy.onServerResponse.called);
+		await wait(() => spy.setSirenEntity.called);
 		assert.deepEqual(observer.class, entity.class);
 		assert.deepEqual(observer.name, entity.properties.name);
 	});
@@ -667,15 +672,13 @@ describe('fetch integration test', () => {
 		let processingError;
 		try {
 			await fetch(state);
-			await (new Promise(resolve => setTimeout(() => resolve(), 200)));
 		} catch (e) {
 			processingError = e;
 		}
-
-		assert.isTrue(mock.called(selfHref));
+		await wait(() => mock.called(selfHref));
+		await wait(() => spy.onServerResponse.called);
 		assert.instanceOf(processingError, FetchError, 'should thow FetchError object');
 		assert.isTrue(spy.setSirenEntity.notCalled);
-		assert.isTrue(spy.onServerResponse.called);
 	});
 
 });
