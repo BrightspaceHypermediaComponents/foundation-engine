@@ -77,6 +77,14 @@ describe('observerFactory object creation', () => {
 		assert.instanceOf(observable, SirenSummonAction, 'Object created was not a SirenSubEntity');
 	});
 
+	it('ObservableFactory creates SirenSummonAction', () => {
+		const propertyInfo = {
+			type: ot.summonAction
+		};
+		const observable = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(observable, SirenSummonAction, 'Object created was not a SirenSubEntity');
+	});
+
 	it('ObservableFactory fails to create class of type that does not exist', () => {
 		const propertyInfo = { type: -1 };
 		expect(() => { sirenObservableFactory(propertyInfo); }).to.throw('Bad siren component');

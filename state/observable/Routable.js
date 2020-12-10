@@ -1,3 +1,5 @@
+import { shouldAttachToken } from '../token.js';
+
 /**
  * Routable mixin
  * Behaviour interface for objects that are routable
@@ -9,12 +11,12 @@ export const Routable = superclass => class extends superclass {
 		this._routes = new Map();
 	}
 
-	get childState() {
-		return this._childState;
+	get routedState() {
+		return this._routedState;
 	}
 
-	set childState(state) {
-		this._childState = state;
+	set routedState(state) {
+		this._routedState = state;
 	}
 
 	/**
@@ -32,11 +34,26 @@ export const Routable = superclass => class extends superclass {
 		}
 	}
 
+	createRoutedState(entityID, token) {
+		return this._state.createChildState(entityID, token);
+	}
+
 	deleteObserver(observer) {
 		if (this._routes.has(observer)) {
 			this._deleteRoute(observer);
 		} else {
 			super.deleteObserver(observer);
+		}
+	}
+
+	async updateRoutedState(identifier, subEntity) {
+		if (this._token) {
+			this.routedState = await this.createRoutedState(identifier, shouldAttachToken(this._token.rawToken, subEntity));
+			this._routes.forEach((route, observer) => {
+				this.routedState.addObservables(observer, route);
+			});
+
+			fetch(this.routedState);
 		}
 	}
 
@@ -46,8 +63,8 @@ export const Routable = superclass => class extends superclass {
 	}
 
 	_deleteRoute(observer) {
-		if (this._childState) {
-			this._childState.dispose(observer);
+		if (this.routedState) {
+			this.routedState.dispose(observer);
 		}
 		this._routes.delete(observer);
 	}
