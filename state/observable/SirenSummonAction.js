@@ -1,17 +1,17 @@
 import { Routable } from './Routable.js';
 import { SirenAction } from './SirenAction.js';
 
-const defaultAction = { has: true, summon: () => undefined };
+const defaultSummon = { has: false, summon: () => undefined };
 
 export class SirenSummonAction extends Routable(SirenAction) {
 	constructor({ id: name, token, state, prime }) {
 		super({ id: name, token, state });
 		this._prime = prime;
-		this.action = defaultAction;
+		this.action = defaultSummon;
 	}
 
 	get action() {
-		return this._observers.value || defaultAction;
+		return this._observers.value || defaultSummon;
 	}
 
 	set action({ has, summon }) {

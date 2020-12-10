@@ -17,64 +17,64 @@ describe('observerFactory object creation', () => {
 		const propertyInfo = {
 			type: ot.action
 		};
-		const basicInfo = sirenObservableFactory(propertyInfo);
-		assert.instanceOf(basicInfo, SirenAction, 'Object created was not a SirenAction');
+		const observable = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(observable, SirenAction, 'Object created was not a SirenAction');
 	});
 
 	it('ObservableFactory creates SirenClasses', () => {
 		const propertyInfo = {
 			type: ot.classes
 		};
-		const basicInfo = sirenObservableFactory(propertyInfo);
-		assert.instanceOf(basicInfo, SirenClasses, 'Object created was not a SirenClasses');
+		const observable = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(observable, SirenClasses, 'Object created was not a SirenClasses');
 	});
 
 	it('ObservableFactory creates SirenProperty', () => {
 		const propertyInfo = {
 			type: ot.property
 		};
-		const basicInfo = sirenObservableFactory(propertyInfo);
-		assert.instanceOf(basicInfo, SirenProperty, 'Object created was not a SirenProperty');
+		const observable = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(observable, SirenProperty, 'Object created was not a SirenProperty');
 	});
 
 	it('ObservableFactory creates SirenLink', () => {
 		const propertyInfo = {
 			type: ot.link
 		};
-		const basicInfo = sirenObservableFactory(propertyInfo);
-		assert.instanceOf(basicInfo, SirenLink, 'Object created was not a SirenLink');
+		const observable = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(observable, SirenLink, 'Object created was not a SirenLink');
 	});
 
 	it('ObservableFactory creates SirenEntity', () => {
 		const propertyInfo = {
 			type: ot.entity
 		};
-		const basicInfo = sirenObservableFactory(propertyInfo);
-		assert.instanceOf(basicInfo, SirenEntity, 'Object created was not a SirenEntity');
+		const observable = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(observable, SirenEntity, 'Object created was not a SirenEntity');
 	});
 
 	it('ObservableFactory creates SirenSubEntities', () => {
 		const propertyInfo = {
 			type: ot.subEntities
 		};
-		const basicInfo = sirenObservableFactory(propertyInfo);
-		assert.instanceOf(basicInfo, SirenSubEntities, 'Object created was not a SirenSubEntities');
+		const observable = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(observable, SirenSubEntities, 'Object created was not a SirenSubEntities');
 	});
 
 	it('ObservableFactory creates SirenSubEntity', () => {
 		const propertyInfo = {
 			type: ot.subEntity
 		};
-		const basicInfo = sirenObservableFactory(propertyInfo);
-		assert.instanceOf(basicInfo, SirenSubEntity, 'Object created was not a SirenSubEntity');
+		const observable = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(observable, SirenSubEntity, 'Object created was not a SirenSubEntity');
 	});
 
 	it('ObservableFactory creates SirenSummonAction', () => {
 		const propertyInfo = {
 			type: ot.summonAction
 		};
-		const basicInfo = sirenObservableFactory(propertyInfo);
-		assert.instanceOf(basicInfo, SirenSummonAction, 'Object created was not a SirenSubEntity');
+		const observable = sirenObservableFactory(propertyInfo);
+		assert.instanceOf(observable, SirenSummonAction, 'Object created was not a SirenSubEntity');
 	});
 
 	it('ObservableFactory fails to create class of type that does not exist', () => {
