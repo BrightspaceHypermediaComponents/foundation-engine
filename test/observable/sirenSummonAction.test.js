@@ -43,5 +43,33 @@ describe('SirenSummonAction', () => {
 			assert.isFalse(summonAction.action.has, 'action does not have summon');
 			assert.isUndefined(summonAction.action.summon(), 'result from summon should be undefined');
 		});
+
+		it('action is set twice', () => {
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			summonAction.action = { has: true, summon: 'summon' };
+			summonAction.action = { has: true, summon: 'summon' };
+
+			assert.isFalse(summonAction.action.has, 'action does not have summon');
+			assert.isUndefined(summonAction.action.summon(), 'result from summon should be undefined');
+		});
+
+		it('action is reset', () => {
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			const action = { has: true, summon: () => 'foo' };
+			summonAction.action = action;
+			summonAction.action = action;
+
+			assert.isTrue(summonAction.action.has, 'action does not have summon');
+			assert.equal(summonAction.action.summon(), 'foo', 'result from summon unchanged');
+		});
+
+		it('summon is updated', () => {
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			summonAction.action = { has: true, summon: () => 'foo' };
+			summonAction.action = { has: true, summon: () => 'bar' };
+
+			assert.isTrue(summonAction.action.has, 'action does have summon');
+			assert.equal(summonAction.action.summon(), 'bar', 'summon should be undated to return bar');
+		});
 	});
 });
