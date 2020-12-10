@@ -23,6 +23,7 @@ export class SirenAction extends Fetchable(Observable) {
 
 	set action({ has, commit }) {
 		if (!has || typeof commit !== 'function') {
+			has = false;
 			commit = () => undefined;
 		}
 		if (this.action.has !== has || this.action.commit !== commit) {

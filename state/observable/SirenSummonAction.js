@@ -16,6 +16,7 @@ export class SirenSummonAction extends Routable(SirenAction) {
 
 	set action({ has, summon }) {
 		if (!has || typeof summon !== 'function') {
+			has = false;
 			summon = () => undefined;
 		}
 		if (this.action.has !== has || this.action.summon !== summon) {
