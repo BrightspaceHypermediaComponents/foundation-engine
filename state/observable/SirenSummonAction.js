@@ -1,5 +1,7 @@
+import { fetch } from '../fetch.js';
 import { Routable } from './Routable.js';
 import { SirenAction } from './SirenAction.js';
+import SirenParse from 'siren-parser';
 
 const defaultSummon = { has: false, summon: () => undefined };
 
@@ -25,12 +27,23 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	}
 
 	onServerResponse(json, error) {
-		const entity = super.onServerResponse(json, error);
+		super.onServerResponse(json, error);
+		const entity = this._state.processRawJsonSirenEntity(json);
+
 		this.setSirenEntity(entity);
+		return entity;
 	}
 
 	// overriding superclass push method to do nothing
 	push() {}
+
+	async summon() {
+		// TODO: return SirenFacade when it exists
+		const response = fetch(this);
+		const entity = await SirenParse(response);
+		this.setSirenEntity(entity);
+		return entity;
+	}
 
 	_updateAction() {
 		this.action = {
