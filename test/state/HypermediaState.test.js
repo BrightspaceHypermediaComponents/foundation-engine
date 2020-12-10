@@ -155,7 +155,7 @@ describe('HypermediaState class', () => {
 			}, 'class should be observed from main entity and property should be fetched from linked entity');
 		});
 
-		it('observable with method', async() => {
+		it('mutates the observed value with method', async() => {
 			const observer = {};
 			const observable = {
 				value: { observable: observableTypes.property, method: (x) => { observer.sqrt = x * x; return x;} }
@@ -682,4 +682,3 @@ describe('fetch integration test', () => {
 	});
 
 });
-
