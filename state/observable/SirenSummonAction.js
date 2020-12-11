@@ -1,7 +1,6 @@
 import { fetch } from '../fetch.js';
 import { Routable } from './Routable.js';
 import { SirenAction } from './SirenAction.js';
-import SirenParse from 'siren-parser';
 
 const defaultSummon = { has: false, summon: () => undefined };
 
