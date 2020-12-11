@@ -27,8 +27,7 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	}
 
 	onServerResponse(json, error) {
-		super.onServerResponse(json, error);
-		const entity = this._state.processRawJsonSirenEntity(json);
+		const entity = super.onServerResponse(json, error);
 
 		this.setSirenEntity(entity);
 		return entity;
@@ -39,9 +38,7 @@ export class SirenSummonAction extends Routable(SirenAction) {
 
 	async summon() {
 		// TODO: return SirenFacade when it exists
-		const response = fetch(this);
-		const entity = await SirenParse(response);
-		this.setSirenEntity(entity);
+		const entity = await fetch(this);
 		return entity;
 	}
 
