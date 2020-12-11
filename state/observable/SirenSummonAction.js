@@ -4,9 +4,8 @@ import { SirenAction } from './SirenAction.js';
 const defaultSummon = { has: false, summon: () => undefined };
 
 export class SirenSummonAction extends Routable(SirenAction) {
-	constructor({ id: name, token, state, prime }) {
+	constructor({ id: name, token, state }) {
 		super({ id: name, token, state });
-		this._prime = prime;
 		this.action = defaultSummon;
 	}
 
