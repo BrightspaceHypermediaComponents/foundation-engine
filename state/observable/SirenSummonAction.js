@@ -1,3 +1,4 @@
+import { fetch } from '../fetch.js';
 import { Routable } from './Routable.js';
 import { SirenAction } from './SirenAction.js';
 
@@ -24,8 +25,7 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	}
 
 	onServerResponse(json, error) {
-		const entity = super.onServerResponse(json, error);
-		this.setSirenEntity(entity);
+		return super.onServerResponse(json, error);
 	}
 
 	// overriding superclass push method to do nothing

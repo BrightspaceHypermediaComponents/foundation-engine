@@ -129,7 +129,9 @@ export class SirenAction extends Fetchable(Observable) {
 
 	_prepareAction(observables) {
 		const input = {};
-		Object.keys(observables).forEach(field => input[field] = observables[field]?.value ? observables[field].value : observables[field]);
+		if (observables) {
+			Object.keys(observables).forEach(field => input[field] = observables[field]?.value ? observables[field].value : observables[field]);
+		}
 		this.setQueryParams(input);
 		this.setBodyFromInput(input);
 	}
