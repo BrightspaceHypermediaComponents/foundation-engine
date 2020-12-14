@@ -11,7 +11,7 @@ export class SirenAction extends Fetchable(Observable) {
 
 	constructor({ id: name, token, state }) {
 		super(null, token);
-		this._action = defaultAction;
+		this.action = defaultAction;
 		this._name = name;
 		this._readyToSend = false;
 		this._state = state;
@@ -23,6 +23,7 @@ export class SirenAction extends Fetchable(Observable) {
 
 	set action({ has, commit }) {
 		if (!has || typeof commit !== 'function') {
+			has = false;
 			commit = () => undefined;
 		}
 		if (this.action.has !== has || this.action.commit !== commit) {
@@ -48,10 +49,10 @@ export class SirenAction extends Fetchable(Observable) {
 			throw new FetchError(error);
 		}
 		if (!json) {
-			return;
+			return null;
 		}
 
-		this._state.processRawJsonSirenEntity(json);
+		return this._state.processRawJsonSirenEntity(json);
 	}
 
 	async push() {
@@ -99,14 +100,7 @@ export class SirenAction extends Fetchable(Observable) {
 		this._href = this._rawSirenAction.href;
 		this._fields = this._decodeFields(this._rawSirenAction);
 
-		this.action = {
-			has: true,
-			commit: (observables) => {
-				this._prepareAction(observables);
-				this._readyToSend = true;
-				return this._state.updateProperties(observables);
-			}
-		};
+		this._updateAction();
 	}
 
 	// Doesn't support field names with the same name.
@@ -135,8 +129,21 @@ export class SirenAction extends Fetchable(Observable) {
 
 	_prepareAction(observables) {
 		const input = {};
-		Object.keys(observables).forEach(field => input[field] = observables[field]?.value ? observables[field].value : observables[field]);
+		if (observables) {
+			Object.keys(observables).forEach(field => input[field] = observables[field]?.value ? observables[field].value : observables[field]);
+		}
 		this.setQueryParams(input);
 		this.setBodyFromInput(input);
+	}
+
+	_updateAction() {
+		this.action = {
+			has: true,
+			commit: (observables) => {
+				this._prepareAction(observables);
+				this._readyToSend = true;
+				return this._state.updateProperties(observables);
+			}
+		};
 	}
 }
