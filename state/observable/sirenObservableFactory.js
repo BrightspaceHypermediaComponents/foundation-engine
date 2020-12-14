@@ -5,6 +5,7 @@ import { SirenLink } from './SirenLink.js';
 import { SirenProperty } from './SirenProperty.js';
 import { SirenSubEntities } from './SirenSubEntities.js';
 import { SirenSubEntity } from './SirenSubEntity.js';
+import { SirenSummonAction } from './SirenSummonAction.js';
 
 export const observableTypes = Object.freeze({
 	property: 1,
@@ -13,7 +14,8 @@ export const observableTypes = Object.freeze({
 	subEntities: 4,
 	entity: 5,
 	subEntity: 6,
-	action: 7
+	action: 7,
+	summonAction: 8
 });
 
 const observableClasses = Object.freeze({
@@ -23,7 +25,8 @@ const observableClasses = Object.freeze({
 	[observableTypes.property]: SirenProperty,
 	[observableTypes.subEntity]: SirenSubEntity,
 	[observableTypes.subEntities]: SirenSubEntities,
-	[observableTypes.action]: SirenAction
+	[observableTypes.action]: SirenAction,
+	[observableTypes.summonAction]: SirenSummonAction
 });
 
 function definedProperty({ observable: type, prime, rel: id, route, token, state }) {
