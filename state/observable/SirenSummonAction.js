@@ -5,6 +5,7 @@ import { SirenAction } from './SirenAction.js';
 const defaultSummon = { has: false, summon: () => undefined };
 
 export class SirenSummonAction extends Routable(SirenAction) {
+
 	constructor({ id: name, token, state, prime }) {
 		super({ id: name, token, state });
 		this._prime = prime;
@@ -34,6 +35,7 @@ export class SirenSummonAction extends Routable(SirenAction) {
 
 	// overriding superclass push method to do nothing
 	push() {}
+
 
 	async summon() {
 		// TODO: return SirenFacade when it exists

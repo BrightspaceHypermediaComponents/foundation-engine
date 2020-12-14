@@ -26,15 +26,14 @@ class HypermediaState extends Fetchable(Object) {
 
 	addObservables(observer, observables) {
 		Object.keys(observables).forEach((name) => {
+
 			const propertyInfo = {
 				name,
 				token: this.token,
 				...observables[name]
 			};
-
 			const basicInfo = sirenObserverDefinedProperty(propertyInfo, this);
 			if (!basicInfo) return;
-
 			const sirenObservable = this._getSirenObservable(basicInfo);
 			sirenObservable.addObserver(observer, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
 		});
@@ -116,17 +115,15 @@ class HypermediaState extends Fetchable(Object) {
 
 			const basicInfo = sirenObserverDefinedProperty(propertyInfo);
 			if (!basicInfo) return;
-
 			const sirenObservable = this._getSirenObservable(basicInfo);
 			sirenObservable && (sirenObservable.value = propertyInfo.value);
 		});
 	}
 
 	_childStates() {
-		let childStates = [];
+		const childStates = [];
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
-				childStates = [...childStates, ...(sirenObservable.childStates || [])];
 				sirenObservable.childState && childStates.push(sirenObservable.childState);
 			});
 		});
@@ -157,9 +154,11 @@ class HypermediaState extends Fetchable(Object) {
 export async function processRawJsonSirenEntity(json, rawToken) {
 	const entity = await SirenParse(json);
 	const entityID = entity.hasLinkByRel && entity.hasLinkByRel('self') && entity.getLinkByRel && entity.getLinkByRel('self').href;
-	if (!entityID) return;
-	const state = await stateFactory(entityID, rawToken);
-	state.setSirenEntity(entity);
+	if (entityID) {
+		const state = await stateFactory(entityID, rawToken);
+		state.setSirenEntity(entity);
+	}
+	return entity;
 }
 
 export async function stateFactory(entityID, rawToken) {
