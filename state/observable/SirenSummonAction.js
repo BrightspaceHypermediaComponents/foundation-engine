@@ -29,7 +29,6 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	onServerResponse(json, error) {
 		const entity = super.onServerResponse(json, error);
 
-		this.setSirenEntity(entity);
 		return entity;
 	}
 
