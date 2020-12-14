@@ -5,7 +5,6 @@ describe('SirenSummonAction', () => {
 	it('construction', () => {
 		const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
 
-
 		assert.isTrue(summonAction._prime, 'prime set from constructor parameter');
 		assert.equal(summonAction._name, 'foo', 'name set from constructor parameter');
 		assert.equal(summonAction._token, 'abc', 'token set from constructor parameter');
