@@ -36,7 +36,6 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	// overriding superclass push method to do nothing
 	push() {}
 
-
 	async summon() {
 		// TODO: return SirenFacade when it exists
 		const entity = await fetch(this);
