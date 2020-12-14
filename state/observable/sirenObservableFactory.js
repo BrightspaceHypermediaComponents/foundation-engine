@@ -63,6 +63,5 @@ export function sirenObservableFactory(componentProperties) {
 	if (!sirenComponentType) {
 		throw new Error('Bad siren component');
 	}
-
 	return new sirenComponentType(componentProperties);
 }
