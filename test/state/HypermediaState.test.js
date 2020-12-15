@@ -146,9 +146,7 @@ describe('HypermediaState class', () => {
 			state.addObservables(observer, observable);
 
 			await fetch(state);
-
-			await state.fetchStatus.complete;
-			await Promise.all(state._childStates().map(childState => childState.fetchStatus.complete));
+			await state.allFetchesComplete;
 
 			assert.isTrue(mock.called(entityHref));
 			assert.isTrue(mock.called(linkedHref));

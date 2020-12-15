@@ -39,6 +39,18 @@ class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
+	/**
+	 * Hook for this fetch and all children state fetches to complete
+	 * This does not go further than a single nested state currently because state links can be cyclical
+	 * @returns {Promise} Resolves when this fetch and its linked states are all complete
+	 */
+	get allFetchesComplete() {
+		return (async() => {
+			await this.fetchStatus.complete;
+			await Promise.all(this._childStates().map(state => state.fetchStatus.complete));
+		})();
+	}
+
 	createChildState(entityID, token) {
 		token = token === undefined ? this.token.rawToken : token;
 		return stateFactory(entityID, token);
