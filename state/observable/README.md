@@ -52,14 +52,13 @@ Observables can be passed the `route` parameter in order to step through the Sir
 
 - `Link`: fetches the entity and returns the observable
 - `SubEntity`: fetches the entity if needed and returns the observable
-- `SubEntities`: fetches the entities if needed and returns an array of the observed items
-- `SummonAction`: calls `summon` to get the entity
+- `SummonAction`: calls `summon` to get the entity and returns the observable
 
 Routing can be used to dig as far into the tree as necessary by adding items to the array.
 
 ### Prime
 
-The `prime` parameter will fetch the relevant observable when the component first loads and place it in the `StateStore`. This is useful for linked entities that are needed when the component loads instead of passing the baton to a sub-component, or to fetch more information on a `subEntity`.
+The `prime` parameter will fetch the relevant observable when the component first loads and place it in the `StateStore`. This is useful for related entities that are needed when the component loads instead of waiting to fetch.
 
 - `Link`: fetches the entity
 - `SubEntity`: fetches the entity if needed &mdash; some subEntities are only partially fetched when the target loads, thus adding `prime` will perform a full fetch
