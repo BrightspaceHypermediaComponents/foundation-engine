@@ -13,7 +13,6 @@ export class SirenSubEntity extends Routable(Observable) {
 		super({});
 		this._state = state;
 		this._rel = id;
-		this._routes = new Map();
 		this._token = token;
 	}
 
