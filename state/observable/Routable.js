@@ -35,7 +35,7 @@ export const Routable = superclass => class extends superclass {
 	}
 
 	createRoutedState(entityID, token) {
-		return this._state.createChildState(entityID, token);
+		return this._state.createRoutedState(entityID, token);
 	}
 
 	deleteObserver(observer) {
