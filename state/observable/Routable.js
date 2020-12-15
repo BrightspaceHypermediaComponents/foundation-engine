@@ -1,3 +1,4 @@
+import { fetch } from '../fetch.js';
 import { shouldAttachToken } from '../token.js';
 
 /**
