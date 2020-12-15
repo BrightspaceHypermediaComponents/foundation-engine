@@ -46,9 +46,9 @@ export const Routable = superclass => class extends superclass {
 		}
 	}
 
-	async updateRoutedState(identifier, subEntity) {
-		if (this._token) {
-			this.routedState = await this.createRoutedState(identifier, shouldAttachToken(this._token.rawToken, subEntity));
+	async updateRoutedState(identifier, subEntity, token) {
+		if (token) {
+			this.routedState = await this.createRoutedState(identifier, shouldAttachToken(token.rawToken, subEntity));
 			this._routes.forEach((route, observer) => {
 				this.routedState.addObservables(observer, route);
 			});

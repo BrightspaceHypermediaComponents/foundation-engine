@@ -1,6 +1,8 @@
+import { fetch } from '../fetch.js';
 import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 import { Routable } from './Routable.js';
+import { shouldAttachToken } from '../token.js';
 
 /**
  * Observable SirenSubEntity object
@@ -11,6 +13,7 @@ export class SirenSubEntity extends Routable(Observable) {
 		super({});
 		this._state = state;
 		this._rel = id;
+		this._routes = new Map();
 		this._token = token;
 	}
 
@@ -62,8 +65,15 @@ export class SirenSubEntity extends Routable(Observable) {
 		const entityId = getEntityIDFromSirenEntity(subEntity);
 		this.entity = subEntity;
 
-		this.updateRoutedState(entityId, subEntity);
-		this.routedState.setSirenEntity(subEntity);
+		if (this._token) {
+			this._routedState = await this.createRoutedState(entityId, shouldAttachToken(this._token.rawToken, subEntity));
+			this._routedState.setSirenEntity(subEntity);
+			this._routes.forEach((route, observer) => {
+				this._routedState.addObservables(observer, route);
+			});
+
+			fetch(this._routedState);
+		}
 	}
 
 }

@@ -1,11 +1,14 @@
+import { fetch } from '../fetch.js';
 import { Observable } from './Observable.js';
 import { Routable } from './Routable.js';
+import { shouldAttachToken } from '../token.js';
 
 export class SirenLink extends Routable(Observable) {
 	constructor({ id, token, state } = {}) {
 		super({});
 		this._state = state;
 		this._rel = id;
+		this._routes = new Map();
 		this._token = token;
 	}
 
@@ -38,7 +41,14 @@ export class SirenLink extends Routable(Observable) {
 			});
 		}
 
-		this.updateRoutedState(link.href, link);
+		if (this._token) {
+			this.routedState = await this.createRoutedState(link.href, shouldAttachToken(this._token.rawToken, link));
+			this._routes.forEach((route, observer) => {
+				this.routedState.addObservables(observer, route);
+			});
+
+			fetch(this.routedState);
+		}
 	}
 
 	_merge(sirenLink) {
