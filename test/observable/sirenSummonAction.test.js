@@ -3,9 +3,8 @@ import { SirenSummonAction } from '../../state/observable/SirenSummonAction.js';
 
 describe('SirenSummonAction', () => {
 	it('construction', () => {
-		const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+		const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc' });
 
-		assert.isTrue(summonAction._prime, 'prime set from constructor parameter');
 		assert.equal(summonAction._name, 'foo', 'name set from constructor parameter');
 		assert.equal(summonAction._token, 'abc', 'token set from constructor parameter');
 		assert.instanceOf(summonAction._routes, Map, 'routes initializes to empty map');
@@ -13,7 +12,7 @@ describe('SirenSummonAction', () => {
 
 	describe('set action', () => {
 		it('should set action to given object', () => {
-			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc' });
 			summonAction.action = { has: true, summon: () => 'result' };
 
 			assert.isTrue(summonAction.action.has, 'action has a function');
@@ -21,7 +20,7 @@ describe('SirenSummonAction', () => {
 		});
 
 		it('has is false, should set action to defaultSummon', () => {
-			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc' });
 			summonAction.action = { has: false, summon: () => 'result' };
 
 			assert.isFalse(summonAction.action.has, 'action does not have summon');
@@ -29,7 +28,7 @@ describe('SirenSummonAction', () => {
 		});
 
 		it('summon is not function, should set action to defaultSummon', () => {
-			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc' });
 			summonAction.action = { has: true, summon: 'summon' };
 
 			assert.isFalse(summonAction.action.has, 'action does not have summon');
@@ -37,7 +36,7 @@ describe('SirenSummonAction', () => {
 		});
 
 		it('has is false and summon is not function, should set action to defaultSummon', () => {
-			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc' });
 			summonAction.action = { has: false, summon: 'summon' };
 
 			assert.isFalse(summonAction.action.has, 'action does not have summon');
@@ -45,7 +44,7 @@ describe('SirenSummonAction', () => {
 		});
 
 		it('action is set twice', () => {
-			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc' });
 			summonAction.action = { has: true, summon: 'summon' };
 			summonAction.action = { has: true, summon: 'summon' };
 
@@ -54,7 +53,7 @@ describe('SirenSummonAction', () => {
 		});
 
 		it('action is reset', () => {
-			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc' });
 			const action = { has: true, summon: () => 'foo' };
 			summonAction.action = action;
 			summonAction.action = action;
@@ -64,7 +63,7 @@ describe('SirenSummonAction', () => {
 		});
 
 		it('summon is updated', () => {
-			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc', prime: true });
+			const summonAction = new SirenSummonAction({ id: 'foo', token: 'abc' });
 			summonAction.action = { has: true, summon: () => 'foo' };
 			summonAction.action = { has: true, summon: () => 'bar' };
 
