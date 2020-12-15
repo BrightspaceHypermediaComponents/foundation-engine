@@ -46,6 +46,7 @@ export class SirenSubEntity extends Routable(Observable) {
 			});
 		}
 
+		this._setSubEntity(subEntity);
 	}
 
 	_merge(entity) {
