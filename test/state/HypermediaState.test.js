@@ -1,10 +1,10 @@
 
-import { dispose, processRawJsonSirenEntity, stateFactory } from '../../state/HypermediaState';
+import { dispose, processRawJsonSirenEntity, stateFactory } from '../../state/HypermediaState.js';
 import { assert } from '@open-wc/testing';
-import { fetch } from '../../state/fetch';
-import { FetchError } from '../../state/Fetchable';
+import { fetch } from '../../state/fetch.js';
+import { FetchError } from '../../state/Fetchable.js';
 import fetchMock from 'fetch-mock/esm/client.js';
-import { observableTypes } from '../../state/observable/sirenObservableFactory';
+import { observableTypes } from '../../state/observable/sirenObservableFactory.js';
 import sinon from 'sinon/pkg/sinon-esm.js';
 import SirenParse from 'siren-parser';
 import { waitUntil } from '@open-wc/testing-helpers';

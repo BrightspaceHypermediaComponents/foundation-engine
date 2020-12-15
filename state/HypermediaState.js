@@ -124,7 +124,7 @@ class HypermediaState extends Fetchable(Object) {
 		const childStates = [];
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
-				sirenObservable.childState && childStates.push(sirenObservable.childState);
+				sirenObservable.routedState && childStates.push(sirenObservable.routedState);
 			});
 		});
 		return childStates;
