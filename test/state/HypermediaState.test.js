@@ -147,8 +147,11 @@ describe('HypermediaState class', () => {
 
 			await fetch(state);
 
-			await wait(() => mock.called(entityHref));
-			await wait(() => mock.called(linkedHref));
+			await state.fetchStatus.complete;
+			await Promise.all(state._childStates().map(childState => childState.fetchStatus.complete));
+
+			assert.isTrue(mock.called(entityHref));
+			assert.isTrue(mock.called(linkedHref));
 			assert.deepEqual(observer, {
 				mainEntityClass: ['main-entity-class'],
 				linkedEntityProperty: 'linked-entity-name'
