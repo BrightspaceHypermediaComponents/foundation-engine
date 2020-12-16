@@ -4,13 +4,10 @@ import { default as fetchMock } from 'fetch-mock/esm/client.js';
 import { html } from 'lit-html';
 
 describe('Component integration', () => {
-	let selfHref, actionHref;
-	beforeEach(() => {
-		selfHref = 'https://summon-action/entity';
-		actionHref = 'https://summon-action/do';
-	});
 
 	it('receives an entity when we summon one', async() => {
+		const selfHref = 'https://summon-action/entity';
+		const actionHref = 'https://summon-action/do';
 		const entity = {
 			actions: [{ href: actionHref, method: 'POST', name: 'example-summon' }],
 			links: [{ rel: ['self'], href: selfHref }]
@@ -32,6 +29,8 @@ describe('Component integration', () => {
 	});
 
 	it('gets an action routed through a summon action', async() => {
+		const selfHref = 'https://summon-action/entity-2';
+		const actionHref = 'https://summon-action/do-2';
 		const entity = {
 			actions: [{ href: actionHref, method: 'POST', name: 'example-summon' }],
 			links: [{ rel: ['self'], href: selfHref }]
