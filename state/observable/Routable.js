@@ -1,14 +1,11 @@
-import { fetch } from '../fetch.js';
-import { shouldAttachToken } from '../token.js';
-
 /**
  * Routable mixin
  * Behaviour interface for objects that are routable
  * @mixin
  */
 export const Routable = superclass => class extends superclass {
-	constructor({ id, token, state }) {
-		super({ id, token, state });
+	constructor(object = {}) {
+		super(object);
 		this._routes = new Map();
 	}
 
@@ -44,17 +41,6 @@ export const Routable = superclass => class extends superclass {
 			this._deleteRoute(observer);
 		} else {
 			super.deleteObserver(observer);
-		}
-	}
-
-	async updateRoutedState(identifier, subEntity, token) {
-		if (token) {
-			this.routedState = await this.createRoutedState(identifier, shouldAttachToken(token.rawToken, subEntity));
-			this._routes.forEach((route, observer) => {
-				this.routedState.addObservables(observer, route);
-			});
-
-			fetch(this.routedState);
 		}
 	}
 
