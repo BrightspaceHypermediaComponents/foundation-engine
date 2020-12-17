@@ -163,12 +163,15 @@ export async function processRawJsonSirenEntity(json, rawToken) {
 
 export async function stateFactory(entityID, rawToken) {
 	const token = await getToken(rawToken);
+
 	if (store.has(entityID, token)) {
 		const state = store.get(entityID, token);
 		return state;
 	}
 	const state = new HypermediaState(entityID, token);
-	store.add(state);
+	if (entityID) {
+		store.add(state);
+	}
 	return state;
 }
 
