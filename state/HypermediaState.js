@@ -39,7 +39,19 @@ class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
-	createChildState(entityID, token) {
+	/**
+	 * Hook for this fetch and all children state fetches to complete
+	 * This does not go further than a single nested state currently because state links can be cyclical
+	 * @returns {Promise} Resolves when this fetch and its linked states are all complete
+	 */
+	get allFetchesComplete() {
+		return (async() => {
+			await this.fetchStatus.complete;
+			await Promise.all(this._routedStates().map(state => state.fetchStatus.complete));
+		})();
+	}
+
+	createRoutedState(entityID, token) {
 		token = token === undefined ? this.token.rawToken : token;
 		return stateFactory(entityID, token);
 	}
@@ -80,13 +92,13 @@ class HypermediaState extends Fetchable(Object) {
 	}
 
 	push() {
-		this._childStates().forEach(childState => childState.push());
+		this._routedStates().forEach(routedState => routedState.push());
 		const actions = this._getMap(this._decodedEntity, observableTypes.action);
 		actions.forEach(action => action.push());
 	}
 
 	reset() {
-		this._childStates().forEach(childState => childState?.reset());
+		this._routedStates().forEach(routedState => routedState?.reset());
 		this.setSirenEntity();
 		const actions = this._getMap(this._decodedEntity, observableTypes.action);
 		actions.forEach(action => action.reset());
@@ -120,16 +132,6 @@ class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
-	_childStates() {
-		const childStates = [];
-		this._decodedEntity.forEach(typeMap => {
-			typeMap.forEach(sirenObservable => {
-				sirenObservable.childState && childStates.push(sirenObservable.childState);
-			});
-		});
-		return childStates;
-	}
-
 	_getMap(map, identifier) {
 		if (map.has(identifier)) {
 			return map.get(identifier);
@@ -138,7 +140,6 @@ class HypermediaState extends Fetchable(Object) {
 		map.set(identifier, new Map());
 		return map.get(identifier);
 	}
-
 	_getSirenObservable(basicInfo) {
 		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
 		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
@@ -149,6 +150,16 @@ class HypermediaState extends Fetchable(Object) {
 
 		return sirenObservable;
 	}
+	_routedStates() {
+		const routedStates = [];
+		this._decodedEntity.forEach(typeMap => {
+			typeMap.forEach(sirenObservable => {
+				sirenObservable.routedState && routedStates.push(sirenObservable.routedState);
+			});
+		});
+		return routedStates;
+	}
+
 }
 
 export async function processRawJsonSirenEntity(json, rawToken) {
