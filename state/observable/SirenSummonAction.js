@@ -29,7 +29,8 @@ export class SirenSummonAction extends Routable(SirenAction) {
 
 	async onServerResponse(json, error) {
 		const entity = super.onServerResponse(json, error);
-
+		const sirenEntity = await this._state.processRawJsonSirenEntity(json);
+		this.routedState.setSirenEntity(sirenEntity);
 		return entity;
 	}
 
@@ -37,22 +38,32 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	push() {}
 
 	async setSirenEntity(entity) {
-		this.summon();
+		if (!entity || !entity.hasActionByName(this._name)) {
+			this.action = { has: false };
+			return;
+		}
 
+		this._rawSirenAction = entity.getActionByName(this._name);
+		this._href = this._rawSirenAction.href;
+		this._fields = this._decodeFields(this._rawSirenAction);
+
+		this._updateAction();
 		if (this._token) {
-			this.routedState = await this.createChildState(null, shouldAttachToken(this._token.rawToken, entity));
+			this.routedState = await this.createRoutedState(null, shouldAttachToken(this._token.rawToken, entity));
 			this._routes.forEach((route, observer) => {
+
 				this.routedState.addObservables(observer, route);
 			});
-			fetch(this.routedState);
+
+			await fetch(this);
 		}
 	}
 
-	async summon() {
-		// TODO: return SirenFacade when it exists
-		const entity = await fetch(this);
-		return entity;
-	}
+	// async summon() {
+	// 	// TODO: return SirenFacade when it exists
+	// 	const entity = await fetch(this);
+	// 	return entity;
+	// }
 
 	_updateAction() {
 		this.action = {

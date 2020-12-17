@@ -1,5 +1,5 @@
 import './summon-action-components.js';
-import { expect, fixture, waitUntil } from '@open-wc/testing';
+import { aTimeout, expect, fixture, waitUntil } from '@open-wc/testing';
 import { default as fetchMock } from 'fetch-mock/esm/client.js';
 import { html } from 'lit-html';
 
@@ -27,7 +27,7 @@ describe('Component integration', () => {
 		expect(element.summonedEntity.properties).to.deep.equal(summonedEntity.properties);
 	});
 
-	it.only('gets an action routed through a summon action', async() => {
+	it('gets an action routed through a summon action', async() => {
 		const selfHref = 'https://summon-action/entity-2';
 		const actionHref = 'https://summon-action/do-2';
 		const entity = {
@@ -39,13 +39,18 @@ describe('Component integration', () => {
 			actions: [{ href: summonedActionHref, name: 'example-action', method: 'PUT' }]
 		};
 		const mock = fetchMock
-			.mock(selfHref, JSON.stringify(entity))
-			.post(actionHref, JSON.stringify(summonedEntity));
+			.mock(selfHref, JSON.stringify(entity), {
+				delay: 100, // fake a slow network
+			})
+			.mock(actionHref, JSON.stringify(summonedEntity), {
+				delay: 100, // fake a slow network
+			});
 		const element = await fixture(html`
 			<summon-action-routed-action-component href="${selfHref}" token="foo"></summon-action-routed-action-component>
 		`);
 
 		await waitUntil(() => mock.called(selfHref));
+
 		expect(element._hasAction('exampleAction'), 'does not have the action yet').to.be.undefined;
 		// the first API call will attach the summon action to the component
 		// the system should see the route parameter and automatically call summon
@@ -53,12 +58,12 @@ describe('Component integration', () => {
 		// expect that this will fail until routing is added
 		// todo: remove these comments and this try catch block when test passes
 		try {
-			//const options = { interval: 3, timeout: 2000 };
 			await waitUntil(() => mock.called(actionHref));
 		} catch (e) {
 			throw new Error(`summon was never called on the action or timed out.\n\t${e.message}`);
 		}
 		// now we expect the system attaches the routed action to the component
+		await aTimeout(100); //Maya can too, so can Ten
 		expect(element._hasAction('exampleAction'), 'has the action').to.be.true;
 	});
 });
