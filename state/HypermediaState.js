@@ -38,6 +38,18 @@ class HypermediaState extends Fetchable(Object) {
 			sirenObservable.addObserver(observer, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
 		});
 	}
+  
+	/**
+	 * Hook for this fetch and all children state fetches to complete
+	 * This does not go further than a single nested state currently because state links can be cyclical
+	 * @returns {Promise} Resolves when this fetch and its linked states are all complete
+	 */
+	get allFetchesComplete() {
+		return (async() => {
+			await this.fetchStatus.complete;
+			await Promise.all(this._routedStates().map(state => state.fetchStatus.complete));
+		})();
+	}
 
 	createRoutedState(entityID, token) {
 		token = token === undefined ? this.token.rawToken : token;
