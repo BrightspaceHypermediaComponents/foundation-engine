@@ -1,5 +1,6 @@
 import { fetch } from '../fetch.js';
 import { Routable } from './Routable.js';
+import { shouldAttachToken } from '../token.js';
 import { SirenAction } from './SirenAction.js';
 
 const defaultSummon = { has: false, summon: () => undefined };
@@ -26,7 +27,7 @@ export class SirenSummonAction extends Routable(SirenAction) {
 		}
 	}
 
-	onServerResponse(json, error) {
+	async onServerResponse(json, error) {
 		const entity = super.onServerResponse(json, error);
 
 		return entity;
@@ -34,6 +35,18 @@ export class SirenSummonAction extends Routable(SirenAction) {
 
 	// overriding superclass push method to do nothing
 	push() {}
+
+	async setSirenEntity(entity) {
+		this.summon();
+
+		if (this._token) {
+			this.routedState = await this.createChildState(null, shouldAttachToken(this._token.rawToken, entity));
+			this._routes.forEach((route, observer) => {
+				this.routedState.addObservables(observer, route);
+			});
+			fetch(this.routedState);
+		}
+	}
 
 	async summon() {
 		// TODO: return SirenFacade when it exists
