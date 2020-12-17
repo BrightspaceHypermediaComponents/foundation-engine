@@ -47,11 +47,11 @@ class HypermediaState extends Fetchable(Object) {
 	get allFetchesComplete() {
 		return (async() => {
 			await this.fetchStatus.complete;
-			await Promise.all(this._childStates().map(state => state.fetchStatus.complete));
+			await Promise.all(this._routedStates().map(state => state.fetchStatus.complete));
 		})();
 	}
 
-	createChildState(entityID, token) {
+	createRoutedState(entityID, token) {
 		token = token === undefined ? this.token.rawToken : token;
 		return stateFactory(entityID, token);
 	}
@@ -92,13 +92,13 @@ class HypermediaState extends Fetchable(Object) {
 	}
 
 	push() {
-		this._childStates().forEach(childState => childState.push());
+		this._routedStates().forEach(routedState => routedState.push());
 		const actions = this._getMap(this._decodedEntity, observableTypes.action);
 		actions.forEach(action => action.push());
 	}
 
 	reset() {
-		this._childStates().forEach(childState => childState?.reset());
+		this._routedStates().forEach(routedState => routedState?.reset());
 		this.setSirenEntity();
 		const actions = this._getMap(this._decodedEntity, observableTypes.action);
 		actions.forEach(action => action.reset());
@@ -132,16 +132,6 @@ class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
-	_childStates() {
-		const childStates = [];
-		this._decodedEntity.forEach(typeMap => {
-			typeMap.forEach(sirenObservable => {
-				sirenObservable.childState && childStates.push(sirenObservable.childState);
-			});
-		});
-		return childStates;
-	}
-
 	_getMap(map, identifier) {
 		if (map.has(identifier)) {
 			return map.get(identifier);
@@ -150,7 +140,6 @@ class HypermediaState extends Fetchable(Object) {
 		map.set(identifier, new Map());
 		return map.get(identifier);
 	}
-
 	_getSirenObservable(basicInfo) {
 		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
 		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
@@ -161,6 +150,16 @@ class HypermediaState extends Fetchable(Object) {
 
 		return sirenObservable;
 	}
+	_routedStates() {
+		const routedStates = [];
+		this._decodedEntity.forEach(typeMap => {
+			typeMap.forEach(sirenObservable => {
+				sirenObservable.routedState && routedStates.push(sirenObservable.routedState);
+			});
+		});
+		return routedStates;
+	}
+
 }
 
 export async function processRawJsonSirenEntity(json, rawToken) {
