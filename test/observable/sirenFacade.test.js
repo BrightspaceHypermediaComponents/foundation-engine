@@ -111,5 +111,17 @@ describe('SirenFacade', () => {
 			expect(facade.rawSirenParsedEntity).to.exist;
 			expect(facade.rawSirenParsedEntity._linksByRel.linkedThing).to.be.lengthOf(1);
 		});
+
+		it('has verbose sub-entity', async() => {
+			const entity = await SirenParse({
+				'entities': [
+					{ 'rel': ['item'], 'links': [{ 'rel': ['linkedThing'], 'href': 'http://linked-thing' }] }
+				]
+			});
+			const facade = new SirenFacade(entity, true);
+			expect(facade.entities).to.have.lengthOf(1);
+			expect(facade.entities[0].rawSirenParsedEntity).to.exist;
+			expect(facade.entities[0].rawSirenParsedEntity._linksByRel.linkedThing).to.be.lengthOf(1);
+		});
 	});
 });

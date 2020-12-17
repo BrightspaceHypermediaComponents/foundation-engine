@@ -18,7 +18,7 @@ export class SirenFacade {
 		// todo: We should figure out how we want to do actions - this is just a list of names
 		this.actions = sirenParsedEntity.actions ? sirenParsedEntity.actions.map(x => x.name) : [];
 		// todo: sub entities only go one level currently
-		this.entities = sirenParsedEntity.entities ? sirenParsedEntity.entities.map(x => new SirenFacade(x)) : [];
+		this.entities = sirenParsedEntity.entities ? sirenParsedEntity.entities.map(x => new SirenFacade(x, verbose)) : [];
 		this.properties = sirenParsedEntity.properties || {};
 		if (verbose) {
 			this.rawSirenParsedEntity = sirenParsedEntity;
