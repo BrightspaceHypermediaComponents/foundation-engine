@@ -15,5 +15,15 @@ class SummonActionComponent extends HypermediaStateMixin(LitElement) {
 		}
 	}
 }
-
 customElements.define('summon-action-component', SummonActionComponent);
+
+class SummonActionRoutedActionComponent extends HypermediaStateMixin(LitElement) {
+	static get properties() {
+		return {
+			exampleAction: { observable: observableTypes.action, name: 'example-action',
+				route: [{ observable: observableTypes.summonAction, name: 'example-summon' }] }
+		};
+	}
+}
+
+customElements.define('summon-action-routed-action-component', SummonActionRoutedActionComponent);

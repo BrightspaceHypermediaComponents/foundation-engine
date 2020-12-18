@@ -179,7 +179,9 @@ export async function stateFactory(entityID, rawToken) {
 		return state;
 	}
 	const state = new HypermediaState(entityID, token);
-	store.add(state);
+	if (entityID) {
+		store.add(state);
+	}
 	return state;
 }
 

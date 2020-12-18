@@ -95,7 +95,6 @@ export class SirenAction extends Fetchable(Observable) {
 			this.action = { has: false };
 			return;
 		}
-
 		this._rawSirenAction = sirenEntity.getActionByName(this._name);
 		this._href = this._rawSirenAction.href;
 		this._fields = this._decodeFields(this._rawSirenAction);
