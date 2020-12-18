@@ -121,6 +121,12 @@ describe('HypermediaState class', () => {
 					route: [
 						{ observable: observableTypes.link, rel: 'linked'  }
 					]
+				},
+				selflessSubEntityProperty: {
+					observable: observableTypes.property,
+					route: [
+						{ observable: observableTypes.subEntity, rel: 'selfless-subEntity-rel' }
+					]
 				}
 			};
 
@@ -130,6 +136,11 @@ describe('HypermediaState class', () => {
 
 			const entity = {
 				class: ['main-entity-class'],
+				entities: [{
+					class: ['selfless-subEntity-class'],
+					rel: [ 'selfless-subEntity-rel' ],
+					properties: { selflessSubEntityProperty: 'selfless-subEntity-name' }
+				}],
 				links: [{ rel: [ 'linked' ], href: linkedHref }, { rel:['self'], href: entityHref }]
 			};
 			const linkedEntity = {
@@ -152,7 +163,8 @@ describe('HypermediaState class', () => {
 			assert.isTrue(mock.called(linkedHref));
 			assert.deepEqual(observer, {
 				mainEntityClass: ['main-entity-class'],
-				linkedEntityProperty: 'linked-entity-name'
+				linkedEntityProperty: 'linked-entity-name',
+				selflessSubEntityProperty: 'selfless-subEntity-name'
 			}, 'class should be observed from main entity and property should be fetched from linked entity');
 		});
 
