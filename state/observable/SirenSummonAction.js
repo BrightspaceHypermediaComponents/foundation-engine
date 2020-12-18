@@ -51,9 +51,9 @@ export class SirenSummonAction extends Routable(SirenAction) {
 			return;
 		}
 
+		this._rawSirenAction = entity.getActionByName(this._name);
 		this._href = this._rawSirenAction.href;
 		this._fields = this._decodeFields(this._rawSirenAction);
-		this._rawSirenAction = entity.getActionByName(this._name);
 		if (this._routes.size > 0) {
 			fetch(this);
 		}

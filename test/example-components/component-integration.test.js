@@ -66,7 +66,7 @@ describe('Component integration', () => {
 
 		await waitUntil(() => mock.called(actionHref));
 
-		await aTimeout(200); //Maya can too, so can Ten
+		await aTimeout(400); //Maya can too, so can Ten
 		expect(element._hasAction('exampleAction'), 'has the action').to.be.true;
 	});
 });
