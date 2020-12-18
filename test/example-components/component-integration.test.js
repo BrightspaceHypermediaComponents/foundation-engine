@@ -43,7 +43,7 @@ describe('Component integration', () => {
 				delay: 100, // fake a slow network
 			})
 			.mock(actionHref, JSON.stringify(summonedEntity), {
-				delay: 200, // fake a slow network
+				delay: 100, // fake a slow network
 			});
 		const element = await fixture(html`
 			<summon-action-routed-action-component href="${selfHref}" token="foo"></summon-action-routed-action-component>
@@ -63,7 +63,7 @@ describe('Component integration', () => {
 			throw new Error(`summon was never called on the action or timed out.\n\t${e.message}`);
 		}
 		// now we expect the system attaches the routed action to the component
-		await aTimeout(500); //Maya can too, so can Ten
+		await aTimeout(200); //Maya can too, so can Ten
 		expect(element._hasAction('exampleAction'), 'has the action').to.be.true;
 	});
 });
