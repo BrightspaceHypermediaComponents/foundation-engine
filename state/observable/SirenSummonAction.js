@@ -1,4 +1,5 @@
 import { fetch } from '../fetch.js';
+import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Routable } from './Routable.js';
 import { shouldAttachToken } from '../token.js';
 import { SirenAction } from './SirenAction.js';
@@ -28,19 +29,17 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	}
 
 	async onServerResponse(json, error) {
-		const entity = super.onServerResponse(json, error);
-		const sirenEntity = await this._state.processRawJsonSirenEntity(json);
+		const sirenEntity = super.onServerResponse(json, error);
 
-		if (this._routes.size > 0) {
-			this.routedState = await this.createRoutedState(null, shouldAttachToken(this._token.rawToken, sirenEntity));
-			this._routes.forEach((route, observer) => {
-				this.routedState.addObservables(observer, route);
-			});
-		}
+		const entityID = getEntityIDFromSirenEntity(sirenEntity);
+		this.routedState = await this.createRoutedState(entityID, shouldAttachToken(this._token.rawToken, sirenEntity));
+		this._routes.forEach((route, observer) => {
+			this.routedState.addObservables(observer, route);
+		});
 
 		this.routedState.setSirenEntity(sirenEntity);
 
-		return entity;
+		return sirenEntity;
 	}
 
 	// overriding superclass push method to do nothing
@@ -52,11 +51,12 @@ export class SirenSummonAction extends Routable(SirenAction) {
 			return;
 		}
 
-		this._rawSirenAction = entity.getActionByName(this._name);
 		this._href = this._rawSirenAction.href;
 		this._fields = this._decodeFields(this._rawSirenAction);
-
-		fetch(this);
+		this._rawSirenAction = entity.getActionByName(this._name);
+		if (this._routes.size > 0) {
+			fetch(this);
+		}
 		this._updateAction();
 	}
 
