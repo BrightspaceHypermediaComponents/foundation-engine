@@ -29,7 +29,7 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	}
 
 	async onServerResponse(json, error) {
-		const sirenEntity = super.onServerResponse(json, error);
+		const sirenEntity = await super.onServerResponse(json, error);
 
 		const entityID = getEntityIDFromSirenEntity(sirenEntity);
 		this.routedState = await this.createRoutedState(entityID, shouldAttachToken(this._token.rawToken, sirenEntity));
