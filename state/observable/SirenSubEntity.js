@@ -61,11 +61,11 @@ export class SirenSubEntity extends Routable(Observable) {
 	}
 
 	async _setSubEntity(subEntity) {
-		const entityId = getEntityIDFromSirenEntity(subEntity);
+		const entityID = getEntityIDFromSirenEntity(subEntity);
 		this.entity = subEntity;
 
 		if (this._token) {
-			this._routedState = await this.createRoutedState(entityId, shouldAttachToken(this._token.rawToken, subEntity));
+			this._routedState = await this.createRoutedState(entityID, shouldAttachToken(this._token.rawToken, subEntity));
 			this._routedState.setSirenEntity(subEntity);
 			this._routes.forEach((route, observer) => {
 				this._routedState.addObservables(observer, route);
