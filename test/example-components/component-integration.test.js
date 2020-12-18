@@ -20,6 +20,7 @@ describe('Component integration', () => {
 		const element = await fixture(html`<summon-action-component href="${selfHref}" token="foo"></summon-action-component>`);
 
 		await waitUntil(() => mock.called(selfHref));
+		await aTimeout(200);
 		expect(element.summonedEntity).to.be.undefined;
 		expect(element._hasAction('exampleSummon')).to.be.true;
 		await element.getSummonedThing();
