@@ -13,6 +13,7 @@ const d2lfetch = window.d2lfetch;
  * 					  If there was an error in fetching then this promised is rejected with an error message.
  */
 export function fetch(fetchable, bypassCache = false) {
+	if (!fetchable.href) return;
 	if (fetchable.fetchStatus.pending) {
 		if (!bypassCache) {
 			return fetchable.fetchStatus.complete;
