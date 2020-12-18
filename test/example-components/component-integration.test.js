@@ -16,7 +16,7 @@ describe('Component integration', () => {
 		};
 		const mock = fetchMock
 			.mock(selfHref, JSON.stringify(entity), {
-				delay: 100, // fake a slow network
+				delay: 50, // fake a slow network
 			})
 			.post(actionHref, JSON.stringify(summonedEntity), {
 				delay: 100, // fake a slow network
@@ -25,7 +25,7 @@ describe('Component integration', () => {
 
 		await waitUntil(() => mock.called(selfHref));
 
-		await aTimeout(200);
+		await aTimeout(300);
 		expect(element.summonedEntity).to.be.undefined;
 		expect(element._hasAction('exampleSummon')).to.be.true;
 		await element.getSummonedThing();
