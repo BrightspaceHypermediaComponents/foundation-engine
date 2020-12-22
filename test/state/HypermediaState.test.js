@@ -6,6 +6,7 @@ import { FetchError } from '../../state/Fetchable.js';
 import fetchMock from 'fetch-mock/esm/client.js';
 import { observableTypes } from '../../state/observable/sirenObservableFactory.js';
 import sinon from 'sinon/pkg/sinon-esm.js';
+import { SirenFacade } from '../../state/observable/SirenFacade.js';
 import SirenParse from 'siren-parser';
 import { waitUntil } from '@open-wc/testing-helpers';
 
@@ -103,13 +104,13 @@ describe('HypermediaState class', () => {
 			assert.deepEqual(observer.class, entity.class);
 			assert.deepEqual(observer.name, entity.properties.name);
 			assert.deepEqual(observer.description, entity.properties.description);
-			assertAreSimilar(observer.subEntity1, entity.entities[0]);
-			assertAreSimilar(observer.subEntity2, entity.entities[1]);
+			assertAreSimilar(observer.subEntity1, new SirenFacade(entity.entities[0]));
+			assertAreSimilar(observer.subEntity2, new SirenFacade(entity.entities[1]));
 			assertAreSimilar(observer.actionGet, { has: true });
 			assertAreSimilar(observer.actionPut, { has: true });
 			assert.equal(observer.linkNext, entity.links[0].href);
 			assert.equal(observer.linkSelf, entity.links[1].href);
-			assertAreSimilar(observer.subEntities, entity.entities);
+			assertAreSimilar(observer.subEntities, entity.entities.map(x => new SirenFacade(x)));
 			assertAreSimilar(observer.entity, entity);
 		});
 
