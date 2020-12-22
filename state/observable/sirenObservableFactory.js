@@ -33,14 +33,13 @@ const observableClasses = Object.freeze({
  *
  * @param {*} param0
  */
-function definedProperty({ observable: type, prime, rel: id, route, token, state, verbose }) {
+function definedProperty({ observable: type, prime, rel: id, route, token, state }) {
 	return {
 		id,
 		route,
 		token: (prime || route) ? token : undefined,
 		type,
-		state,
-		verbose
+		state
 	};
 }
 

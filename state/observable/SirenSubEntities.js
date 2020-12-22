@@ -7,8 +7,9 @@ import { SirenSubEntity } from './SirenSubEntity.js';
  * Reflects back an array of SirenFacades to any observers
  */
 export class SirenSubEntities extends Observable {
-	static definedProperty({ token }) {
-		return { token };
+
+	static definedProperty({ token, verbose }) {
+		return { token, verbose };
 	}
 
 	constructor({ id, token, state, verbose }) {
@@ -20,6 +21,9 @@ export class SirenSubEntities extends Observable {
 		this._verbose = verbose;
 	}
 
+	/**
+	 * @return { Array<SirenFacade> }
+	 */
 	get entities() {
 		return this._observers.value || [];
 	}

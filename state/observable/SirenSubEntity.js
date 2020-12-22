@@ -10,6 +10,11 @@ import { SirenFacade } from './SirenFacade.js';
  * Reflects back a SirenFacade to any observers
  */
 export class SirenSubEntity extends Routable(Observable) {
+
+	static definedProperty({ verbose }) {
+		return { verbose };
+	}
+
 	constructor({ id, token, state, verbose } = {}) {
 		super({});
 		this._state = state;

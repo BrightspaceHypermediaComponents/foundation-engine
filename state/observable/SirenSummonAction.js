@@ -11,6 +11,14 @@ const defaultSummon = { has: false, summon: () => undefined };
  * Observable that uses an action to summon another entity
  */
 export class SirenSummonAction extends Routable(SirenAction) {
+
+	/**
+	 * The name is the identifier of the summon action
+	 */
+	static definedProperty({ name: id, token, verbose }) {
+		return { id, token, verbose };
+	}
+
 	/**
 	 * @param {Object} obj
 	 * @param {String} obj.id - The name of the action
