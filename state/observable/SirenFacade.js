@@ -13,6 +13,7 @@ export class SirenFacade {
 		if (!sirenParsedEntity) return;
 
 		this.href = getEntityIDFromSirenEntity(sirenParsedEntity) || undefined;
+		this.rel = sirenParsedEntity.rel || [];
 		this.class = sirenParsedEntity.class || [];
 		this.links = sirenParsedEntity.links || [];
 		// todo: We should figure out how we want to do actions - this is just a list of names

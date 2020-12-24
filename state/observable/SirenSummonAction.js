@@ -3,15 +3,35 @@ import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Routable } from './Routable.js';
 import { shouldAttachToken } from '../token.js';
 import { SirenAction } from './SirenAction.js';
+import { SirenFacade } from './SirenFacade.js';
 
 const defaultSummon = { has: false, summon: () => undefined };
 
+/**
+ * Observable that uses an action to summon another entity
+ */
 export class SirenSummonAction extends Routable(SirenAction) {
 
-	constructor({ id: name, token, state, prime }) {
+	/**
+	 * The name is the identifier of the summon action
+	 */
+	static definedProperty({ name: id, token, verbose }) {
+		return { id, token, verbose };
+	}
+
+	/**
+	 * @param {Object} obj
+	 * @param {String} obj.id - The name of the action
+	 * @param {Token} obj.token - JWT token
+	 * @param {HypermediaState} obj.state
+	 * @param {Boolean} obj.verbose - Whether to attach the raw entity on summon
+	 * @param {Boolean} obj.prime - Whether to immediately summon the object/prime the cache
+	 */
+	constructor({ id: name, token, state, verbose, prime }) {
 		super({ id: name, token, state });
 		this._prime = prime;
 		this.action = defaultSummon;
+		this._verbose = verbose;
 	}
 
 	get action() {
@@ -69,10 +89,11 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	_updateAction() {
 		this.action = {
 			has: true,
-			summon: (observables) => {
+			summon: async(observables) => {
 				this._prepareAction(observables);
 				this._readyToSend = true;
-				return fetch(this);
+				const parsedSirenEntity = await fetch(this);
+				return new SirenFacade(parsedSirenEntity, this._verbose);
 			}
 		};
 	}

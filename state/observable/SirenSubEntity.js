@@ -3,17 +3,24 @@ import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 import { Routable } from './Routable.js';
 import { shouldAttachToken } from '../token.js';
+import { SirenFacade } from './SirenFacade.js';
 
 /**
  * Observable SirenSubEntity object
- * Reflects back the siren parsed entity to any observers
+ * Reflects back a SirenFacade to any observers
  */
 export class SirenSubEntity extends Routable(Observable) {
-	constructor({ id, token, state } = {}) {
+
+	static definedProperty({ verbose }) {
+		return { verbose };
+	}
+
+	constructor({ id, token, state, verbose } = {}) {
 		super({});
 		this._state = state;
 		this._rel = id;
 		this._token = token;
+		this._verbose = verbose;
 	}
 
 	get entity() {
@@ -21,13 +28,14 @@ export class SirenSubEntity extends Routable(Observable) {
 	}
 
 	/**
-	 * @param {Entity} subEntity siren-parser Entity to set to
+	 * Mutates a given siren-parser Entity object to a SirenFacade before setting
+	 * the observed property
+	 * @param {Entity} subEntity - the siren-parser entity to set
 	 */
 	set entity(subEntity) {
-		if (this.entity !== subEntity) {
-			// todo: remove this when we have the facade for subEntity
-			subEntity.href = getEntityIDFromSirenEntity(subEntity);
-			this._observers.setProperty(subEntity);
+		const facade = new SirenFacade(subEntity, this._verbose);
+		if (this.entity !== facade) {
+			this._observers.setProperty(facade);
 		}
 	}
 
@@ -36,11 +44,11 @@ export class SirenSubEntity extends Routable(Observable) {
 	}
 
 	setSirenEntity(sirenEntity, SubEntityCollectionMap) {
-		const subEntity = sirenEntity && sirenEntity.hasSubEntityByRel(this._rel) && sirenEntity.getSubEntityByRel(this._rel);
-		if (!subEntity) return;
+		const parsedSirenEntity = sirenEntity && sirenEntity.hasSubEntityByRel(this._rel) && sirenEntity.getSubEntityByRel(this._rel);
+		if (!parsedSirenEntity) return;
 
 		if (SubEntityCollectionMap && SubEntityCollectionMap instanceof Map) {
-			subEntity.rel.forEach(rel => {
+			parsedSirenEntity.rel.forEach(rel => {
 				if (SubEntityCollectionMap.has(rel)) {
 					this._merge(SubEntityCollectionMap.get(rel));
 				}
@@ -48,16 +56,20 @@ export class SirenSubEntity extends Routable(Observable) {
 			});
 		}
 
-		this._setSubEntity(subEntity);
+		this._setSubEntity(parsedSirenEntity);
 	}
 
-	_merge(entity) {
-		if (!entity || !(entity instanceof SirenSubEntity)) {
+	/**
+	 *
+	 * @param {SirenSubEntity} sirenSubEntity - the observable object to merge
+	 */
+	_merge(sirenSubEntity) {
+		if (!sirenSubEntity || !(sirenSubEntity instanceof SirenSubEntity)) {
 			return;
 		}
 
-		this._observers.merge(entity._observers);
-		this._token = this._token || entity._token;
+		this._observers.merge(sirenSubEntity._observers);
+		this._token = this._token || sirenSubEntity._token;
 	}
 
 	async _setSubEntity(subEntity) {

@@ -29,6 +29,10 @@ const observableClasses = Object.freeze({
 	[observableTypes.summonAction]: SirenSummonAction
 });
 
+/**
+ *
+ * @param {*} param0
+ */
 function definedProperty({ observable: type, prime, rel: id, route, token, state }) {
 	return {
 		id,
