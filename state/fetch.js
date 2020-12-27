@@ -23,17 +23,23 @@ export function fetch(fetchable, bypassCache = false) {
 
 	const responsePromise = fetchable.fetchStatus.start();
 
-	performServerFetch(fetchable, bypassCache);
+	const fetchPromise = performServerFetch(fetchable, bypassCache);
 
-	return responsePromise
-		.then(json => {
-			fetchable.onServerResponse(json);
-			return json;
+	fetchPromise
+		.then(async(json) => {
+			await fetchable.onServerResponse(json);
+			fetchable.fetchStatus.done(json);
 		})
-		.catch(error => {
-			fetchable.onServerResponse(null, error);
-			throw error;
+		.catch(async(error) => {
+			try {
+				await fetchable.onServerResponse(null, error);
+			} catch (e) {
+				error = e;
+			}
+			fetchable.fetchStatus.done(null, error);
 		});
+
+	return responsePromise;
 }
 
 /**
@@ -54,17 +60,14 @@ async function performServerFetch(fetchable, bypassCache) {
 		headers.set('cache-control', 'no-cache');
 	}
 
-	try {
-		const response = await fetch.fetch(fetchable.href, { headers, body: fetchable.body, method: fetchable.method });
-		if (!response.ok) {
-			throw response.status;
-		}
-		fetchable.handleCachePriming(cachePrimingList(response));
-		const json = await response.json();
-		fetchable.fetchStatus.done(json);
-	} catch (err) {
-		fetchable.fetchStatus.done(null, err);
+	const response = await fetch.fetch(fetchable.href, { headers, body: fetchable.body, method: fetchable.method });
+	if (!response.ok) {
+		console.log(response.status);
+		throw response.status;
 	}
+	await fetchable.handleCachePriming(cachePrimingList(response));
+	return response.json();
+
 }
 
 /**

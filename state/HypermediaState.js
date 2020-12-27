@@ -26,16 +26,15 @@ class HypermediaState extends Fetchable(Object) {
 
 	addObservables(observer, observables) {
 		Object.keys(observables).forEach((name) => {
-
 			const propertyInfo = {
 				name,
 				token: this.token,
 				...observables[name]
 			};
-			const basicInfo = sirenObserverDefinedProperty(propertyInfo, this);
-			if (!basicInfo) return;
-			const sirenObservable = this._getSirenObservable(basicInfo);
-			sirenObservable.addObserver(observer, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
+			const definedProperty = sirenObserverDefinedProperty(propertyInfo, this);
+			if (!definedProperty) return;
+			const sirenObservable = this._getSirenObservable(definedProperty);
+			sirenObservable.addObserver(observer, name, { route: definedProperty.route ? { [name]: definedProperty.route } : undefined, method: observables[name].method });
 		});
 	}
 
@@ -47,7 +46,7 @@ class HypermediaState extends Fetchable(Object) {
 	get allFetchesComplete() {
 		return (async() => {
 			await this.fetchStatus.complete;
-			await Promise.all(this._routedStates().map(state => state.fetchStatus.complete));
+			await Promise.all(this._routedStates().map(state => state.allFetchesComplete));
 		})();
 	}
 
@@ -68,10 +67,10 @@ class HypermediaState extends Fetchable(Object) {
 		return this.href;
 	}
 
-	async handleCachePriming(links) {
+	handleCachePriming(links) {
 		return Promise.all(links.map(async(link) => {
 			const state = await stateFactory(link, this.token.rawToken);
-			return fetch(state, true);
+			return fetch(state);
 		}));
 	}
 
@@ -125,9 +124,9 @@ class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenObserverDefinedProperty(propertyInfo);
-			if (!basicInfo) return;
-			const sirenObservable = this._getSirenObservable(basicInfo);
+			const definedProperty = sirenObserverDefinedProperty(propertyInfo);
+			if (!definedProperty) return;
+			const sirenObservable = this._getSirenObservable(definedProperty);
 			sirenObservable && (sirenObservable.value = propertyInfo.value);
 		});
 	}
@@ -140,16 +139,18 @@ class HypermediaState extends Fetchable(Object) {
 		map.set(identifier, new Map());
 		return map.get(identifier);
 	}
-	_getSirenObservable(basicInfo) {
-		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
-		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
 
-		const sirenObservable = sirenObservableFactory(basicInfo);
-		typeMap.set(basicInfo.id, sirenObservable);
+	_getSirenObservable(definedProperty) {
+		const typeMap = this._getMap(this._decodedEntity, definedProperty.type);
+		if (typeMap.has(definedProperty.id)) return typeMap.get(definedProperty.id);
+
+		const sirenObservable = sirenObservableFactory(definedProperty);
+		typeMap.set(definedProperty.id, sirenObservable);
 		this._entity && sirenObservable.setSirenEntity(this._entity, typeMap);
 
 		return sirenObservable;
 	}
+
 	_routedStates() {
 		const routedStates = [];
 		this._decodedEntity.forEach(typeMap => {

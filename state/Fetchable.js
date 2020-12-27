@@ -32,7 +32,7 @@ class FetchStatus {
 	 */
 	done(response, error) {
 		if (!this.pending) throw new FetchError('Cannot call done() on a status that is not pending');
-		error ? this._rejecter(new FetchError(error)) : this._resolver(response);
+		error ? this._rejecter(error) : this._resolver(response);
 		this.pending = false;
 	}
 
