@@ -15,6 +15,11 @@ export class StateStore {
 		tokenMap.set(lowerCaseEntityID, state);
 	}
 
+	clear() {
+		this._states.forEach(map => map.clear());
+		this._states.clear();
+	}
+
 	get(entityID, token) {
 		if (!entityID || !token?.toString()) {
 			return false;

@@ -189,3 +189,7 @@ export async function stateFactory(entityID, rawToken) {
 export function dispose(state, observer) {
 	state && state.dispose(observer);
 }
+
+export function clearStore() {
+	store.clear();
+}
