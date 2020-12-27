@@ -358,18 +358,22 @@ describe('HypermediaState class', () => {
 		let state, putActionSpy, getActionSpy, subEntityRoutedStateSpy, linkPrimeRoutedStateSpy;
 		before(async() => {
 			const entityHref = `http://entity-${uniqueId()}`;
+			const subEntity = `${entityHref}/sub1'`;
+			const primeLink = `${entityHref}/prime`;
+			fetchMock
+				.mock(subEntity, {})
+				.mock(primeLink, {});
 			const observable = {
 				actionPut: { observable: observableTypes.action, name: 'do-put' },
-				// need route or prime to pass token to observable so SirenLink observable will fetch the link and will create routed state
 				linkPrime: { observable: observableTypes.link, rel: 'prime', prime: true },
 				subEntity: { observable: observableTypes.subEntity, rel: 'item', route: [{ abc: 'need route to pass token to ' }] }
 			};
 			const entity = {
-				class:['foo'],
+				class:['aClass'],
 				entities: [{
-					class: [ 'foo-sub-class' ],
+					class: [ 'sub-class' ],
 					rel: [ 'item' ],
-					href: 'http://foo/sub1'
+					href: subEntity
 				}],
 				actions: [
 					{
@@ -387,7 +391,7 @@ describe('HypermediaState class', () => {
 						type: 'application/x-www-form-urlencoded'
 					}
 				],
-				links: [{ rel: [ 'self' ], href: entityHref }, { rel: [ 'prime' ], href: `${entityHref}/prime` }]
+				links: [{ rel: [ 'self' ], href: entityHref }, { rel: [ 'prime' ], href: primeLink }]
 			};
 
 			state = await stateFactory(entityHref, 'token');
@@ -409,6 +413,10 @@ describe('HypermediaState class', () => {
 			getActionSpy = sinon.spy(getActionObservable);
 			subEntityRoutedStateSpy = sinon.spy(subEntityObservable.routedState);
 			linkPrimeRoutedStateSpy = sinon.spy(linkPrimeObservable.routedState);
+		});
+
+		after(() => {
+			fetchMock.reset();
 		});
 
 		methods.forEach((method) => {
