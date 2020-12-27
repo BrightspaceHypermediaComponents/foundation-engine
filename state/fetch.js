@@ -62,7 +62,6 @@ async function performServerFetch(fetchable, bypassCache) {
 
 	const response = await fetch.fetch(fetchable.href, { headers, body: fetchable.body, method: fetchable.method });
 	if (!response.ok) {
-		console.log(response.status);
 		throw response.status;
 	}
 	await fetchable.handleCachePriming(cachePrimingList(response));

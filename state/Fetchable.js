@@ -109,7 +109,7 @@ export const Fetchable = superclass => class extends superclass {
 	 * @returns {String} The method to be used in the request. Default is GET
 	 */
 	get method() {
-		return 'GET';
+		return this._method || 'GET';
 	}
 
 	onServerResponse() {}
