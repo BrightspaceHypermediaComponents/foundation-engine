@@ -40,14 +40,13 @@ class HypermediaState extends Fetchable(Object) {
 
 	/**
 	 * Hook for this fetch and all children state fetches to complete
-	 * This does not go further than a single nested state currently because state links can be cyclical
 	 * @returns {Promise} Resolves when this fetch and its linked states are all complete
 	 */
-	get allFetchesComplete() {
-		return (async() => {
-			await this.fetchStatus.complete;
-			await Promise.all(this._routedStates().map(state => state.allFetchesComplete));
-		})();
+	async allFetchesComplete(skipTheseStates) {
+		skipTheseStates = Array.isArray(skipTheseStates) ? skipTheseStates : [skipTheseStates];
+		const skipTheseStatesOnNextStep = [ this, ...skipTheseStates ];
+		await this.fetchStatus.complete;
+		await Promise.all(this._routedStates().map(state => skipTheseStates.includes(state) || state.allFetchesComplete(skipTheseStatesOnNextStep)));
 	}
 
 	createRoutedState(entityID, token) {
