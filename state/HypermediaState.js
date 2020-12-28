@@ -46,13 +46,9 @@ class HypermediaState extends Fetchable(Object) {
 		skipTheseStates = Array.isArray(skipTheseStates) ? skipTheseStates : [skipTheseStates];
 		const skipTheseStatesOnNextStep = [ this, ...skipTheseStates ];
 		await this.fetchStatus.complete;
-		const rountedStates = this._routedStates()
+		await Promise.all(this._routedStates()
 			.filter(state => !skipTheseStates.includes(state))
-			.map(state => state.allFetchesComplete(skipTheseStatesOnNextStep));
-		for (let i = 0; i < rountedStates.length; i++) {
-			await rountedStates[i];
-		}
-
+			.map(state => state.allFetchesComplete(skipTheseStatesOnNextStep)));
 	}
 
 	createRoutedState(entityID, token) {
