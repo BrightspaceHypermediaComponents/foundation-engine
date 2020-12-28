@@ -20,11 +20,11 @@ describe('should know when the tree has loaded', () => {
 	const subEntitySecond = `${parentHref}/sub2'`;
 	const primeLink = `${parentHref}/prime`;
 	const primeLinkSubEntity = `${primeLink}/sub`;
-	const delayFetchAmountMs = 50;
+	const delayFetchAmountMs = 100;
 	let sandbox;
 
 	before(async() => {
-		const parentJson = JSON.stringify({
+		const parentJson = {
 			class: [ 'pink' ],
 			properties: {
 				answer: 42
@@ -40,9 +40,9 @@ describe('should know when the tree has loaded', () => {
 				{ rel: [ 'self' ], href: parentHref },
 				{ rel: [ 'prime' ], href: primeLink },
 			]
-		});
+		};
 
-		const subEntityFirstJson = JSON.stringify({
+		const subEntityFirstJson = {
 			properties: {
 				answer: 43
 			},
@@ -53,27 +53,27 @@ describe('should know when the tree has loaded', () => {
 			links: [
 				{ rel: [ 'self' ], href: subEntityFirstSub },
 			]
-		});
+		};
 
-		const subEntityFirstSubJson = JSON.stringify({
+		const subEntityFirstSubJson = {
 			properties: {
 				answer: 44
 			},
 			links: [
 				{ rel: [ 'self' ], href: subEntityFirstSub },
 			]
-		});
+		};
 
-		const subEntitySecondJson = JSON.stringify({
+		const subEntitySecondJson = {
 			properties: {
 				answer: 45
 			},
 			links: [
 				{ rel: [ 'self' ], href: subEntitySecond },
 			]
-		});
+		};
 
-		const primeLinkJson = JSON.stringify({
+		const primeLinkJson = {
 			properties: {
 				answer: 46
 			},
@@ -84,9 +84,9 @@ describe('should know when the tree has loaded', () => {
 			links: [
 				{ rel: [ 'self' ], href: primeLink },
 			]
-		});
+		};
 
-		const primeLinkSubEntityJson = JSON.stringify({
+		const primeLinkSubEntityJson = {
 			properties: {
 				answer: 47
 			},
@@ -94,7 +94,7 @@ describe('should know when the tree has loaded', () => {
 				{ rel: [ 'self' ], href: primeLinkSubEntity },
 				{ rel: [ 'prime' ], href: primeLink }
 			]
-		});
+		};
 
 		const responses = {
 			[parentHref]: aGoodResponse(parentJson),
