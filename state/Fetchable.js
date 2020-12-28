@@ -90,6 +90,8 @@ export const Fetchable = superclass => class extends superclass {
 	 */
 	handleCachePriming() {}
 
+	hasServerResponseCached() { return false; }
+
 	/**
 	 * @returns {Headers} Headers for the request
 	 */

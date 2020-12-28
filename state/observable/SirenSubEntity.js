@@ -43,7 +43,7 @@ export class SirenSubEntity extends Routable(Observable) {
 		return this._rel;
 	}
 
-	setSirenEntity(sirenEntity, SubEntityCollectionMap) {
+	async setSirenEntity(sirenEntity, SubEntityCollectionMap) {
 		const parsedSirenEntity = sirenEntity && sirenEntity.hasSubEntityByRel(this._rel) && sirenEntity.getSubEntityByRel(this._rel);
 		if (!parsedSirenEntity) return;
 
@@ -56,23 +56,10 @@ export class SirenSubEntity extends Routable(Observable) {
 			});
 		}
 
-		this._setSubEntity(parsedSirenEntity);
+		await this.setSubEntity(parsedSirenEntity);
 	}
 
-	/**
-	 *
-	 * @param {SirenSubEntity} sirenSubEntity - the observable object to merge
-	 */
-	_merge(sirenSubEntity) {
-		if (!sirenSubEntity || !(sirenSubEntity instanceof SirenSubEntity)) {
-			return;
-		}
-
-		this._observers.merge(sirenSubEntity._observers);
-		this._token = this._token || sirenSubEntity._token;
-	}
-
-	async _setSubEntity(subEntity) {
+	async setSubEntity(subEntity) {
 		const entityID = getEntityIDFromSirenEntity(subEntity);
 		this.entity = subEntity;
 
@@ -87,4 +74,16 @@ export class SirenSubEntity extends Routable(Observable) {
 		}
 	}
 
+	/**
+	 *
+	 * @param {SirenSubEntity} sirenSubEntity - the observable object to merge
+	 */
+	_merge(sirenSubEntity) {
+		if (!sirenSubEntity || !(sirenSubEntity instanceof SirenSubEntity)) {
+			return;
+		}
+
+		this._observers.merge(sirenSubEntity._observers);
+		this._token = this._token || sirenSubEntity._token;
+	}
 }

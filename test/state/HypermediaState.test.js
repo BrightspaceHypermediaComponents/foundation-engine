@@ -1,6 +1,6 @@
 
-import { dispose, processRawJsonSirenEntity, stateFactory } from '../../state/HypermediaState.js';
-import { assert } from '@open-wc/testing';
+import { assert, expect } from '@open-wc/testing';
+import { clearStore, dispose, processRawJsonSirenEntity, stateFactory } from '../../state/HypermediaState.js';
 import { fetch } from '../../state/fetch.js';
 import { FetchError } from '../../state/Fetchable.js';
 import fetchMock from 'fetch-mock/esm/client.js';
@@ -99,7 +99,7 @@ describe('HypermediaState class', () => {
 			};
 
 			state.addObservables(observer, observables);
-			state.setSirenEntity(SirenParse(JSON.stringify(entity)));
+			await state.setSirenEntity(SirenParse(JSON.stringify(entity)));
 
 			assert.deepEqual(observer.class, entity.class);
 			assert.deepEqual(observer.name, entity.properties.name);
@@ -523,6 +523,167 @@ describe('HypermediaState class', () => {
 			const newState = window.D2L.Foundation.StateStore.get(href, rawToken);
 			assert.equal(newState.entityID, href);
 			assert.equal(newState.token.rawToken, rawToken);
+		});
+	});
+
+	describe('should know when the tree has loaded', () => {
+		const parentHref = 'http://pink';
+		const subEntityFirst = `${parentHref}/sub1`;
+		const subEntityFirstSub = `${subEntityFirst}/sub`;
+		const subEntitySecond = `${parentHref}/sub2`;
+		const primeLink = `${parentHref}/prime`;
+		const primeLinkSubEntity = `${primeLink}/sub`;
+		const delayFetchAmountMs = 50;
+
+		before(async() => {
+			const parentJson = JSON.stringify({
+				class: [ 'pink' ],
+				properties: {
+					answer: 42
+				},
+				entities: [{
+					rel: [ 'first' ],
+					href: subEntityFirst
+				}, {
+					rel: [ 'second' ],
+					href: subEntitySecond
+				}],
+				links: [
+					{ rel: [ 'self' ], href: parentHref },
+					{ rel: [ 'prime' ], href: primeLink },
+				]
+			});
+
+			const subEntityFirstJson = JSON.stringify({
+				properties: {
+					answer: 43
+				},
+				entities: [{
+					rel: [ 'third' ],
+					href: subEntityFirstSub
+				}],
+				links: [
+					{ rel: [ 'self' ], href: subEntityFirstSub },
+				]
+			});
+
+			const subEntityFirstSubJson = JSON.stringify({
+				properties: {
+					answer: 44
+				},
+				links: [
+					{ rel: [ 'self' ], href: subEntityFirstSub },
+				]
+			});
+
+			const subEntitySecondJson = JSON.stringify({
+				properties: {
+					answer: 45
+				},
+				links: [
+					{ rel: [ 'self' ], href: subEntitySecond },
+				]
+			});
+
+			const primeLinkJson = JSON.stringify({
+				properties: {
+					answer: 46
+				},
+				entities: [{
+					rel: [ 'forth' ],
+					href: primeLinkSubEntity
+				}],
+				links: [
+					{ rel: [ 'self' ], href: primeLink },
+				]
+			});
+
+			const primeLinkSubEntityJson = JSON.stringify({
+				properties: {
+					answer: 47
+				},
+				links: [
+					{ rel: [ 'self' ], href: primeLinkSubEntity },
+					{ rel: [ 'prime' ], href: primeLink }
+				]
+			});
+			const option = { delay: delayFetchAmountMs };
+			await fetchMock
+				.mock(parentHref, parentJson, option)
+				.mock(subEntityFirst, subEntityFirstJson, option)
+				.mock(subEntityFirstSub, subEntityFirstSubJson, option)
+				.mock(subEntitySecond, subEntitySecondJson, option)
+				.mock(primeLink, primeLinkJson, option)
+				.mock(primeLinkSubEntity, primeLinkSubEntityJson, option);
+
+		});
+
+		after(() => {
+			fetchMock.reset();
+			clearStore();
+		});
+
+		beforeEach(() => {
+			clearStore();
+		});
+
+		it('the parent state, should know when the children loaded', async() => {
+			const state = await stateFactory(parentHref, 'token');
+			const observable = {
+				parentAnswer: {
+					observable: observableTypes.property, id: 'answer'
+				},
+				subEntityFirstAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [{ observable: observableTypes.subEntity, rel: 'first' }]
+				},
+				subEntityFirstSubAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [
+						{ observable: observableTypes.subEntity, rel: 'first' },
+						{ observable: observableTypes.subEntity, rel: 'third' }
+					]
+				},
+				subEntitySecondAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [{ observable: observableTypes.subEntity, rel: 'second' }]
+				},
+				primeLinkAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [{ observable: observableTypes.link, rel: 'prime' }]
+				},
+				primeLinkSubEntityAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [
+						{ observable: observableTypes.link, rel: 'prime' },
+						{ observable: observableTypes.subEntity, rel: 'forth' }
+					]
+				},
+				primeLinkSubEntityBackToPrimeLinkAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [
+						{ observable: observableTypes.link, rel: 'prime' },
+						{ observable: observableTypes.subEntity, rel: 'forth' },
+						{ observable: observableTypes.link, rel: 'prime' }
+					]
+				}
+			};
+			const observer = {};
+			state.addObservables(observer, observable);
+
+			const timeBeforeFetch = Date.now();
+			fetch(state);
+			await state.allFetchesComplete();
+			const timeAfterFetch = Date.now();
+			const depthOfResponses = 3;
+			const maxDelay = delayFetchAmountMs * depthOfResponses;
+			expect(timeAfterFetch - timeBeforeFetch).to.be.above(maxDelay);
+			expect(observer.parentAnswer).to.equal(42);
+			expect(observer.subEntityFirstAnswer).to.equal(43);
+			expect(observer.subEntityFirstSubAnswer).to.equal(44);
+			expect(observer.subEntitySecondAnswer).to.equal(45);
+			expect(observer.primeLinkAnswer).to.equal(46);
+			expect(observer.primeLinkSubEntityAnswer).to.equal(47);
 		});
 	});
 });

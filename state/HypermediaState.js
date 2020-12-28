@@ -87,7 +87,7 @@ class HypermediaState extends Fetchable(Object) {
 		if (error) throw new FetchError(error);
 
 		const entity = await SirenParse(response);
-		this.setSirenEntity(entity);
+		await this.setSirenEntity(entity);
 	}
 
 	processRawJsonSirenEntity(json, token) {
@@ -108,16 +108,18 @@ class HypermediaState extends Fetchable(Object) {
 		actions.forEach(action => action.reset());
 	}
 
-	setSirenEntity(entity = null) {
+	async setSirenEntity(entity = null) {
 		if (entity && entity.href) {
 			return;
 		}
 		this._entity = entity !== null ? entity : this._entity;
+		const setSirenEntityPromises = [];
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
-				sirenObservable.setSirenEntity(this._entity, typeMap);
+				setSirenEntityPromises.push(sirenObservable.setSirenEntity(this._entity, typeMap));
 			});
 		});
+		await Promise.all(setSirenEntityPromises);
 	}
 
 	updateProperties(observables) {

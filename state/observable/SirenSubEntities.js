@@ -45,7 +45,7 @@ export class SirenSubEntities extends Observable {
 		return this._rel;
 	}
 
-	setSirenEntity(sirenParsedEntity) {
+	async setSirenEntity(sirenParsedEntity) {
 		const subEntities = sirenParsedEntity && sirenParsedEntity.getSubEntitiesByRel(this._rel);
 		const entityMap = new Map();
 		const sirenFacades = [];
@@ -56,19 +56,20 @@ export class SirenSubEntities extends Observable {
 		// If we find a case where that assumption is bad.
 		// There is a way to build a list from next/prev that is performant
 		// and will change based on the individual item update.
-		subEntities.forEach((sirenSubEntity) => {
+		const promises = subEntities.map(async(sirenSubEntity) => {
 			const entityID = getEntityIDFromSirenEntity(sirenSubEntity);
 			let subEntity;
 			// If we already set it up why do it again?
 			if (this.entityMap.has(entityID)) {
 				subEntity = this.entityMap.get(entityID);
 			} else {
-				subEntity = new SirenSubEntity({ id: this.rel, token: this._token, verbose: this._verbose });
-				subEntity.entity = sirenSubEntity;
+				subEntity = new SirenSubEntity({ id: this.rel, token: this._token, verbose: this._verbose, state: this._state });
+				await subEntity.setSubEntity(sirenSubEntity);
 			}
 			entityMap.set(entityID, subEntity);
 			sirenFacades.push(subEntity.entity);
 		});
+		await Promise.all(promises);
 
 		// Clear the old entity map and reset it to the new one
 		this.entityMap.clear();
