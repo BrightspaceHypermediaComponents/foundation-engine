@@ -1,11 +1,12 @@
 
-import { dispose, processRawJsonSirenEntity, stateFactory } from '../../state/HypermediaState';
+import { dispose, processRawJsonSirenEntity, stateFactory } from '../../state/HypermediaState.js';
 import { assert } from '@open-wc/testing';
-import { fetch } from '../../state/fetch';
-import { FetchError } from '../../state/Fetchable';
+import { fetch } from '../../state/fetch.js';
+import { FetchError } from '../../state/Fetchable.js';
 import fetchMock from 'fetch-mock/esm/client.js';
-import { observableTypes } from '../../state/observable/sirenObservableFactory';
+import { observableTypes } from '../../state/observable/sirenObservableFactory.js';
 import sinon from 'sinon/pkg/sinon-esm.js';
+import { SirenFacade } from '../../state/observable/SirenFacade.js';
 import SirenParse from 'siren-parser';
 import { waitUntil } from '@open-wc/testing-helpers';
 
@@ -103,13 +104,13 @@ describe('HypermediaState class', () => {
 			assert.deepEqual(observer.class, entity.class);
 			assert.deepEqual(observer.name, entity.properties.name);
 			assert.deepEqual(observer.description, entity.properties.description);
-			assertAreSimilar(observer.subEntity1, entity.entities[0]);
-			assertAreSimilar(observer.subEntity2, entity.entities[1]);
+			assertAreSimilar(observer.subEntity1, new SirenFacade(entity.entities[0]));
+			assertAreSimilar(observer.subEntity2, new SirenFacade(entity.entities[1]));
 			assertAreSimilar(observer.actionGet, { has: true });
 			assertAreSimilar(observer.actionPut, { has: true });
 			assert.equal(observer.linkNext, entity.links[0].href);
 			assert.equal(observer.linkSelf, entity.links[1].href);
-			assertAreSimilar(observer.subEntities, entity.entities);
+			assertAreSimilar(observer.subEntities, entity.entities.map(x => new SirenFacade(x)));
 			assertAreSimilar(observer.entity, entity);
 		});
 
@@ -121,6 +122,12 @@ describe('HypermediaState class', () => {
 					route: [
 						{ observable: observableTypes.link, rel: 'linked'  }
 					]
+				},
+				selflessSubEntityProperty: {
+					observable: observableTypes.property,
+					route: [
+						{ observable: observableTypes.subEntity, rel: 'selfless-subEntity-rel' }
+					]
 				}
 			};
 
@@ -130,6 +137,11 @@ describe('HypermediaState class', () => {
 
 			const entity = {
 				class: ['main-entity-class'],
+				entities: [{
+					class: ['selfless-subEntity-class'],
+					rel: [ 'selfless-subEntity-rel' ],
+					properties: { selflessSubEntityProperty: 'selfless-subEntity-name' }
+				}],
 				links: [{ rel: [ 'linked' ], href: linkedHref }, { rel:['self'], href: entityHref }]
 			};
 			const linkedEntity = {
@@ -146,12 +158,14 @@ describe('HypermediaState class', () => {
 			state.addObservables(observer, observable);
 
 			await fetch(state);
+			await state.allFetchesComplete;
 
-			await wait(() => mock.called(entityHref));
-			await wait(() => mock.called(linkedHref));
+			assert.isTrue(mock.called(entityHref));
+			assert.isTrue(mock.called(linkedHref));
 			assert.deepEqual(observer, {
 				mainEntityClass: ['main-entity-class'],
-				linkedEntityProperty: 'linked-entity-name'
+				linkedEntityProperty: 'linked-entity-name',
+				selflessSubEntityProperty: 'selfless-subEntity-name'
 			}, 'class should be observed from main entity and property should be fetched from linked entity');
 		});
 
@@ -237,10 +251,10 @@ describe('HypermediaState class', () => {
 		});
 	});
 
-	describe('createChildState method', () => {
-		it('can create new state by calling state.createChildState ', async() => {
+	describe('createRoutedState method', () => {
+		it('can create new state by calling state.createRoutedState ', async() => {
 			const state = await stateFactory(uniqueId(), 'bar');
-			const anotherState = await state.createChildState('anotherFoo', 'anotherBar');
+			const anotherState = await state.createRoutedState('anotherFoo', 'anotherBar');
 			assert.equal(anotherState.entityID, 'anotherFoo');
 			assert.equal(anotherState.token, 'anotherBar');
 		});
@@ -341,12 +355,12 @@ describe('HypermediaState class', () => {
 
 	describe('push and reset methods', () => {
 		const methods = ['push', 'reset'];
-		let state, putActionSpy, getActionSpy, subEntityChilStateSpy, linkPrimeChildStateSpy;
+		let state, putActionSpy, getActionSpy, subEntityRoutedStateSpy, linkPrimeRoutedStateSpy;
 		before(async() => {
 			const entityHref = `http://entity-${uniqueId()}`;
 			const observable = {
 				actionPut: { observable: observableTypes.action, name: 'do-put' },
-				// need route or prime to pass token to observable so SirenLink observable will fetch the link and will create child state
+				// need route or prime to pass token to observable so SirenLink observable will fetch the link and will create routed state
 				linkPrime: { observable: observableTypes.link, rel: 'prime', prime: true },
 				subEntity: { observable: observableTypes.subEntity, rel: 'item', route: [{ abc: 'need route to pass token to ' }] }
 			};
@@ -393,18 +407,18 @@ describe('HypermediaState class', () => {
 			await wait(() => subEntityObservable !== undefined);
 			putActionSpy = sinon.spy(putActionObservable);
 			getActionSpy = sinon.spy(getActionObservable);
-			subEntityChilStateSpy = sinon.spy(subEntityObservable.childState);
-			linkPrimeChildStateSpy = sinon.spy(linkPrimeObservable.childState);
+			subEntityRoutedStateSpy = sinon.spy(subEntityObservable.routedState);
+			linkPrimeRoutedStateSpy = sinon.spy(linkPrimeObservable.routedState);
 		});
 
 		methods.forEach((method) => {
-			it(`should call ${method} method for childStates and for action observables`, async() => {
+			it(`should call ${method} method for routedStates and for action observables`, async() => {
 				// push or reset state
 				await state[method]();
 
 				//verify shild states where pushed or reset
-				await wait(() => subEntityChilStateSpy[method].calledOnce);
-				await wait(() => linkPrimeChildStateSpy[method].calledOnce);
+				await wait(() => subEntityRoutedStateSpy[method].calledOnce);
+				await wait(() => linkPrimeRoutedStateSpy[method].calledOnce);
 
 				// verify entity actions where pushed or reset
 				await wait(() => putActionSpy[method].calledOnce);

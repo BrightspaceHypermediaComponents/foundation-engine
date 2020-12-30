@@ -1,13 +1,13 @@
 import { fetch } from '../fetch.js';
 import { Observable } from './Observable.js';
+import { Routable } from './Routable.js';
 import { shouldAttachToken } from '../token.js';
 
-export class SirenLink extends Observable {
+export class SirenLink extends Routable(Observable) {
 	constructor({ id, token, state } = {}) {
-		super();
+		super({});
 		this._state = state;
 		this._rel = id;
-		this._routes = new Map();
 		this._token = token;
 	}
 
@@ -18,26 +18,6 @@ export class SirenLink extends Observable {
 	set href(href) {
 		if (this.href !== href) {
 			this._observers.setProperty(href);
-		}
-	}
-
-	addObserver(observer, property, { route, method } = {}) {
-		if (route) {
-			this._addRoute(observer, route);
-		} else {
-			super.addObserver(observer, property, { method });
-		}
-	}
-
-	get childState() {
-		return this._childState;
-	}
-
-	deleteObserver(observer) {
-		if (this._routes.has(observer)) {
-			this._deleteRoute(observer);
-		} else {
-			super.deleteObserver(observer);
 		}
 	}
 
@@ -61,12 +41,12 @@ export class SirenLink extends Observable {
 		}
 
 		if (this._token) {
-			this._childState = await this.createChildState(link.href, shouldAttachToken(this._token.rawToken, link));
+			this.routedState = await this.createRoutedState(link.href, shouldAttachToken(this._token.rawToken, link));
 			this._routes.forEach((route, observer) => {
-				this._childState.addObservables(observer, route);
+				this.routedState.addObservables(observer, route);
 			});
 
-			fetch(this._childState);
+			fetch(this.routedState);
 		}
 	}
 

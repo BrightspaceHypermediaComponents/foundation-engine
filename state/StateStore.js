@@ -16,6 +16,10 @@ export class StateStore {
 	}
 
 	get(entityID, token) {
+		if (!entityID || !token?.toString()) {
+			return false;
+		}
+
 		const lowerCaseEntityID = entityID.toLowerCase();
 		const tokenCache = token.toString();
 
@@ -25,6 +29,10 @@ export class StateStore {
 	}
 
 	has(entityID, token) {
+		if (!entityID || !token?.toString()) {
+			return false;
+		}
+
 		const lowerCaseEntityID = entityID.toLowerCase();
 		const tokenCache = token.toString();
 

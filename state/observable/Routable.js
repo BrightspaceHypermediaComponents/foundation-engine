@@ -4,17 +4,17 @@
  * @mixin
  */
 export const Routable = superclass => class extends superclass {
-	constructor({ id, token, state }) {
-		super({ id, token, state });
+	constructor(object = {}) {
+		super(object);
 		this._routes = new Map();
 	}
 
-	get childState() {
-		return this._childState;
+	get routedState() {
+		return this._routedState;
 	}
 
-	set childState(state) {
-		this._childState = state;
+	set routedState(state) {
+		this._routedState = state;
 	}
 
 	/**
@@ -32,6 +32,10 @@ export const Routable = superclass => class extends superclass {
 		}
 	}
 
+	createRoutedState(entityID, token) {
+		return this._state.createRoutedState(entityID, token);
+	}
+
 	deleteObserver(observer) {
 		if (this._routes.has(observer)) {
 			this._deleteRoute(observer);
@@ -46,8 +50,8 @@ export const Routable = superclass => class extends superclass {
 	}
 
 	_deleteRoute(observer) {
-		if (this._childState) {
-			this._childState.dispose(observer);
+		if (this.routedState) {
+			this.routedState.dispose(observer);
 		}
 		this._routes.delete(observer);
 	}

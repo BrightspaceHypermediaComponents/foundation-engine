@@ -4,28 +4,36 @@ import { SirenSubEntity } from './SirenSubEntity.js';
 
 /**
  * Observable SirenSubEntities
- * Reflects back an array of parsed siren entities to any observers
+ * Reflects back an array of SirenFacades to any observers
  */
 export class SirenSubEntities extends Observable {
-	static definedProperty({ token }) {
-		return { token };
+
+	static definedProperty({ token, verbose }) {
+		return { token, verbose };
 	}
 
-	constructor({ id, token, state }) {
+	constructor({ id, token, state, verbose }) {
 		super();
 		this._state = state;
 		this._rel = id;
 		this._entityMap = new Map();
 		this._token = token;
+		this._verbose = verbose;
 	}
 
+	/**
+	 * @return { Array<SirenFacade> }
+	 */
 	get entities() {
 		return this._observers.value || [];
 	}
 
-	set entities(sirenParsedEntities) {
-		if (this.entities !== sirenParsedEntities) {
-			this._observers.setProperty(sirenParsedEntities || []);
+	/**
+	 * @param { Array<SirenFacade> } sirenFacades - List of SirenFacade objects
+	 */
+	set entities(sirenFacades) {
+		if (this.entities !== sirenFacades) {
+			this._observers.setProperty(sirenFacades || []);
 		}
 	}
 
@@ -40,7 +48,7 @@ export class SirenSubEntities extends Observable {
 	setSirenEntity(sirenParsedEntity) {
 		const subEntities = sirenParsedEntity && sirenParsedEntity.getSubEntitiesByRel(this._rel);
 		const entityMap = new Map();
-		const sirenParsedEntities = [];
+		const sirenFacades = [];
 
 		// This makes the assumption that the order returned by the collection
 		// matches the prev/next order for each item.
@@ -55,18 +63,17 @@ export class SirenSubEntities extends Observable {
 			if (this.entityMap.has(entityID)) {
 				subEntity = this.entityMap.get(entityID);
 			} else {
-				// todo: create a facade to make the subEntity easier to work with
-				subEntity = new SirenSubEntity({ id: this.rel, token: this._token });
+				subEntity = new SirenSubEntity({ id: this.rel, token: this._token, verbose: this._verbose });
 				subEntity.entity = sirenSubEntity;
 			}
 			entityMap.set(entityID, subEntity);
-			sirenParsedEntities.push(subEntity.entity);
+			sirenFacades.push(subEntity.entity);
 		});
 
 		// Clear the old entity map and reset it to the new one
 		this.entityMap.clear();
 		this._entityMap = entityMap;
 
-		this.entities = sirenParsedEntities;
+		this.entities = sirenFacades;
 	}
 }
