@@ -11,8 +11,11 @@ class FetchableObject extends Fetchable(Object) {
 		this.links = links;
 	}
 	onServerResponse(json, error) {
+		if (error) {
+			this.error = new FetchError(error);
+			throw this.error;
+		}
 		this.json = json;
-		this.error = error;
 	}
 	resetLinks() {
 		this.links = undefined;
@@ -105,10 +108,10 @@ describe('fetch', () => {
 		}
 
 		expect(onServerResponseSpy.calledOnce).to.be.true;
-		expect(fetchable.json).to.be.null;
+		expect(fetchable.json).to.be.undefined;
 		expect(fetchable.error).to.include(FetchError);
 		expect(fetchable.error.message).to.equal('400');
-		expect(processError).to.equal(processError);
+		expect(processError).to.equal(fetchable.error);
 	});
 
 	it('fetching the same href at the same time will only run one fetch and return the same promise results', async() => {
