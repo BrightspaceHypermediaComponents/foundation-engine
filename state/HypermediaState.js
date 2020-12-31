@@ -76,7 +76,7 @@ class HypermediaState extends Fetchable(Object) {
 	}
 
 	hasServerResponseCached() {
-		return !!this._entity && this.token.cookie;
+		return !!this._entity;
 	}
 
 	async onServerResponse(response, error) {
