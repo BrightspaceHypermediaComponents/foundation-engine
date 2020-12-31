@@ -526,7 +526,7 @@ describe('HypermediaState class', () => {
 		});
 	});
 
-	describe('should know when the tree has loaded', () => {
+	describe.only('should know when the tree has loaded', () => {
 		const parentHref = 'http://pink';
 		const subEntityFirst = `${parentHref}/sub1`;
 		const subEntityFirstSub = `${subEntityFirst}/sub`;
@@ -681,6 +681,75 @@ describe('HypermediaState class', () => {
 			expect(observer.parentAnswer).to.equal(42);
 			expect(observer.subEntityFirstAnswer).to.equal(43);
 			expect(observer.subEntityFirstSubAnswer).to.equal(44);
+			expect(observer.subEntitySecondAnswer).to.equal(45);
+			expect(observer.primeLinkAnswer).to.equal(46);
+			expect(observer.primeLinkSubEntityAnswer).to.equal(47);
+		});
+
+		it('the parent state, should know when the children loaded', async() => {
+			const state = await stateFactory(parentHref, 'token');
+			const observable = {
+				parentAnswer: {
+					observable: observableTypes.property, id: 'answer'
+				},
+				subEntityFirstAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [{ observable: observableTypes.subEntity, rel: 'first' }]
+				},
+				subEntityFirstSubAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [
+						{ observable: observableTypes.subEntity, rel: 'first' },
+						{ observable: observableTypes.subEntity, rel: 'third' }
+					]
+				},
+				subEntitySecondAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [{ observable: observableTypes.subEntity, rel: 'second' }]
+				},
+				primeLinkAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [{ observable: observableTypes.link, rel: 'prime' }]
+				},
+				primeLinkSubEntityAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [
+						{ observable: observableTypes.link, rel: 'prime' },
+						{ observable: observableTypes.subEntity, rel: 'forth' }
+					]
+				},
+				primeLinkSubEntityBackToPrimeLinkAnswer: {
+					observable: observableTypes.property, id: 'answer',
+					route: [
+						{ observable: observableTypes.link, rel: 'prime' },
+						{ observable: observableTypes.subEntity, rel: 'forth' },
+						{ observable: observableTypes.link, rel: 'prime' }
+					]
+				}
+			};
+			const observer = {};
+			state.addObservables(observer, observable);
+
+			const aChildState = await stateFactory(subEntityFirstSub, 'token');
+			const childObservable = {
+				answer: {
+					observable: observableTypes.property, id: 'answer'
+				}
+			};
+			const childObserver = {};
+			aChildState.addObservables(childObserver, childObservable);
+
+			const timeBeforeFetch = Date.now();
+			fetch(state);
+			await aChildState.allFetchesComplete();
+			const timeAfterFetch = Date.now();
+			const depthOfResponses = 3;
+			const maxDelay = delayFetchAmountMs * depthOfResponses;
+			expect(timeAfterFetch - timeBeforeFetch).to.be.above(maxDelay);
+			expect(observer.parentAnswer).to.equal(42);
+			expect(observer.subEntityFirstAnswer).to.equal(43);
+			expect(observer.subEntityFirstSubAnswer).to.equal(44);
+			expect(childObserver.answer).to.equal(44);
 			expect(observer.subEntitySecondAnswer).to.equal(45);
 			expect(observer.primeLinkAnswer).to.equal(46);
 			expect(observer.primeLinkSubEntityAnswer).to.equal(47);
