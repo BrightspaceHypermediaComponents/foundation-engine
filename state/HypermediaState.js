@@ -130,7 +130,7 @@ class HypermediaState extends Fetchable(Object) {
 			const definedProperty = sirenObserverDefinedProperty(propertyInfo);
 			if (!definedProperty) return;
 			const sirenObservable = this._getSirenObservable(definedProperty);
-			sirenObservable && (sirenObservable.value = propertyInfo.value);
+			sirenObservable && (sirenObservable.updateProperty(propertyInfo.value));
 		});
 	}
 
