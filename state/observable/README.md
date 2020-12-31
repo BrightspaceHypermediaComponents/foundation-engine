@@ -24,6 +24,7 @@ Observables are special properties defined by `foundation-components` that are *
 |`id`|`String`|What the observable is called in the Siren entity object - if not passed, default is the name of the property with or without an underscore|
 |`route`|`Array`|Route to the observable through the given array of observables (see below)|
 |`prime`|`Boolean`|Pre-fetch and cache the observable (see below)|
+|`verbose`|`Boolean`|Give a verbose version of the siren entity when requesting SirenFacades|
 
 ## Routing and Priming
 
