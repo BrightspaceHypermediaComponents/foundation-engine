@@ -15,4 +15,12 @@ export class Observable {
 	}
 
 	setSirenEntity() {}
+
+	/**
+	 * Updates the property on all observers
+	 * @param value - The value to set the reflected property to
+	 */
+	updateProperty(value) {
+		this._observers.setProperty(value);
+	}
 }
