@@ -32,7 +32,7 @@ class FetchStatus {
 	 */
 	done(response, error) {
 		if (!this.pending) throw new FetchError('Cannot call done() on a status that is not pending');
-		error ? this._rejecter(new FetchError(error)) : this._resolver(response);
+		error ? this._rejecter(error) : this._resolver(response);
 		this.pending = false;
 	}
 
@@ -90,6 +90,8 @@ export const Fetchable = superclass => class extends superclass {
 	 */
 	handleCachePriming() {}
 
+	hasServerResponseCached() { return false; }
+
 	/**
 	 * @returns {Headers} Headers for the request
 	 */
@@ -109,7 +111,7 @@ export const Fetchable = superclass => class extends superclass {
 	 * @returns {String} The method to be used in the request. Default is GET
 	 */
 	get method() {
-		return 'GET';
+		return this._method || 'GET';
 	}
 
 	onServerResponse() {}

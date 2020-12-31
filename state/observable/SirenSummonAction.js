@@ -80,12 +80,6 @@ export class SirenSummonAction extends Routable(SirenAction) {
 		this._updateAction();
 	}
 
-	// async summon() {
-	// 	// TODO: return SirenFacade when it exists
-	// 	const entity = await fetch(this);
-	// 	return entity;
-	// }
-
 	_updateAction() {
 		this.action = {
 			has: true,

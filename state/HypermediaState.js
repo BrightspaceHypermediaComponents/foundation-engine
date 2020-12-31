@@ -26,29 +26,29 @@ class HypermediaState extends Fetchable(Object) {
 
 	addObservables(observer, observables) {
 		Object.keys(observables).forEach((name) => {
-
 			const propertyInfo = {
 				name,
 				token: this.token,
 				...observables[name]
 			};
-			const basicInfo = sirenObserverDefinedProperty(propertyInfo, this);
-			if (!basicInfo) return;
-			const sirenObservable = this._getSirenObservable(basicInfo);
-			sirenObservable.addObserver(observer, name, { route: basicInfo.route ? { [name]: basicInfo.route } : undefined, method: observables[name].method });
+			const definedProperty = sirenObserverDefinedProperty(propertyInfo, this);
+			if (!definedProperty) return;
+			const sirenObservable = this._getSirenObservable(definedProperty);
+			sirenObservable.addObserver(observer, name, { route: definedProperty.route ? { [name]: definedProperty.route } : undefined, method: observables[name].method });
 		});
 	}
 
 	/**
 	 * Hook for this fetch and all children state fetches to complete
-	 * This does not go further than a single nested state currently because state links can be cyclical
 	 * @returns {Promise} Resolves when this fetch and its linked states are all complete
 	 */
-	get allFetchesComplete() {
-		return (async() => {
-			await this.fetchStatus.complete;
-			await Promise.all(this._routedStates().map(state => state.fetchStatus.complete));
-		})();
+	async allFetchesComplete(skipTheseStates) {
+		skipTheseStates = Array.isArray(skipTheseStates) ? skipTheseStates : [skipTheseStates];
+		const skipTheseStatesOnNextStep = [ this, ...skipTheseStates ];
+		await this.fetchStatus.complete;
+		await Promise.all(this._routedStates()
+			.filter(state => !skipTheseStates.includes(state))
+			.map(state => state.allFetchesComplete(skipTheseStatesOnNextStep)));
 	}
 
 	createRoutedState(entityID, token) {
@@ -68,10 +68,10 @@ class HypermediaState extends Fetchable(Object) {
 		return this.href;
 	}
 
-	async handleCachePriming(links) {
+	handleCachePriming(links) {
 		return Promise.all(links.map(async(link) => {
 			const state = await stateFactory(link, this.token.rawToken);
-			return fetch(state, true);
+			return fetch(state);
 		}));
 	}
 
@@ -83,7 +83,7 @@ class HypermediaState extends Fetchable(Object) {
 		if (error) throw new FetchError(error);
 
 		const entity = await SirenParse(response);
-		this.setSirenEntity(entity);
+		await this.setSirenEntity(entity);
 	}
 
 	processRawJsonSirenEntity(json, token) {
@@ -104,16 +104,18 @@ class HypermediaState extends Fetchable(Object) {
 		actions.forEach(action => action.reset());
 	}
 
-	setSirenEntity(entity = null) {
+	async setSirenEntity(entity = null) {
 		if (entity && entity.href) {
 			return;
 		}
 		this._entity = entity !== null ? entity : this._entity;
+		const setSirenEntityPromises = [];
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
-				sirenObservable.setSirenEntity(this._entity, typeMap);
+				setSirenEntityPromises.push(sirenObservable.setSirenEntity(this._entity, typeMap));
 			});
 		});
+		await Promise.all(setSirenEntityPromises);
 	}
 
 	updateProperties(observables) {
@@ -125,10 +127,10 @@ class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const basicInfo = sirenObserverDefinedProperty(propertyInfo);
-			if (!basicInfo) return;
-			const sirenObservable = this._getSirenObservable(basicInfo);
-			sirenObservable && (sirenObservable.value = propertyInfo.value);
+			const definedProperty = sirenObserverDefinedProperty(propertyInfo);
+			if (!definedProperty) return;
+			const sirenObservable = this._getSirenObservable(definedProperty);
+			sirenObservable && (sirenObservable.updateProperty(propertyInfo.value));
 		});
 	}
 
@@ -140,16 +142,18 @@ class HypermediaState extends Fetchable(Object) {
 		map.set(identifier, new Map());
 		return map.get(identifier);
 	}
-	_getSirenObservable(basicInfo) {
-		const typeMap = this._getMap(this._decodedEntity, basicInfo.type);
-		if (typeMap.has(basicInfo.id)) return typeMap.get(basicInfo.id);
 
-		const sirenObservable = sirenObservableFactory(basicInfo);
-		typeMap.set(basicInfo.id, sirenObservable);
+	_getSirenObservable(definedProperty) {
+		const typeMap = this._getMap(this._decodedEntity, definedProperty.type);
+		if (typeMap.has(definedProperty.id)) return typeMap.get(definedProperty.id);
+
+		const sirenObservable = sirenObservableFactory(definedProperty);
+		typeMap.set(definedProperty.id, sirenObservable);
 		this._entity && sirenObservable.setSirenEntity(this._entity, typeMap);
 
 		return sirenObservable;
 	}
+
 	_routedStates() {
 		const routedStates = [];
 		this._decodedEntity.forEach(typeMap => {
@@ -187,4 +191,8 @@ export async function stateFactory(entityID, rawToken) {
 
 export function dispose(state, observer) {
 	state && state.dispose(observer);
+}
+
+export function clearStore() {
+	store.clear();
 }
