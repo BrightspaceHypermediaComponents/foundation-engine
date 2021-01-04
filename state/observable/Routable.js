@@ -25,7 +25,7 @@ export const Routable = superclass => class extends superclass {
 	 * @param {function} obj.method - A function that will mutate the value before setting the property
 	 */
 	addObserver(observer, property, { route, method } = {}) {
-		if (route) {
+		if (route && route[property]?.length !== 0) {
 			this._addRoute(observer, route);
 		} else {
 			super.addObserver(observer, property, { method });
