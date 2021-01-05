@@ -25,5 +25,14 @@ class SummonActionRoutedActionComponent extends HypermediaStateMixin(LitElement)
 		};
 	}
 }
-
 customElements.define('summon-action-routed-action-component', SummonActionRoutedActionComponent);
+
+class SummonActionRoutedSummonActionComponent extends HypermediaStateMixin(LitElement) {
+	static get properties() {
+		return {
+			nestedSummon: { observable: observableTypes.summonAction, name: 'example-nested-summon',
+				route: [{ observable: observableTypes.summonAction, name: 'example-summon' }] }
+		};
+	}
+}
+customElements.define('summon-action-routed-summon-action-component', SummonActionRoutedSummonActionComponent);

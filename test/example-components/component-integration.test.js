@@ -58,15 +58,42 @@ describe('Component integration', () => {
 		await waitUntil(() => mock.called(selfHref));
 
 		expect(element._hasAction('exampleAction'), 'does not have the action yet').to.be.undefined;
-		// the first API call will attach the summon action to the component
-		// the system should see the route parameter and automatically call summon
-		// then we wait until that response is received
-		// expect that this will fail until routing is added
-		// todo: remove these comments and this try catch block when test passes
 
 		await waitUntil(() => mock.called(actionHref));
 
-		await aTimeout(400); //Maya can too, so can Ten
+		await aTimeout(400);
 		expect(element._hasAction('exampleAction'), 'has the action').to.be.true;
+	});
+
+	it('gets an summon action routed through a summon action', async() => {
+		const selfHref = 'https://summon-action/entity-3';
+		const actionHref = 'https://summon-action/do-3';
+		const entity = {
+			actions: [{ href: actionHref, method: 'POST', name: 'example-summon' }],
+			links: [{ rel: ['self'], href: selfHref }]
+		};
+		const summonedActionHref = 'https://summoned-action/nested-summon';
+		const summonedEntity = {
+			actions: [{ href: summonedActionHref, name: 'example-nested-summon', method: 'POST' }]
+		};
+		const mock = fetchMock
+			.mock(selfHref, JSON.stringify(entity), {
+				delay: 100, // fake a slow network
+			})
+			.mock(actionHref, JSON.stringify(summonedEntity), {
+				delay: 100, // fake a slow network
+			});
+		const element = await fixture(html`
+			<summon-action-routed-summon-action-component href="${selfHref}" token="foo"></summon-action-routed-summon-action-component>
+		`);
+
+		await waitUntil(() => mock.called(selfHref));
+
+		expect(element._hasAction('nestedSummon'), 'does not have the action yet').to.be.undefined;
+
+		await waitUntil(() => mock.called(actionHref));
+
+		await aTimeout(400);
+		expect(element._hasAction('nestedSummon'), 'has the action').to.be.true;
 	});
 });
