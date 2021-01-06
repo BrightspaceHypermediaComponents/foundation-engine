@@ -39,6 +39,10 @@ class ComponentStore {
 		});
 	}
 
+	skeletonTag() {
+		return this._componentStore.get(defaultType);
+	}
+
 	_getComponentTag(type, otherTypes, map, depth = 0) {
 		map = map ? map : this._componentStore;
 		if (!map.has(type)) {
