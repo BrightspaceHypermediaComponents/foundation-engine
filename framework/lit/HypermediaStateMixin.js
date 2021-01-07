@@ -58,7 +58,7 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 			this.__gettingState = true;
 			this._state = await stateFactory(this.href, this.token);
 			this._state.addObservables(this, this._observables);
-			await fetch(this._state);
+			fetch(this._state);
 		} catch (error) {
 			console.error(error);
 		} finally {
