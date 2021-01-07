@@ -22,6 +22,8 @@ class HypermediaState extends Fetchable(Object) {
 		super(entityID, token);
 
 		this._decodedEntity = new Map();
+		this._parents = new Map();
+		this._waitForFirstFetch = entityID && this.fetchStatus.waitForNextFetch;
 	}
 
 	addObservables(observer, observables) {
@@ -38,14 +40,26 @@ class HypermediaState extends Fetchable(Object) {
 		});
 	}
 
+	addParent(state) {
+		this._parents.set(state, true);
+	}
+
 	/**
 	 * Hook for this fetch and all children state fetches to complete
 	 * @returns {Promise} Resolves when this fetch and its linked states are all complete
 	 */
 	async allFetchesComplete(skipTheseStates) {
+		await this._waitForFirstFetch;
+		await this.fetchStatus.complete;
 		skipTheseStates = Array.isArray(skipTheseStates) ? skipTheseStates : [skipTheseStates];
 		const skipTheseStatesOnNextStep = [ this, ...skipTheseStates ];
-		await this.fetchStatus.complete;
+		const parentPromises = [];
+		this._parents.forEach((_, parent) => {
+			if (!skipTheseStates.includes(parent)) {
+				parentPromises.push(parent.allFetchesComplete(skipTheseStatesOnNextStep));
+			}
+		});
+		await Promise.all(parentPromises);
 		await Promise.all(this._routedStates()
 			.filter(state => !skipTheseStates.includes(state))
 			.map(state => state.allFetchesComplete(skipTheseStatesOnNextStep)));
@@ -53,7 +67,11 @@ class HypermediaState extends Fetchable(Object) {
 
 	createRoutedState(entityID, token) {
 		token = token === undefined ? this.token.rawToken : token;
-		return stateFactory(entityID, token);
+		return stateFactory(entityID, token)
+			.then(state => {
+				state.addParent(this);
+				return state;
+			});
 	}
 
 	dispose(observer) {
