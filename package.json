@@ -1,6 +1,6 @@
 {
   "name": "@brightspace-hmc/foundation-engine",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "engine for foundation hypermedia components",
   "scripts": {
     "lint": "eslint . --ext .js,.html",
