@@ -198,14 +198,18 @@ export class HypermediaResult extends TemplateResult {
 		};
 		const resources = { classes: [] };
 		const components = componentStoreFactory(pseudoTag);
-		if (!href || !token) return html`loading`;
+		if (!href || !token) return this._skeletonRender(components);
 		const statePromise = stateFactory(href, token);
 		const fetchedResults  = statePromise.then(async state => {
 			state.addObservables(resources, observable);
 			await fetch(state);
 			return state;
 		}).then(state => this.render(state, components, resources, pseudoTag, strings, values));
-		return html`${until(fetchedResults, html`loading`)}`;
+		return html`${until(fetchedResults, this._skeletonRender(components))}`;
 	}
 
+	_skeletonRender(components) {
+		const tag = components.skeletonTag();
+		return tag ? new TemplateResult([`<${tag} skeleton></${tag}>`], [], 'html', defaultTemplateProcessor) : null;
+	}
 }
