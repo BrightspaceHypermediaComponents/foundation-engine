@@ -73,6 +73,12 @@ export class SirenAction extends Fetchable(Observable) {
 		this._readyToSend = false;
 	}
 
+	/**
+	 * Sets the body of the request from the given input along with the other fields
+	 * Supports array inputs - will unpack the array into separate field entries
+	 * @param {Object} input - The inputs to commit
+	 * @return {String} The prepared body
+	 */
 	setBodyFromInput(input) {
 		if (this._rawSirenAction.type.indexOf('json') !== -1) {
 			this._body = JSON.stringify({ ...this._fields, ...input });
@@ -80,7 +86,12 @@ export class SirenAction extends Fetchable(Observable) {
 			const formData = new FormData();
 			const fields = { ...this._fields, ...input };
 			Object.keys(fields).forEach((name) => {
-				formData.append(name, fields[name]);
+				if (Array.isArray(fields[name])) {
+					// unpack the array and append each entry
+					fields[name].forEach(input => formData.append(name, input));
+				} else {
+					formData.append(name, fields[name]);
+				}
 			});
 			this._body = formData;
 		}
@@ -108,9 +119,11 @@ export class SirenAction extends Fetchable(Observable) {
 		this._updateAction();
 	}
 
-	// Doesn't support field names with the same name.
-	// todo: add support for array fields
-	// todo: change to getQueryParams
+	/**
+	 * Decodes the query parameters and fields for the action
+	 * Doesn't support fields with the same name - use an array for input in these cases
+	 * @param {Object} action - The raw action parsed from siren-parser
+	 */
 	_decodeFields(action) {
 		const url = new URL(action.href, window.location.origin);
 		const fields = {};
