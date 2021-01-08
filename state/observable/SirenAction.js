@@ -77,7 +77,7 @@ export class SirenAction extends Fetchable(Observable) {
 	 * Sets the body of the request from the given input along with the other fields
 	 * Supports array inputs - will unpack the array into separate field entries
 	 * @param {Object} input - The inputs to commit
-	 * @return {String} The prepared body
+	 * @return {FormData} The prepared body
 	 */
 	setBodyFromInput(input) {
 		if (this._rawSirenAction.type.indexOf('json') !== -1) {
@@ -123,6 +123,7 @@ export class SirenAction extends Fetchable(Observable) {
 	 * Decodes the query parameters and fields for the action
 	 * Doesn't support fields with the same name - use an array for input in these cases
 	 * @param {Object} action - The raw action parsed from siren-parser
+	 * @returns {Object} Fields object
 	 */
 	_decodeFields(action) {
 		const url = new URL(action.href, window.location.origin);
