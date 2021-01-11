@@ -53,7 +53,7 @@ export class SirenAction extends Fetchable(Observable) {
 		}
 
 		const entity = await this._state.processRawJsonSirenEntity(json);
-		if (!this._state.href && !entity.hasLinkByRel('self')) {
+		if (!this._state.isSelfless && !entity.hasLinkByRel('self')) {
 			this._state.setSirenEntity(entity);
 		}
 
