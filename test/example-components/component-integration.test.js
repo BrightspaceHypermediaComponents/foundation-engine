@@ -136,7 +136,7 @@ describe('Component integration', () => {
 			};
 			const mock = fetchMock
 				.mock(selfHref, JSON.stringify(entity))
-				.mock(linkedHref, JSON.stringify(linkedEntity));
+				.mock(linkedHref, JSON.stringify(linkedEntity), { delay: 500 });
 			const element = await fixture(html`<routed-subentities-component href="${selfHref}" token="someToken"></routed-subentities-component>`);
 			await waitUntil(() => element._loaded === true);
 			expect(mock.called(selfHref)).to.be.true;
@@ -165,7 +165,7 @@ describe('Component integration', () => {
 				.mock(routedHref, JSON.stringify(entityWithRouting));
 			const element = await fixture(html`<subentities-component href="${entityHref}" token="someToken"></subentities-component>`);
 			const elementWithRouting = await fixture(html`<routed-subentities-component href="${routedHref}" token="someToken"></routed-subentities-component>`);
-			await waitUntil(() => element._loaded === true && elementWithRouting._loaded === true);
+			await waitUntil(() => element._loaded === true);
 			expect(mock.called(entityHref)).to.be.true;
 			expect(mock.called(routedHref)).to.be.true;
 
@@ -183,7 +183,6 @@ describe('Component integration', () => {
 			expect(element.items[0].properties.newProp).to.be.equal('cake');
 			expect(elementWithRouting.items[0].properties.newProp, 'second observing component sees change').to.be.equal('cake');
 			// update the state from the second component
-			//todo: THIS FAILS
 			elementWithRouting.updateItems([{
 				properties: { newProp: 'cupcake' }
 			}]);
