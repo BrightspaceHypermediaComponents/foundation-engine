@@ -16,6 +16,7 @@ class FetchStatus {
 	constructor() {
 		this.complete = null;
 		this.pending = false;
+		this._resetWaitForNextFetch();
 	}
 
 	/**
@@ -34,6 +35,7 @@ class FetchStatus {
 		if (!this.pending) throw new FetchError('Cannot call done() on a status that is not pending');
 		error ? this._rejecter(error) : this._resolver(response);
 		this.pending = false;
+		this._resetWaitForNextFetch();
 	}
 
 	/**
@@ -45,8 +47,19 @@ class FetchStatus {
 			this._rejecter = reject;
 		});
 		this.pending = true;
+		this._waitForNextFetchResolver();
 
 		return this.complete;
+	}
+
+	get waitForNextFetch() {
+		return this._waitForNextFetch;
+	}
+
+	async _resetWaitForNextFetch() {
+		this._waitForNextFetch = new Promise((resolve) => {
+			this._waitForNextFetchResolver = resolve;
+		});
 	}
 }
 

@@ -19,12 +19,14 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 			/**
 			 * Token JWT Token for brightspace | a function that returns a JWT token for brightspace | null (defaults to cookie authentication in a browser)
 			 */
-			token: { type: String }
+			token: { type: String },
+			_loaded: { type: Boolean }
 		};
 	}
 
 	constructor() {
 		super();
+		this._loaded = false;
 		this.__observables = this.constructor.properties;
 	}
 
@@ -58,7 +60,13 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 			this.__gettingState = true;
 			this._state = await stateFactory(this.href, this.token);
 			this._state.addObservables(this, this._observables);
-			await fetch(this._state);
+			fetch(this._state)
+				.then(async() => {
+					await this.updateComplete;
+					await this._state.allFetchesComplete();
+					this._loaded = true;
+				});
+
 		} catch (error) {
 			console.error(error);
 		} finally {
