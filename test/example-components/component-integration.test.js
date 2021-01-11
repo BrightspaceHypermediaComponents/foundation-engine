@@ -162,7 +162,7 @@ describe('Component integration', () => {
 			};
 			const mock = fetchMock
 				.mock(entityHref, JSON.stringify(entity))
-				.mock(routedHref, JSON.stringify(entityWithRouting))
+				.mock(routedHref, JSON.stringify(entityWithRouting));
 			const element = await fixture(html`<subentities-component href="${entityHref}" token="someToken"></subentities-component>`);
 			const elementWithRouting = await fixture(html`<routed-subentities-component href="${routedHref}" token="someToken"></routed-subentities-component>`);
 			await waitUntil(() => element._loaded === true && elementWithRouting._loaded === true);
