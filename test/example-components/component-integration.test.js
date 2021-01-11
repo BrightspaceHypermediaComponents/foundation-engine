@@ -98,7 +98,7 @@ describe('Component integration', () => {
 		expect(element._hasAction('nestedSummon'), 'has the action').to.be.true;
 	});
 
-	describe.only('SubEntities', () => {
+	describe('SubEntities', () => {
 		beforeEach(() => {
 			fetchMock.reset();
 		});
