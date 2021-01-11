@@ -52,13 +52,11 @@ export class SirenSummonAction extends Routable(SirenAction) {
 		const sirenEntity = await super.onServerResponse(json, error);
 
 		const entityID = getEntityIDFromSirenEntity(sirenEntity);
-		this.routedState = await this.createRoutedState(entityID, shouldAttachToken(this._token.rawToken, sirenEntity));
+		this.routedState = this.routedState || await this.createRoutedState(entityID, shouldAttachToken(this._token.rawToken, sirenEntity));
 		this._routes.forEach((route, observer) => {
 			this.routedState.addObservables(observer, route);
 		});
-
-		this.routedState.setSirenEntity(sirenEntity);
-
+		await this.routedState.setSirenEntity(sirenEntity);
 		return sirenEntity;
 	}
 
@@ -86,8 +84,9 @@ export class SirenSummonAction extends Routable(SirenAction) {
 			summon: async(observables) => {
 				this._prepareAction(observables);
 				this._readyToSend = true;
-				const parsedSirenEntity = await fetch(this);
-				return new SirenFacade(parsedSirenEntity, this._verbose);
+				// todo: we should be able to just return what we get back from fetch, but it is returning the json
+				await fetch(this);
+				return new SirenFacade(this.routedState._entity, this._verbose);
 			}
 		};
 	}

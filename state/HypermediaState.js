@@ -97,6 +97,10 @@ class HypermediaState extends Fetchable(Object) {
 		return !!this._entity;
 	}
 
+	get isSelfless() {
+		return !this.href;
+	}
+
 	async onServerResponse(response, error) {
 		if (error) throw new FetchError(error);
 

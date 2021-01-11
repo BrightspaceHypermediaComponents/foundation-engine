@@ -44,7 +44,7 @@ export class SirenAction extends Fetchable(Observable) {
 		return this._rawSirenAction && this._rawSirenAction.method;
 	}
 
-	onServerResponse(json, error) {
+	async onServerResponse(json, error) {
 		if (error) {
 			throw new FetchError(error);
 		}
@@ -52,7 +52,12 @@ export class SirenAction extends Fetchable(Observable) {
 			return null;
 		}
 
-		return this._state.processRawJsonSirenEntity(json);
+		const entity = await this._state.processRawJsonSirenEntity(json);
+		if (!this._state.isSelfless && !entity.hasLinkByRel('self')) {
+			this._state.setSirenEntity(entity);
+		}
+
+		return entity;
 	}
 
 	async push() {
