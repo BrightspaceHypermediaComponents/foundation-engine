@@ -97,6 +97,10 @@ class HypermediaState extends Fetchable(Object) {
 		return !!this._entity;
 	}
 
+	get isSelfless() {
+		return !this.href;
+	}
+
 	async onServerResponse(response, error) {
 		if (error) throw new FetchError(error);
 
@@ -136,6 +140,11 @@ class HypermediaState extends Fetchable(Object) {
 		await Promise.all(setSirenEntityPromises);
 	}
 
+	/**
+	 * Updates the states of the observables passed to it - changes will register
+	 * in all components that are observing
+	 * @param { Object } observables - The observables to update, as defined by the component
+	 */
 	updateProperties(observables) {
 		Object.keys(observables).forEach((name) => {
 			const propertyInfo = {
@@ -145,9 +154,17 @@ class HypermediaState extends Fetchable(Object) {
 				...observables[name]
 			};
 
-			const definedProperty = sirenObserverDefinedProperty(propertyInfo);
+			let definedProperty = sirenObserverDefinedProperty(propertyInfo, this);
 			if (!definedProperty) return;
-			const sirenObservable = this._getSirenObservable(definedProperty);
+			let state = this;
+			while (definedProperty.route && definedProperty.route.length !== 0) {
+				const observable = state._getSirenObservable(definedProperty);
+				state = observable && observable.routedState;
+				if (!state) return;
+				definedProperty = sirenObserverDefinedProperty(definedProperty.route, state);
+			}
+
+			const sirenObservable = state._getSirenObservable(definedProperty);
 			sirenObservable && (sirenObservable.updateProperty(propertyInfo.value));
 		});
 	}
