@@ -125,7 +125,6 @@ class HypermediaState extends Fetchable(Object) {
 			await action.push();
 		}
 		this._stopUpdates = false;
-		this.setSirenEntity();
 	}
 
 	reset() {
