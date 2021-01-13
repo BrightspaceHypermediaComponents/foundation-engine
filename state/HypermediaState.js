@@ -113,18 +113,10 @@ class HypermediaState extends Fetchable(Object) {
 		return processRawJsonSirenEntity(json, token);
 	}
 
-	async push() {
-		this._stopUpdates = true;
-		const actions = [];
-
-		this._routedStates().forEach(action => actions.push(action));
-		const actionMap = this._getMap(this._decodedEntity, observableTypes.action);
-
-		actionMap.forEach(action => actions.push(action));
-		for await (const action of actions) {
-			await action.push();
-		}
-		this._stopUpdates = false;
+	push() {
+		this._routedStates().forEach(routedState => routedState.push());
+		const actions = this._getMap(this._decodedEntity, observableTypes.action);
+		actions.forEach(action => action.push());
 	}
 
 	reset() {
@@ -135,11 +127,10 @@ class HypermediaState extends Fetchable(Object) {
 	}
 
 	async setSirenEntity(entity = null) {
-		this._entity = entity !== null ? entity : this._entity;
-		if (this._stopUpdates) return;
-		if (this._entity && this._entity.href) {
+		if (entity && entity.href) {
 			return;
 		}
+		this._entity = entity !== null ? entity : this._entity;
 		const setSirenEntityPromises = [];
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
