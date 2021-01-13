@@ -135,11 +135,13 @@ class HypermediaState extends Fetchable(Object) {
 	}
 
 	async setSirenEntity(entity = null) {
-		this._entity = entity !== null ? entity : this._entity;
-		if (this._stopUpdates) return;
-		if (this._entity && this._entity.href) {
+		if (entity && entity.href) {
 			return;
 		}
+
+		this._entity = entity !== null ? entity : this._entity;
+		if (this._stopUpdates) return;
+
 		const setSirenEntityPromises = [];
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
