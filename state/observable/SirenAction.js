@@ -1,7 +1,6 @@
 import { Fetchable, FetchError } from '../Fetchable.js';
 import { fetch } from '../fetch.js';
 import { Observable } from './Observable.js';
-import { observableTypes } from './sirenObservableFactory.js';
 
 const defaultAction = { has: false, commit: () => undefined };
 
