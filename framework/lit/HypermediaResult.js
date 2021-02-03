@@ -4,6 +4,17 @@ import { observableTypes, stateFactory } from '../../state/HypermediaState.js';
 import { fetch } from '../../state/fetch.js';
 import { until } from 'lit-html/directives/until.js';
 
+if (!String.prototype.matchAll) {
+	String.prototype.matchAll = function(rx) {
+		if (typeof rx === 'string') rx = new RegExp(rx, 'g'); // coerce a string to be a global regex
+		rx = new RegExp(rx); // Clone the regex so we don't update the last index on the regex they pass us
+		let cap = []; // the single capture
+		const all = []; // all the captures (return this)
+		while ((cap = rx.exec(this)) !== null) all.push(cap); // execute and add
+		return all;
+	};
+}
+
 export function custom(tag, elementClass, pseudoTag, hypermediaClasses, options) {
 	pseudoTag = pseudoTag || tag;
 	const components = componentStoreFactory(pseudoTag);
