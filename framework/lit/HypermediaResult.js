@@ -75,8 +75,7 @@ export class HypermediaResult extends TemplateResult {
 		}
 
 		// return all of this information as a TemplateResult to be stored as a value for a different Result
-		const result = new TemplateResult(mainStrings, mainValues, 'html', defaultTemplateProcessor);
-		return result;
+		return new TemplateResult(mainStrings, mainValues, 'html', defaultTemplateProcessor);
 	}
 
 	/*
