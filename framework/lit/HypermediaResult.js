@@ -75,8 +75,8 @@ export class HypermediaResult extends TemplateResult {
 		}
 
 		// return all of this information as a TemplateResult to be stored as a value for a different Result
-
-		return new TemplateResult(mainStrings, mainValues, 'html', defaultTemplateProcessor);
+		const result = new TemplateResult(mainStrings, mainValues, 'html', defaultTemplateProcessor);
+		return result;
 	}
 
 	/*
@@ -210,15 +210,14 @@ export class HypermediaResult extends TemplateResult {
 		};
 		const resources = { classes: [] };
 		const components = componentStoreFactory(pseudoTag);
-		console.log('renderhmcomponent');
 		if (!href || !token) return this._skeletonRender(components);
-		console.log('boop');
 		const statePromise = stateFactory(href, token);
 		const fetchedResults  = statePromise.then(async state => {
 			state.addObservables(resources, observable);
 			await fetch(state);
 			return state;
 		}).then(state => this.render(state, components, resources, pseudoTag, strings, values));
+		this._fetchedResults = fetchedResults; // exposing for easier testing
 		return html`${until(fetchedResults, this._skeletonRender(components))}`;
 	}
 

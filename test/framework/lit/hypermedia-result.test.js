@@ -1,6 +1,5 @@
 import { customHypermediaElement, html } from '../../../framework/lit/hypermedia-components.js';
-import { expect, aTimeout }  from '@open-wc/testing';
-import { stateFactory } from '../../../state/HypermediaState.js';
+import { expect }  from '@open-wc/testing';
 import { default as fetchMock } from 'fetch-mock/esm/client.js';
 import { html as lithtml } from 'lit-element';
 
@@ -11,7 +10,7 @@ customElements.define('test-component', TestComponent);
 customHypermediaElement('test-hm-component', TestHMComponent);
 customHypermediaElement('test-hm-component-extend', TestHMComponentExtend, 'test-hm-component', [['class1']]);
 
-describe.only('Lit-element Framework Integration', () => {
+describe('Lit-element Framework Integration', () => {
 
 	it('outputs the same as lit html if element is not a Hypermedia element', () => {
 		expect(html``).to.deep.equal(lithtml``);
@@ -31,22 +30,6 @@ describe.only('Lit-element Framework Integration', () => {
 	});
 
 	describe('HypermediaResult', () => {
-		it('creates a HypermediaResult from an empty string', () => {
-			const result = html``;
-			const litResult = lithtml``;
-			expect(result).to.have.property('strings');
-			expect(result.strings).to.be.an('array');
-			expect(result).to.deep.equal(litResult);
-		});
-
-		it('creates a HypermediaResult from a regular element', () => {
-			const result = html`<div></div>`;
-			const litResult = lithtml`<div></div>`;
-			expect(result).to.have.property('strings');
-			expect(result.strings).to.be.an('array');
-			expect(result).to.deep.equal(litResult);
-		});
-
 		it('creates a HypermediaResult from a component with an href and token', () => {
 			const href = 'http://cupcake.ca';
 			const token = 'cookie';
@@ -66,19 +49,22 @@ describe.only('Lit-element Framework Integration', () => {
 				.to.deep.equal(litResult);
 		});
 
-		it('resolves a tag that extends the base tag from the hypermedia classes', async() => {
-			const href = 'https://entity';
+		it('resolves a tag that extends the base tag from the hypermedia classes', () => {
+			const href = 'https://entity/';
+			const token = 'foo';
 			const entity = {
 				class: ['class1']
 			};
 			const mock = fetchMock.mock(href, JSON.stringify(entity));
-			const hypermediaResult = html`<test-hm-component href="${href}" .token="foo"></test-hm-component>`;
-			console.log(hypermediaResult.strings, hypermediaResult.values[0]);
-			//console.log(hypermediaResult.getHrefToken(hypermediaResult.strings, hypermediaResult.values));
-			const state = await stateFactory(href, 'foo');
-			await state.allFetchesComplete(); // same promise as the one being awaited from the hypermedia render
-			//await aTimeout(300);
-			console.log(hypermediaResult.strings, hypermediaResult.values[0]);
+			const hypermediaResult = html`<test-hm-component href="${href}" .token="${token}"></test-hm-component>`;
+
+			hypermediaResult._fetchedResults.then(result => {
+				expect(mock.called(href)).to.be.true;
+				expect(result.strings).to.deep.equal(['<test-hm-component-extend href="', '" .token="', '"></test-hm-component-extend>']);
+				expect(result.values).to.deep.equal([href, token]);
+				fetchMock.reset();
+			});
+
 		});
 	});
 });
