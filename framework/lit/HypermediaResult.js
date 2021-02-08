@@ -75,19 +75,23 @@ export class HypermediaResult extends TemplateResult {
 		}
 
 		// return all of this information as a TemplateResult to be stored as a value for a different Result
-
 		return new TemplateResult(mainStrings, mainValues, 'html', defaultTemplateProcessor);
 	}
 
 	/*
 	*  Determines the href and token associated with the current element
 	*/
-
 	getHrefToken(strings, values) {
 		let href, token;
 		strings = [...strings];
 		strings.forEach((string, index) => {
-			const output = [...string.matchAll(/(token=)|(href=)/g)].pop();
+			const matches = [];
+			let match;
+			const regex = /(token=)|(href=)/g;
+			while ((match = regex.exec(string)) !== null) {
+				matches.push(match);
+			}
+			const output = [...matches].pop();
 			if (output && output[1]) {
 				token = values[index];
 			} else if (output && output[2]) {
@@ -106,15 +110,16 @@ export class HypermediaResult extends TemplateResult {
 		return super.getHTML();
 	}
 
-	/*
+	/**
 	* Function called on a HypermediaResult to process the strings
 	* most importantly, this finds any base tags that exist and starts
 	* the process to recursively resolve them
-	* - strings is an array of strings of length n
-	* - values is an array of length n-1 html values
+	* @param { Object } obj
+	* @param { Array } obj.strings The array of strings to process of length n
+	* @param { Array } obj.values The values of length n-1 html values
 	* strings[0] + values[0] + strings[1] + values[1] + ... + strings[n-1] + values[n-1] + strings[n]
-	*   forms an html string
-	*/
+	* forms an html string
+	**/
 
 	processing() {
 		const stringCollections = [{ strings: [], values: [] }];
@@ -135,8 +140,14 @@ export class HypermediaResult extends TemplateResult {
 			*  output[2] - tagname if it matched <\tagname
 			*  output.index: the first index of tagname including prefix in strings[i]
 			*/
+			const matches = [];
+			let match;
 			// eslint-disable-next-line no-useless-escape
-			const outputs = [...strings[i].matchAll(/\<([A-Za-z][A-Za-z0-9\-]*)|\<\/([A-Za-z][A-Za-z0-9\-]*)\>/g)];
+			const regex = /\<([A-Za-z][A-Za-z0-9\-]*)|\<\/([A-Za-z][A-Za-z0-9\-]*)\>/g;
+			while ((match = regex.exec(currentString)) !== null) {
+				matches.push(match);
+			}
+			const outputs = [...matches];
 			outputs.forEach(output => {
 				// the tag is an opening tag and a pseudotag
 				if (output[1] && isPseudoTag(output[1])) {
@@ -205,6 +216,7 @@ export class HypermediaResult extends TemplateResult {
 			await fetch(state);
 			return state;
 		}).then(state => this.render(state, components, resources, pseudoTag, strings, values));
+		this._fetchedResults = fetchedResults; // exposing for easier testing
 		return html`${until(fetchedResults, this._skeletonRender(components))}`;
 	}
 
