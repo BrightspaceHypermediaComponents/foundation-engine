@@ -105,7 +105,7 @@ describe('Component integration', () => {
 	});
 
 	describe('SubEntities', () => {
-		beforeEach(() => {
+		afterEach(() => {
 			fetchMock.reset();
 		});
 
