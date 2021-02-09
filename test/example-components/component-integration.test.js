@@ -2,6 +2,7 @@ import './summon-action-components.js';
 import './subentities-components.js';
 import './action-components.js';
 import { expect, fixture, waitUntil } from '@open-wc/testing';
+import { clearStore } from '../../state/HypermediaState.js';
 import { default as fetchMock } from 'fetch-mock/esm/client.js';
 import { html } from 'lit-html';
 
@@ -107,6 +108,7 @@ describe('Component integration', () => {
 	describe('SubEntities', () => {
 		afterEach(() => {
 			fetchMock.reset();
+			clearStore();
 		});
 
 		it('gets the subEntities', async() => {
@@ -126,6 +128,38 @@ describe('Component integration', () => {
 			expect(element.items).to.be.an('array');
 			expect(element.items).to.have.lengthOf(1);
 			expect(element.items[0].properties.prop1).to.be.equal('foo');
+		});
+
+		it('will load multiple components listening to the same subEntities ', async() => {
+			const selfHref = 'https://entity';
+			const subEntities = [];
+			for (let i = 0; i < 5; i++) {
+				subEntities.push({
+					properties: { itemNumber: i },
+					rel: ['item']
+				});
+			}
+			const entity = {
+				entities: subEntities,
+				links: [{ rel: ['self'], href: selfHref }]
+			};
+			const mock = fetchMock.mock(selfHref, JSON.stringify(entity));
+			const elements = [];
+			for (let i = 0; i < 5; i++) {
+				elements.push(await fixture(html`<subentities-component-modified-list href="${selfHref}" token="someToken"></subentities-component-modified-list>`));
+			}
+			await waitUntil(() => elements[0]._loaded === true);
+			elements.forEach(element => {
+				expect(mock.called(selfHref)).to.be.true;
+				expect(element.items).to.exist;
+				expect(element.items).to.be.an('array');
+				expect(element.items).to.have.lengthOf(5);
+				let uniqueId = null;
+				element.items.forEach((item, key) => {
+					uniqueId = uniqueId === null ? item.properties.itemNumber : uniqueId;
+					expect(item.properties.itemNumber).to.be.equal(key + uniqueId);
+				});
+			});
 		});
 
 		it('gets the routed subEntities', async() => {
