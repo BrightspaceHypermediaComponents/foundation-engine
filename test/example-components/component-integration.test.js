@@ -248,7 +248,9 @@ describe('Component integration', () => {
 				await elements[0].updateItems(newItems);
 
 				elements.forEach(element => {
+					// copy not a ref
 					expect(element.items).to.deep.equal(newItems);
+					expect(element.items).to.not.equal(newItems);
 				});
 			});
 		});
