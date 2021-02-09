@@ -222,6 +222,7 @@ describe('Component integration', () => {
 					elements.push(await fixture(html`<subentities-component-modified-list href="${selfHref}" token="someToken"></subentities-component-modified-list>`));
 				}
 				await waitUntil(() => elements[0]._loaded === true);
+				expect(mock.called(selfHref)).to.be.true;
 			});
 
 			afterEach(() => {
@@ -231,7 +232,6 @@ describe('Component integration', () => {
 
 			it('will load multiple components listening to the same subEntities', async() => {
 				elements.forEach(element => {
-					expect(mock.called(selfHref)).to.be.true;
 					expect(element.items).to.exist;
 					expect(element.items).to.be.an('array');
 					expect(element.items).to.have.lengthOf(numberOfItems);
