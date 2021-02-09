@@ -57,7 +57,11 @@ class SubEntitiesComponentModifiedList extends HypermediaStateMixin(LitElement) 
 				rel: 'item',
 				method: (items) => {
 					const unqiueId = uniqueId();
-					items.forEach(item => item.properties.itemNumber = unqiueId + item.properties.itemNumber);
+					items.forEach(item => {
+						if (item.properties) {
+							item.properties.itemNumber = unqiueId + item.properties.itemNumber;
+						}
+					});
 					return items;
 				}
 			}
