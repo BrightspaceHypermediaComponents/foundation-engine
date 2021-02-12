@@ -2,6 +2,7 @@ import './summon-action-components.js';
 import './subentities-components.js';
 import './action-components.js';
 import { expect, fixture, waitUntil } from '@open-wc/testing';
+import { clearStore } from '../../state/HypermediaState.js';
 import { default as fetchMock } from 'fetch-mock/esm/client.js';
 import { html } from 'lit-html';
 
@@ -107,6 +108,7 @@ describe('Component integration', () => {
 	describe('SubEntities', () => {
 		afterEach(() => {
 			fetchMock.reset();
+			clearStore();
 		});
 
 		it('gets the subEntities', async() => {
@@ -195,6 +197,62 @@ describe('Component integration', () => {
 			expect(elementWithRouting.items[0].properties.newProp, 'routed component sees change').to.be.equal('cupcake');
 			expect(element.items[0].properties.newProp, 'component directly observing sees change').to.be.equal('cupcake');
 
+		});
+		describe('loading multiple subentities listening to the same state', () => {
+			const numberOfComponents = 5;
+			const numberOfItems = 5;
+			let elements, mock;
+			const selfHref = 'https://entity';
+
+			beforeEach(async() => {
+				const subEntities = [];
+				for (let i = 0; i < numberOfItems; i++) {
+					subEntities.push({
+						properties: { itemNumber: i },
+						rel: ['item']
+					});
+				}
+				const entity = {
+					entities: subEntities,
+					links: [{ rel: ['self'], href: selfHref }]
+				};
+				mock = fetchMock.mock(selfHref, JSON.stringify(entity));
+				elements = [];
+				for (let i = 0; i < numberOfComponents; i++) {
+					elements.push(await fixture(html`<subentities-component-modified-list href="${selfHref}" token="someToken"></subentities-component-modified-list>`));
+				}
+				await waitUntil(() => elements[0]._loaded === true);
+				expect(mock.called(selfHref)).to.be.true;
+			});
+
+			afterEach(() => {
+				mock.resetHistory();
+				clearStore();
+			});
+
+			it('will load multiple components listening to the same subEntities', async() => {
+				elements.forEach(element => {
+					expect(element.items).to.exist;
+					expect(element.items).to.be.an('array');
+					expect(element.items).to.have.lengthOf(numberOfItems);
+					let uniqueId = null;
+					element.items.forEach((item, key) => {
+						uniqueId = uniqueId === null ? item.properties.itemNumber : uniqueId;
+						expect(item.properties.itemNumber).to.be.equal(key + uniqueId);
+					});
+				});
+			});
+
+			it('will change all instances when one updates the state', async() => {
+				const newItems = ['one', 'two', 'three'];
+				await elements[0].updateItems(newItems);
+
+				elements.forEach(element => {
+					// copy not a ref
+					expect(element.items).to.deep.equal(newItems);
+					expect(element.items).to.not.equal(newItems);
+				});
+			});
 		});
 	});
 });

@@ -2,6 +2,10 @@ import { HypermediaStateMixin } from '../../framework/lit/HypermediaStateMixin.j
 import { LitElement } from 'lit-element';
 import { observableTypes } from '../../state/HypermediaState.js';
 
+function uniqueId() {
+	return Math.floor(Math.random() * 10000);
+}
+
 class SubEntitiesComponent extends HypermediaStateMixin(LitElement) {
 	static get properties() {
 		return {
@@ -44,3 +48,34 @@ class RoutedSubEntitiesComponent extends HypermediaStateMixin(LitElement) {
 	}
 }
 customElements.define('routed-subentities-component', RoutedSubEntitiesComponent);
+
+class SubEntitiesComponentModifiedList extends HypermediaStateMixin(LitElement) {
+	static get properties() {
+		return {
+			items: {
+				observable: observableTypes.subEntities,
+				rel: 'item',
+				method: (items) => {
+					const unqiueId = uniqueId();
+					items.forEach(item => {
+						if (item.properties) {
+							item.properties.itemNumber = unqiueId + item.properties.itemNumber;
+						}
+					});
+					return items;
+				}
+			}
+		};
+	}
+
+	async updateItems(items) {
+		this._state.updateProperties({
+			items: {
+				observable: observableTypes.subEntities,
+				rel: 'item',
+				value: items
+			}
+		});
+	}
+}
+customElements.define('subentities-component-modified-list', SubEntitiesComponentModifiedList);
