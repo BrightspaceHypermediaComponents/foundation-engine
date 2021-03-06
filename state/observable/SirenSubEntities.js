@@ -60,13 +60,13 @@ export class SirenSubEntities extends Observable {
 			const entityID = getEntityIDFromSirenEntity(sirenSubEntity);
 			let subEntity;
 			// If we already set it up why do it again?
-			if (this.entityMap.has(entityID)) {
+			if (entityID && this.entityMap.has(entityID)) {
 				subEntity = this.entityMap.get(entityID);
 			} else {
 				subEntity = new SirenSubEntity({ id: this.rel, token: this._token, verbose: this._verbose, state: this._state });
 				await subEntity.setSubEntity(sirenSubEntity);
+				entityMap.set(entityID, subEntity);
 			}
-			entityMap.set(entityID, subEntity);
 			sirenFacades.push(subEntity.entity);
 		});
 		await Promise.all(promises);
