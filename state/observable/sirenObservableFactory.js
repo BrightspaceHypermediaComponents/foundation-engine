@@ -15,7 +15,8 @@ export const observableTypes = Object.freeze({
 	entity: 5,
 	subEntity: 6,
 	action: 7,
-	summonAction: 8
+	summonAction: 8,
+	custom: 9
 });
 
 const observableClasses = Object.freeze({
@@ -33,14 +34,23 @@ const observableClasses = Object.freeze({
  *
  * @param {*} param0
  */
-function definedProperty({ observable: type, prime, rel: id, route, token, state }) {
+function definedProperty({ observable: type, observableObject: typeObject, prime, rel: id, route, token, state }) {
 	return {
 		id,
 		route,
 		token: (prime || route) ? token : undefined,
 		type,
+		typeObject,
 		state
 	};
+}
+
+function getObservableObject(observableType, observableCustomObject) {
+	if (observableType === observableTypes.custom) {
+		return observableCustomObject;
+	}
+	return observableType && observableClasses[observableType];
+
 }
 
 function handleRouting(observerProperties) {
@@ -52,7 +62,7 @@ function handleRouting(observerProperties) {
 
 export function sirenObserverDefinedProperty(observerProperties, state) {
 	observerProperties = handleRouting(observerProperties);
-	const sirenObserverType = observerProperties.observable && observableClasses[observerProperties.observable];
+	const sirenObserverType = getObservableObject(observerProperties.observable, observerProperties.observableObject);
 	if (!sirenObserverType) {
 		return;
 	}
@@ -63,7 +73,7 @@ export function sirenObserverDefinedProperty(observerProperties, state) {
 }
 
 export function sirenObservableFactory(componentProperties) {
-	const sirenComponentType = componentProperties.type && observableClasses[componentProperties.type];
+	const sirenComponentType = getObservableObject(componentProperties.type, componentProperties.typeObject);
 	if (!sirenComponentType) {
 		throw new Error('Bad siren component');
 	}
