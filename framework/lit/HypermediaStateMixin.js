@@ -51,23 +51,22 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 		super.updated(changedProperties);
 	}
 
-	waitForProperty(attribute, valuesThatAreFalsy = []) {
-		if (!this.__waitForAttributes[attribute]) {
-			this.__waitForAttributes[attribute] = [];
+	waitForProperty(property, valuesThatAreFalsy = []) {
+		if (!this.__waitForAttributes[property]) {
+			this.__waitForAttributes[property] = [];
 		}
-		this.__waitForAttributes[attribute] = [...this.__waitForAttributes[attribute], ...valuesThatAreFalsy];
+		this.__waitForAttributes[property] = [...this.__waitForAttributes[property], ...valuesThatAreFalsy];
 	}
 
 	__shouldUpdateState(changedProperties) {
-		const propertiesNeedToHaveValues = { ...this.__waitForAttributes, href: ['undefined'], token: [] };
-		const onePropertyIsChanging = Object.keys(propertiesNeedToHaveValues).some(property => changedProperties.has(property));
-		if (!onePropertyIsChanging) return false;
+		const requiredProperties = { ...this.__waitForAttributes, href: ['undefined'], token: [] };
+		const atLeastOnePropertyIsChanging = Object.keys(requiredProperties).some(property => changedProperties.has(property));
+		if (!atLeastOnePropertyIsChanging) return false;
 
-		const value = !Object.keys(propertiesNeedToHaveValues).some(property => {
-			const isAFalsyValue = propertiesNeedToHaveValues[property].some(value => this[property] === value);
+		return !Object.keys(requiredProperties).some(property => {
+			const isAFalsyValue = requiredProperties[property].some(value => this[property] === value);
 			return !this[property] || isAFalsyValue;
 		});
-		return value;
 	}
 
 	_hasAction(action) {
