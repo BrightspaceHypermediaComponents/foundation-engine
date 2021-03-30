@@ -28,6 +28,7 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 		super();
 		this._loaded = false;
 		this.__observables = this.constructor.properties;
+		this.__waitForAttributes = {};
 	}
 
 	connectedCallback() {
@@ -43,11 +44,30 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 	}
 
 	updated(changedProperties) {
-		if ((changedProperties.has('href') || changedProperties.has('token')) && this.href && this.token && this.href !== 'undefined') {
+		if (this.__shouldUpdateState(changedProperties)) {
 			dispose(this._state, this);
 			this._makeState();
 		}
 		super.updated(changedProperties);
+	}
+
+	waitForProperty(attribute, valuesThatAreFalsy = []) {
+		if (!this.__waitForAttributes[attribute]) {
+			this.__waitForAttributes[attribute] = [];
+		}
+		this.__waitForAttributes[attribute] = [...this.__waitForAttributes[attribute], ...valuesThatAreFalsy];
+	}
+
+	__shouldUpdateState(changedProperties) {
+		const propertiesNeedToHaveValues = { ...this.__waitForAttributes, href: ['undefined'], token: [] };
+		const onePropertyIsChanging = Object.keys(propertiesNeedToHaveValues).some(property => changedProperties.has(property));
+		if (!onePropertyIsChanging) return false;
+
+		const value = !Object.keys(propertiesNeedToHaveValues).some(property => {
+			const isAFalsyValue = propertiesNeedToHaveValues[property].some(value => this[property] === value);
+			return !this[property] || isAFalsyValue;
+		});
+		return value;
 	}
 
 	_hasAction(action) {
