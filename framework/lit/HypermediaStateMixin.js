@@ -51,7 +51,7 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 		super.updated(changedProperties);
 	}
 
-	waitForProperty(property, valuesThatAreFalsy = []) {
+	requiredPropertyForState(property, valuesThatAreFalsy = []) {
 		if (!this.__waitForAttributes[property]) {
 			this.__waitForAttributes[property] = [];
 		}
