@@ -3,6 +3,10 @@ export function deepCopy(inObject, copiedObjects = null) {
 		return inObject; // Return the value if inObject is not an object
 	}
 
+	if (inObject instanceof Date) {
+		return new Date(inObject.getTime());
+	}
+
 	// Create an array or object to hold the values
 	const outObject = Array.isArray(inObject) ? [] : {};
 
