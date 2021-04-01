@@ -3,7 +3,7 @@ import { Observable } from './Observable.js';
 
 export class RefreshState extends Observable {
 	static definedProperty({ state }) {
-		return { id: 'refetchState', state };
+		return { id: 'refreshState', state };
 	}
 	constructor({ state }) {
 		super();
