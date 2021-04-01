@@ -1,3 +1,4 @@
+import { RefreshState } from './RefreshState.js';
 import { SirenAction } from './SirenAction.js';
 import { SirenClasses } from './SirenClasses.js';
 import { SirenEntity } from './SirenEntity.js';
@@ -16,7 +17,8 @@ export const observableTypes = Object.freeze({
 	subEntity: 6,
 	action: 7,
 	summonAction: 8,
-	custom: 9
+	custom: 9,
+	refreshState: 10
 });
 
 const observableClasses = Object.freeze({
@@ -27,7 +29,8 @@ const observableClasses = Object.freeze({
 	[observableTypes.subEntity]: SirenSubEntity,
 	[observableTypes.subEntities]: SirenSubEntities,
 	[observableTypes.action]: SirenAction,
-	[observableTypes.summonAction]: SirenSummonAction
+	[observableTypes.summonAction]: SirenSummonAction,
+	[observableTypes.refreshState]: RefreshState
 });
 
 /**

@@ -13,6 +13,7 @@ Observables are special properties defined by `foundation-components` that are *
 |SubEntities|`Array`|An array of subEntity objects with the same `rel`|
 |Action|`Object`|An action that can commit changes to the state|
 |SummonAction|`Object`|A special action that when performed, returns an another entity. Used for workflow actions that do not make changes to the target|
+|RefreshState|`function`|Returns a function that will refetch the current state. Note the current state when using routing is the one at the end of the route|
 |Entity **(dev only)**|`Object`|A full object representation of the target|
 
 ## Parameters
