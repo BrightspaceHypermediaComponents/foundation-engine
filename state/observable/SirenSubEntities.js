@@ -46,6 +46,12 @@ export class SirenSubEntities extends Observable {
 		return this._rel;
 	}
 
+	get routedState() {
+		const routedStates = [];
+		this.entityMap.forEach(subEntity => subEntity.routedState && routedStates.push(subEntity.routedState));
+		return routedStates;
+	}
+
 	async setSirenEntity(sirenParsedEntity) {
 		const subEntities = sirenParsedEntity && sirenParsedEntity.getSubEntitiesByRel(this._rel);
 		const entityMap = new Map();
