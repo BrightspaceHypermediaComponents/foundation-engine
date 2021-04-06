@@ -41,7 +41,7 @@ function definedProperty({ observable: type, observableObject: typeObject, prime
 	return {
 		id,
 		route,
-		token: (prime || route) ? token : undefined,
+		token: (prime || (route && route.length !== 0)) ? token : undefined,
 		type,
 		typeObject,
 		state
