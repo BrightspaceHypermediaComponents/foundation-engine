@@ -1,5 +1,6 @@
 import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
+import { SirenFacade } from './SirenFacade.js';
 import { SirenSubEntity } from './SirenSubEntity.js';
 
 /**
@@ -58,6 +59,7 @@ export class SirenSubEntities extends Observable {
 		// and will change based on the individual item update.
 		const promises = subEntities.map(async(sirenSubEntity) => {
 			const entityID = getEntityIDFromSirenEntity(sirenSubEntity);
+			sirenFacades.push(new SirenFacade(sirenSubEntity, this._verbose));
 			let subEntity;
 			// If we already set it up why do it again?
 			if (entityID && this.entityMap.has(entityID)) {
@@ -67,7 +69,6 @@ export class SirenSubEntities extends Observable {
 				await subEntity.setSubEntity(sirenSubEntity);
 				entityMap.set(entityID, subEntity);
 			}
-			sirenFacades.push(subEntity.entity);
 		});
 		await Promise.all(promises);
 
