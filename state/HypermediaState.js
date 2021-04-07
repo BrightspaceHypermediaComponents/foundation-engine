@@ -200,7 +200,9 @@ class HypermediaState extends Fetchable(Object) {
 		const routedStates = [];
 		this._decodedEntity.forEach(typeMap => {
 			typeMap.forEach(sirenObservable => {
-				sirenObservable.routedState && routedStates.push(sirenObservable.routedState);
+				if (!sirenObservable.routedState) return;
+				sirenObservable = Array.isArray(sirenObservable.routedState) ? sirenObservable.routedState : [sirenObservable.routedState];
+				sirenObservable.forEach(routedState => routedState && routedStates.push(routedState));
 			});
 		});
 		return routedStates;
