@@ -1,6 +1,7 @@
 import { fetch } from '../fetch.js';
 import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Routable } from './Routable.js';
+import { shouldAttachToken } from '../token.js';
 import { SirenAction } from './SirenAction.js';
 import { SirenFacade } from './SirenFacade.js';
 
@@ -51,7 +52,7 @@ export class SirenSummonAction extends Routable(SirenAction) {
 		const sirenEntity = await super.onServerResponse(json, error);
 
 		const entityID = getEntityIDFromSirenEntity(sirenEntity);
-		this.routedState = this.routedState || await this.createRoutedState(entityID, this._token.rawToken);
+		this.routedState = this.routedState || await this.createRoutedState(entityID, shouldAttachToken(this._token.rawToken, sirenEntity));
 		this._routes.forEach((route, observer) => {
 			this.routedState.addObservables(observer, route);
 		});
@@ -71,7 +72,6 @@ export class SirenSummonAction extends Routable(SirenAction) {
 		this._rawSirenAction = entity.getActionByName(this._name);
 		this._href = this._rawSirenAction.href;
 		this._fields = this._decodeFields(this._rawSirenAction);
-		this._method = this._rawSirenAction.method;
 		if (this._routes.size > 0) {
 			fetch(this);
 		}

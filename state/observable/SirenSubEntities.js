@@ -1,4 +1,3 @@
-import { fetch } from '../fetch.js';
 import { getEntityIDFromSirenEntity } from './ObserverMap.js';
 import { Observable } from './Observable.js';
 import { SirenFacade } from './SirenFacade.js';
@@ -74,9 +73,8 @@ export class SirenSubEntities extends Observable {
 			} else {
 				subEntity = new SirenSubEntity({ id: this.rel, token: this._token, verbose: this._verbose, state: this._state });
 				await subEntity.setSubEntity(sirenSubEntity);
+				entityMap.set(entityID, subEntity);
 			}
-			if (entityID) entityMap.set(entityID, subEntity);
-
 		});
 		await Promise.all(promises);
 
@@ -84,11 +82,6 @@ export class SirenSubEntities extends Observable {
 		this.entityMap.clear();
 		this._entityMap = entityMap;
 
-		Promise.all(sirenFacades.map(async(sirenFacade) => {
-			if (!sirenFacade.href || !entityMap.has(sirenFacade.href)) return;
-			const state = entityMap.get(sirenFacade.href).routedState;
-			await fetch(state);
-			sirenFacade.update(state._entity, this._verbose);
-		})).then(() => this.entities = sirenFacades);
+		this.entities = sirenFacades;
 	}
 }

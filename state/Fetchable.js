@@ -81,7 +81,6 @@ export const Fetchable = superclass => class extends superclass {
 		this._headers = null;
 		this._href = href;
 		this._token = token;
-		this._paramsObj = [];
 	}
 
 	/**
@@ -118,7 +117,7 @@ export const Fetchable = superclass => class extends superclass {
 	 * @returns {String} href that identifies the fetchable
 	 */
 	get href() {
-		return this._setupHrefWithQueryParams();
+		return this._href;
 	}
 
 	/**
@@ -144,7 +143,11 @@ export const Fetchable = superclass => class extends superclass {
 	 * @returns {String} A URL containing the query string
 	 */
 	setQueryParams(paramsObj) {
-		this._paramsObj = paramsObj;
+		let url = new URL(this.href, window.location.origin);
+		const params = new URLSearchParams(Object.keys(paramsObj).map(field => [field, paramsObj[field]]));
+		url = new URL(`${url.pathname}?${params.toString()}`, url.origin);
+		this._href = url.toString();
+		return this._href;
 	}
 
 	/**
@@ -161,19 +164,5 @@ export const Fetchable = superclass => class extends superclass {
 		const headers = new Headers();
 		!this.token.cookie && headers.set('Authorization', `Bearer ${this.token.value}`);
 		this._headers = headers;
-	}
-
-	/**
-	 * @param {Object} paramsObj An object representing key value pairs or lists of query parameters
-	 * E.g. { key: 'input-for-key' } or { key: ['input1', 'input2']}
-	 * @returns {String} A URL containing the query string
-	 */
-	_setupHrefWithQueryParams() {
-		if (!this._paramsObj || this._paramsObj.length === 0) return this._href;
-		let url = new URL(this._href, window.location.origin);
-		const params = new URLSearchParams(Object.keys(this._paramsObj).map(field => [field, this._paramsObj[field]]));
-		url = new URL(`${url.pathname}?${params.toString()}`, url.origin);
-		this._href = url.toString();
-		return this._href;
 	}
 };
