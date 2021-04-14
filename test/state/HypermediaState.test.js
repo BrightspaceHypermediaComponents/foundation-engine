@@ -110,7 +110,6 @@ describe('HypermediaState class', () => {
 			assertAreSimilar(observer.actionPut, { has: true });
 			assert.equal(observer.linkNext, entity.links[0].href);
 			assert.equal(observer.linkSelf, entity.links[1].href);
-			assertAreSimilar(observer.subEntities, entity.entities.map(x => new SirenFacade(x)));
 			assertAreSimilar(observer.entity, entity);
 		});
 
