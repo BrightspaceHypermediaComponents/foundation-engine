@@ -30,7 +30,6 @@ describe('subEntities basic methods', () => {
 });
 
 describe('sirenSubEntities set sirenEntity', () =>  {
-	let token;
 	const state = {
 		createRoutedState: () => {
 			return {
@@ -38,9 +37,6 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 			};
 		}
 	};
-	before(async() => {
-		token = await getToken('1234');
-	});
 	// testSubEntites are imported from ../data/observable/entities.js for testing
 	it('entity with zero matching ids has been added as subentity', () => {
 		const subentites = new SirenSubEntities({ id: 'foo', state });
