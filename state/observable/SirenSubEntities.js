@@ -55,6 +55,7 @@ export class SirenSubEntities extends Observable {
 
 	async setSirenEntity(sirenParsedEntity) {
 		const subEntities = sirenParsedEntity && sirenParsedEntity.getSubEntitiesByRel(this._rel);
+		if (!subEntities || subEntities.length === 0) return;
 		const entityMap = new Map();
 		const sirenFacades = [];
 

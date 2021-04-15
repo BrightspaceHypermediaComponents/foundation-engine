@@ -46,7 +46,7 @@ export class SirenLink extends Routable(Observable) {
 				this.routedState.addObservables(observer, route);
 			});
 
-			fetch(this.routedState);
+			if (!this._routedState.hasServerResponseCached()) fetch(this.routedState);
 		}
 	}
 
