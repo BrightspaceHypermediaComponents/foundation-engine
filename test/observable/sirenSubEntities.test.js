@@ -1,5 +1,4 @@
 import { assert }  from '@open-wc/testing';
-import { getToken } from '../../state/token.js';
 import { default as SirenParse } from 'siren-parser';
 import { SirenSubEntities } from '../../state/observable/SirenSubEntities.js';
 import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
