@@ -1,6 +1,4 @@
 import { assert }  from '@open-wc/testing';
-import { getToken } from '../../state/token.js';
-import { SirenFacade } from '../../state/observable/SirenFacade.js';
 import { default as SirenParse } from 'siren-parser';
 import { SirenSubEntities } from '../../state/observable/SirenSubEntities.js';
 import { SirenSubEntity } from '../../state/observable/SirenSubEntity.js';
@@ -31,7 +29,6 @@ describe('subEntities basic methods', () => {
 });
 
 describe('sirenSubEntities set sirenEntity', () =>  {
-	let token;
 	const state = {
 		createRoutedState: () => {
 			return {
@@ -39,12 +36,9 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 			};
 		}
 	};
-	before(async() => {
-		token = await getToken('1234');
-	});
 	// testSubEntites are imported from ../data/observable/entities.js for testing
 	it('entity with zero matching ids has been added as subentity', () => {
-		const subentites = new SirenSubEntities({ id: 'foo', token, state });
+		const subentites = new SirenSubEntities({ id: 'foo', state });
 		const entity = SirenParse(subEntitiesTests.barEntity);
 
 		subentites.setSirenEntity(entity);
@@ -54,7 +48,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 	});
 
 	it('entity with one matching id has been added as subentity', async() => {
-		const subentites = new SirenSubEntities({ id: 'foo', token, state });
+		const subentites = new SirenSubEntities({ id: 'foo', state });
 		const entity = SirenParse(subEntitiesTests.fooEntity);
 
 		await subentites.setSirenEntity(entity);
@@ -63,11 +57,10 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 		assert.isTrue(subentites.entityMap.has('www.abc.com'), 'SirenSubEntities should have child stored');
 		const addedSubentity = subentites.entityMap.get('www.abc.com');
 		assert.instanceOf(addedSubentity, SirenSubEntity, 'SirenSubEntities child should be a SirenSubEntity');
-		assert.deepEqual(subentites.entities, entity.entities.map(x => new SirenFacade(x)), 'SirenSubEntities entities should store one entity');
 	});
 
 	it('entity with two matching ids has been added as subentity', async() => {
-		const subentites = new SirenSubEntities({ id: 'foo', token, state });
+		const subentites = new SirenSubEntities({ id: 'foo', state });
 		const entity = SirenParse(subEntitiesTests.multipleSubEntities);
 
 		await subentites.setSirenEntity(entity);
@@ -75,11 +68,10 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 		assert.equal(subentites.entityMap.size, 2, 'SirenSubEntities should have 2 children');
 		assert.isTrue(subentites.entityMap.has('www.def.com'), 'SirenSubEntities should store first child');
 		assert.isTrue(subentites.entityMap.has('www.xyz.com'), 'SirenSubEntities should store second child');
-		assert.deepEqual(subentites.entities, entity.entities.map(x => new SirenFacade(x)), 'SirenSubEntities entities should store two entities');
 	});
 
 	it('entity with two matching ids overwritten with one id', async() => {
-		const subentites = new SirenSubEntities({ id: 'foo', token, state });
+		const subentites = new SirenSubEntities({ id: 'foo', state });
 		const entity1 = SirenParse(subEntitiesTests.multipleSubEntities);
 		const entity2 = SirenParse(subEntitiesTests.fooEntity);
 
@@ -88,6 +80,5 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 
 		assert.equal(subentites.entityMap.size, 1, 'SirenSubEntities should have 1 child');
 		assert.isTrue(subentites.entityMap.has('www.abc.com'), 'SirenSubEntities should have child stored');
-		assert.deepEqual(subentites.entities, entity2.entities.map(x => new SirenFacade(x)), 'SirenSubEntities entities should store one entity');
 	});
 });

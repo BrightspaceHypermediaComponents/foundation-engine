@@ -65,7 +65,7 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 
 		return !Object.keys(requiredProperties).some(property => {
 			const isAFalsyValue = requiredProperties[property].some(value => this[property] === value);
-			return !this[property] || isAFalsyValue;
+			return (!this[property] && this[property] !== 0 && this[property] !== false) || isAFalsyValue;
 		});
 	}
 

@@ -70,7 +70,7 @@ export class SirenSubEntity extends Routable(Observable) {
 				this._routedState.addObservables(observer, route);
 			});
 
-			fetch(this._routedState);
+			if (!this._routedState.hasServerResponseCached()) fetch(this._routedState);
 		}
 	}
 
