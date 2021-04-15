@@ -43,7 +43,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 	});
 	// testSubEntites are imported from ../data/observable/entities.js for testing
 	it('entity with zero matching ids has been added as subentity', () => {
-		const subentites = new SirenSubEntities({ id: 'foo', token, state });
+		const subentites = new SirenSubEntities({ id: 'foo', state });
 		const entity = SirenParse(subEntitiesTests.barEntity);
 
 		subentites.setSirenEntity(entity);
@@ -53,7 +53,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 	});
 
 	it('entity with one matching id has been added as subentity', async() => {
-		const subentites = new SirenSubEntities({ id: 'foo', token, state });
+		const subentites = new SirenSubEntities({ id: 'foo', state });
 		const entity = SirenParse(subEntitiesTests.fooEntity);
 
 		await subentites.setSirenEntity(entity);
@@ -65,7 +65,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 	});
 
 	it('entity with two matching ids has been added as subentity', async() => {
-		const subentites = new SirenSubEntities({ id: 'foo', token, state });
+		const subentites = new SirenSubEntities({ id: 'foo', state });
 		const entity = SirenParse(subEntitiesTests.multipleSubEntities);
 
 		await subentites.setSirenEntity(entity);
@@ -76,7 +76,7 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 	});
 
 	it('entity with two matching ids overwritten with one id', async() => {
-		const subentites = new SirenSubEntities({ id: 'foo', token, state });
+		const subentites = new SirenSubEntities({ id: 'foo', state });
 		const entity1 = SirenParse(subEntitiesTests.multipleSubEntities);
 		const entity2 = SirenParse(subEntitiesTests.fooEntity);
 
