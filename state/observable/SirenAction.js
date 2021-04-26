@@ -100,10 +100,8 @@ export class SirenAction extends Fetchable(Observable) {
 
 	setQueryParams(input) {
 		if (this.method === 'GET' || this.method === 'HEAD') {
-			super.setQueryParams({ ...this._fields, ...input });
+			super.setQueryParams(input);
 		}
-
-		return this.href;
 	}
 
 	setSirenEntity(sirenEntity) {
@@ -128,12 +126,11 @@ export class SirenAction extends Fetchable(Observable) {
 	_decodeFields(action) {
 		const url = new URL(action.href, window.location.origin);
 		const fields = {};
-		if (action.method === 'GET' || action.method === 'HEAD') {
+		if (url.searchParams.toString() && (action.method === 'GET' || action.method === 'HEAD')) {
 			for (const param in url.searchParams.entries()) {
 				fields[param[0]] = param[1];
 			}
 		}
-
 		if (action.fields && action.fields.forEach) {
 			action.fields.forEach((field) => {
 				if (field.value === undefined) {
@@ -155,6 +152,10 @@ export class SirenAction extends Fetchable(Observable) {
 		}
 		this.setQueryParams(input);
 		this.setBodyFromInput(input);
+	}
+
+	_setupHrefWithQueryParams(paramsObj) {
+		return super._setupHrefWithQueryParams({ ...this._fields, ...paramsObj });
 	}
 
 	_updateAction() {
