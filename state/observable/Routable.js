@@ -47,6 +47,9 @@ export const Routable = superclass => class extends superclass {
 	_addRoute(observer, route) {
 		const currentRoute = this._routes.has(observer) ? this._routes.get(observer) : {};
 		this._routes.set(observer, { ...currentRoute, ...route });
+		if (this._routedState) {
+			this._routedState.addObservables(observer, route);
+		}
 	}
 
 	_deleteRoute(observer) {
