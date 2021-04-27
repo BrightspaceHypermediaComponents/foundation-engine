@@ -1,6 +1,10 @@
 import 'd2l-fetch/d2l-fetch.js';
 
 const d2lfetch = window.d2lfetch;
+window.D2L = window.D2L || {};
+window.D2L.Foundation = window.D2L.Foundation || {};
+window.D2L.Foundation.renderQueue = window.D2L.Foundation.renderQueue || [];
+const renderQueue = window.D2L.Foundation.renderQueue;
 
 /**
  * This method sends request to the server. It returns the results to fetchable.onServerResponse and the returned promise.
@@ -21,6 +25,8 @@ export function fetch(fetchable, bypassCache = false) {
 		fetchable.fetchStatus.cancel();
 	}
 
+	if (!bypassCache && fetchable.hasServerResponseCached()) return fetchable.fetchStatus.complete;
+
 	const responsePromise = fetchable.fetchStatus.start();
 
 	const fetchPromise = performServerFetch(fetchable, bypassCache);
@@ -38,7 +44,7 @@ export function fetch(fetchable, bypassCache = false) {
 			}
 			fetchable.fetchStatus.done(null, error);
 		});
-
+	renderQueue.push(responsePromise);
 	return responsePromise;
 }
 
@@ -56,6 +62,7 @@ async function performServerFetch(fetchable, bypassCache) {
 
 	const headers = fetchable.headers;
 	if (bypassCache) {
+		fetchable.byPassCache();
 		headers.set('pragma', 'no-cache');
 		headers.set('cache-control', 'no-cache');
 	}

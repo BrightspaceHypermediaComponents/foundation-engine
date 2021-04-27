@@ -104,7 +104,7 @@ export class SirenAction extends Fetchable(Observable) {
 		}
 	}
 
-	setSirenEntity(sirenEntity) {
+	async setSirenEntity(sirenEntity) {
 		if (!sirenEntity || !sirenEntity.hasActionByName(this._name)) {
 			this.action = { has: false };
 			return;

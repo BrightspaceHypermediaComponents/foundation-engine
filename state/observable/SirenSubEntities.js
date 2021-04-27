@@ -85,7 +85,7 @@ export class SirenSubEntities extends Observable {
 		this.entityMap.clear();
 		this._entityMap = entityMap;
 
-		Promise.all(sirenFacades.map(async(sirenFacade) => {
+		await Promise.all(sirenFacades.map(async(sirenFacade) => {
 			if (!sirenFacade.href || !entityMap.has(sirenFacade.href)) return;
 			const state = entityMap.get(sirenFacade.href).routedState;
 			await fetch(state);

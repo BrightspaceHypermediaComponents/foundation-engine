@@ -1,4 +1,7 @@
 import { deepCopy } from '../../helper/deepCopy.js';
+window.D2L = window.D2L || {};
+window.D2L.Foundation = window.D2L.Foundation || {};
+window.D2L.Foundation.renderQueue = window.D2L.Foundation.renderQueue || [];
 
 export class ObserverMap {
 	constructor() {
@@ -58,6 +61,10 @@ export class ObserverMap {
 		const method = this._methods.has(observer) && this._methods.get(observer);
 		const value = deepCopy(this.value);
 		observer[property] = method ? method(value) : value;
+		const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));
+		console.log(window.D2L.Foundation.renderQueue.length);
+		//window.D2L.Foundation.renderQueue.push(timeoutPromise);
+		window.D2L.Foundation.renderQueue.push(observer.updateComplete);
 	}
 
 }

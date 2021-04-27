@@ -11,7 +11,7 @@ export class SirenClasses extends Observable {
 		}
 	}
 
-	setSirenEntity(sirenEntity) {
+	async setSirenEntity(sirenEntity) {
 		this.classes = sirenEntity && sirenEntity['class'];
 	}
 }

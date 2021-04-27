@@ -25,7 +25,7 @@ export class SirenProperty extends Observable {
 		return this._property;
 	}
 
-	setSirenEntity(sirenEntity) {
+	async setSirenEntity(sirenEntity) {
 		this.value = sirenEntity && sirenEntity.properties && sirenEntity.properties[this.property];
 	}
 }

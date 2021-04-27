@@ -10,7 +10,8 @@ export const observableTypes = ot;
 window.D2L = window.D2L || {};
 window.D2L.Foundation = window.D2L.Foundation || {};
 window.D2L.Foundation.StateStore = window.D2L.Foundation.StateStore || new StateStore();
-
+window.D2L.Foundation.renderQueue = window.D2L.Foundation.renderQueue || [];
+const renderQueue = window.D2L.Foundation.renderQueue;
 const store = window.D2L.Foundation.StateStore;
 
 /**
@@ -64,6 +65,10 @@ class HypermediaState extends Fetchable(Object) {
 		await Promise.all(this._routedStates()
 			.filter(state => !skipTheseStates.includes(state))
 			.map(state => state.allFetchesComplete(skipTheseStatesOnNextStep)));
+	}
+
+	byPassCache() {
+		this._entity = undefined;
 	}
 
 	createRoutedState(entityID, token) {
@@ -136,7 +141,10 @@ class HypermediaState extends Fetchable(Object) {
 	}
 
 	async setSirenEntity(entity = null) {
+		if (this.hasServerResponseCached()) return;
 		if ((entity && entity.href) || this._stopUpdates) return;
+		let resolver;
+		renderQueue.push(new Promise(resolve => resolver = resolve));
 		this._entity = entity !== null ? entity : this._entity;
 
 		const setSirenEntityPromises = [];
@@ -146,6 +154,7 @@ class HypermediaState extends Fetchable(Object) {
 			});
 		});
 		await Promise.all(setSirenEntityPromises);
+		resolver();
 	}
 
 	/**

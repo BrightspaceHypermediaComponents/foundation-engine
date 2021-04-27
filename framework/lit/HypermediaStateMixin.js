@@ -33,7 +33,7 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 
 	connectedCallback() {
 		super.connectedCallback();
-		if (!this._state && this.href && this.token && this.href !== 'undefined') {
+		if (!this._state && this.__shouldUpdateState()) {
 			this._makeState();
 		}
 	}
@@ -58,10 +58,12 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 		this.__waitForAttributes[property] = [...this.__waitForAttributes[property], ...valuesThatAreFalsy];
 	}
 
-	__shouldUpdateState(changedProperties) {
+	__shouldUpdateState(changedProperties = null) {
 		const requiredProperties = { ...this.__waitForAttributes, href: ['undefined'], token: [] };
-		const atLeastOnePropertyIsChanging = Object.keys(requiredProperties).some(property => changedProperties.has(property));
-		if (!atLeastOnePropertyIsChanging) return false;
+		if (changedProperties !== null) {
+			const atLeastOnePropertyIsChanging = Object.keys(requiredProperties).some(property => changedProperties.has(property));
+			if (!atLeastOnePropertyIsChanging) return false;
+		}
 
 		return !Object.keys(requiredProperties).some(property => {
 			const isAFalsyValue = requiredProperties[property].some(value => this[property] === value);
@@ -78,7 +80,7 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 		try {
 			this.__gettingState = true;
 			this._state = await stateFactory(this.href, this.token);
-			this._state.addObservables(this, this._observables);
+			await this._state.addObservables(this, this._observables);
 			fetch(this._state)
 				.then(async() => {
 					await this.updateComplete;
