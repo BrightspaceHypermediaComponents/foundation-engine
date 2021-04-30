@@ -21,6 +21,8 @@ export function fetch(fetchable, bypassCache = false) {
 		fetchable.fetchStatus.cancel();
 	}
 
+	if (!bypassCache && fetchable.hasServerResponseCached()) return fetchable.fetchStatus.complete;
+
 	const responsePromise = fetchable.fetchStatus.start();
 
 	const fetchPromise = performServerFetch(fetchable, bypassCache);
@@ -56,6 +58,7 @@ async function performServerFetch(fetchable, bypassCache) {
 
 	const headers = fetchable.headers;
 	if (bypassCache) {
+		fetchable.byPassCache();
 		headers.set('pragma', 'no-cache');
 		headers.set('cache-control', 'no-cache');
 	}

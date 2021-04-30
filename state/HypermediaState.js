@@ -66,6 +66,10 @@ class HypermediaState extends Fetchable(Object) {
 			.map(state => state.allFetchesComplete(skipTheseStatesOnNextStep)));
 	}
 
+	byPassCache() {
+		this._entity = undefined;
+	}
+
 	createRoutedState(entityID, token) {
 		token = token === undefined ? this.token.rawToken : token;
 		return stateFactory(entityID, token)
@@ -136,7 +140,7 @@ class HypermediaState extends Fetchable(Object) {
 	}
 
 	async setSirenEntity(entity = null) {
-		if ((entity && entity.href) || this._stopUpdates) return;
+		if ((entity && entity.href) || this._stopUpdates || this.hasServerResponseCached()) return;
 		this._entity = entity !== null ? entity : this._entity;
 
 		const setSirenEntityPromises = [];

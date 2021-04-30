@@ -91,6 +91,8 @@ export const Fetchable = superclass => class extends superclass {
 		return this._body;
 	}
 
+	byPassCache() {}
+
 	/**
 	 * @returns {FetchStatus} Status object for the fetch
 	 */
