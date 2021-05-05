@@ -161,7 +161,7 @@ export class SirenAction extends Fetchable(Observable) {
 	_updateAction() {
 		this.action = {
 			has: true,
-			commit: (observables) => {
+			commit: (observables = {}) => {
 				this._prepareAction(observables);
 				this._readyToSend = true;
 				return this._state.updateProperties(observables);
