@@ -26,6 +26,28 @@ describe('Component integration', () => {
 			await waitUntil(() => element._loaded === true);
 			expect(element._hasAction('exampleAction')).to.be.true;
 		});
+
+		it.only('Accepts an action with 204 response', async() => {
+			const selfHref = 'https://entity';
+			const actionHref = 'https://action/do';
+			const entity = {
+				actions: [{ href: actionHref, method: 'GET', name: 'example-action' }],
+				links: [{ rel: ['self'], href: selfHref }]
+			};
+			const mock = fetchMock
+				.mock(selfHref, JSON.stringify(entity))
+				.mock(actionHref, 204);
+
+			const element = await fixture(html`<action-component href="${selfHref}" token="foo"></action-component>`);
+			await waitUntil(() => element._state.fetchStatus.pending);
+			expect(element._hasAction('exampleAction')).to.be.false;
+			expect(mock.called(selfHref)).to.be.true;
+			await waitUntil(() => element._loaded === true);
+			expect(element._hasAction('exampleAction')).to.be.true;
+			element.exampleAction.commit();
+			await element._state.push();
+			expect(mock.called(actionHref)).to.be.true;
+		});
 	});
 	describe('Summon Actions', () => {
 		it('receives an entity when we summon one', async() => {
