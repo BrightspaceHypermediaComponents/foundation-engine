@@ -37,6 +37,17 @@ class LoadingGroup {
 		}
 	}
 
+	async reset() {
+		this._loaded = new Promise(resolver => this._loadedResolver = resolver);
+		this._fetching = [];
+		this._setupNoMoreChildrenPromise();
+		this._fetchables.forEach(fetchable => this._fetching.push(fetchable.waitAfterFetch()));
+		for await (const fetchable of this._fetchables) {
+			await fetchable.waitAfterFetch();
+		}
+		this._noMoreChildrenResolver();
+	}
+
 	waitForHref(href) {
 		this._waitForHref.push(href);
 	}
@@ -59,6 +70,10 @@ class LoadingGroup {
 
 class Loaders {
 	constructor() {
+		this._loadingGroups = [];
+	}
+
+	clear() {
 		this._loadingGroups = [];
 	}
 
@@ -86,4 +101,8 @@ const loaders = window.D2L.Foundation.Loaders;
 export function myLoadingPromise(fetchable) {
 	const loadingGroup = loaders.putInLoadingGroup(fetchable);
 	return loadingGroup.loaded;
+}
+
+export function clearLoading() {
+	loaders._loadingGroups[0].reset();
 }

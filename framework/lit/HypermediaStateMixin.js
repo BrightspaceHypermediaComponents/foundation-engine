@@ -88,7 +88,6 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 					await myLoadingPromise(this._state);
 					this._loaded = true;
 				});
-
 		} catch (error) {
 			console.error(error);
 		} finally {

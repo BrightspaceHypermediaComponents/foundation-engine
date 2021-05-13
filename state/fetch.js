@@ -25,7 +25,6 @@ export function fetch(fetchable, bypassCache = false) {
 	const responsePromise = fetchable.fetchStatus.start();
 	myLoadingPromise(fetchable);
 	const fetchPromise = performServerFetch(fetchable, bypassCache);
-
 	fetchPromise
 		.then(async(json) => {
 			await fetchable.onServerResponse(json);
@@ -57,6 +56,7 @@ async function performServerFetch(fetchable, bypassCache) {
 
 	const headers = fetchable.headers;
 	if (bypassCache) {
+		fetchable.byPassCache();
 		headers.set('pragma', 'no-cache');
 		headers.set('cache-control', 'no-cache');
 	}

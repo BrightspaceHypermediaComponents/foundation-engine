@@ -20,7 +20,7 @@ const store = window.D2L.Foundation.StateStore;
 class HypermediaState extends Fetchable(Object) {
 	constructor(entityID, token) {
 		super(entityID, token);
-
+		this._entity = null;
 		this._decodedEntity = new Map();
 		this._parents = new Map();
 		this._waitForFirstFetch = entityID && this.fetchStatus.waitForNextFetch;
@@ -69,6 +69,10 @@ class HypermediaState extends Fetchable(Object) {
 			.map(state => state.allFetchesComplete(skipTheseStatesOnNextStep)));
 	}
 
+	byPassCache() {
+		this._entity = null;
+	}
+
 	get childHrefs() { return this._childHrefs; }
 
 	createRoutedState(entityID, token) {
@@ -102,7 +106,7 @@ class HypermediaState extends Fetchable(Object) {
 	}
 
 	hasServerResponseCached() {
-		return !!this._entity;
+		return this._entity !== null;
 	}
 
 	get isSelfless() {
@@ -143,7 +147,7 @@ class HypermediaState extends Fetchable(Object) {
 	}
 
 	async setSirenEntity(entity = null) {
-		if ((entity && entity.href) || this._stopUpdates) return;
+		if ((entity && entity.href) || this._stopUpdates || this.hasServerResponseCached()) return;
 		this._entity = entity !== null ? entity : this._entity;
 
 		const setSirenEntityPromises = [];
