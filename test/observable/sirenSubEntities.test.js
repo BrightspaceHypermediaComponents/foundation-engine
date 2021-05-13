@@ -37,11 +37,11 @@ describe('sirenSubEntities set sirenEntity', () =>  {
 		}
 	};
 	// testSubEntites are imported from ../data/observable/entities.js for testing
-	it('entity with zero matching ids has been added as subentity', () => {
+	it('entity with zero matching ids has been added as subentity', async() => {
 		const subentites = new SirenSubEntities({ id: 'foo', state });
 		const entity = SirenParse(subEntitiesTests.barEntity);
 
-		subentites.setSirenEntity(entity);
+		await subentites.setSirenEntity(entity);
 
 		assert.equal(subentites.entityMap.size, 0, 'SirenSubEntities should have 0 children');
 		assert.deepEqual(subentites.entities, [], 'SirenSubEntities should have 0 entities');
