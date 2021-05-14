@@ -1,6 +1,7 @@
 import { dispose, observableTypes as ot, stateFactory } from '../../state/HypermediaState.js';
 import { deepCopy } from '../../helper/deepCopy.js';
 import { fetch } from '../../state/fetch.js';
+import { myLoadingPromise } from '../../state/loader.js';
 
 export const observableTypes = ot;
 
@@ -84,10 +85,9 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 			fetch(this._state)
 				.then(async() => {
 					await this.updateComplete;
-					await this._state.allFetchesComplete();
+					await myLoadingPromise(this._state);
 					this._loaded = true;
 				});
-
 		} catch (error) {
 			console.error(error);
 		} finally {

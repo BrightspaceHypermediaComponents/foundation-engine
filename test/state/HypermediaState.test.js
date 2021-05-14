@@ -4,6 +4,7 @@ import { clearStore, dispose, processRawJsonSirenEntity, stateFactory } from '..
 import { fetch } from '../../state/fetch.js';
 import { FetchError } from '../../state/Fetchable.js';
 import fetchMock from 'fetch-mock/esm/client.js';
+import { myLoadingPromise } from '../../state/loading.js';
 import { observableTypes } from '../../state/observable/sirenObservableFactory.js';
 import sinon from 'sinon/pkg/sinon-esm.js';
 import { SirenFacade } from '../../state/observable/SirenFacade.js';
@@ -54,13 +55,11 @@ describe('HypermediaState class', () => {
 				entities: [
 					{
 						class: [ 'foo-sub-class' ],
-						rel: [ 'sub1', 'item' ],
-						href: 'http://foo/sub1'
+						rel: [ 'sub1', 'item' ]
 					},
 					{
 						class: [ 'foo-sub-entity-2' ],
 						rel: [ 'sub2', 'item' ],
-						href: 'http://foo/sub2'
 					}
 				],
 				actions: [
@@ -669,7 +668,7 @@ describe('HypermediaState class', () => {
 
 			const timeBeforeFetch = Date.now();
 			fetch(state);
-			await state.allFetchesComplete();
+			await myLoadingPromise(state);
 			const timeAfterFetch = Date.now();
 			const depthOfResponses = 3;
 			const maxDelay = delayFetchAmountMs * depthOfResponses;
@@ -697,7 +696,7 @@ describe('HypermediaState class', () => {
 
 			const timeBeforeFetch = Date.now();
 			fetch(state);
-			await aChildState.allFetchesComplete();
+			await myLoadingPromise(aChildState);
 			const timeAfterFetch = Date.now();
 			const depthOfResponses = 3;
 			const maxDelay = delayFetchAmountMs * depthOfResponses;
@@ -754,19 +753,15 @@ describe('processRawJsonSirenEntity function', () => {
 			"properties": {
 				"bar": 42
 			},
-			"entities": [
-			  {
+			"entities": [{
 				"class": [ "sub-foo" ],
 				"rel": [ "self" ],
 				"href": "http://foo/sub"
-			  }
-			],
+			}],
 			"actions": [
 			],
-			"links": [
-			  { "rel": [ "self" ], "href": "${href}" }
-			]
-		  }`;
+			"links": [{ "rel": [ "self" ], "href": "${href}" }]
+		}`;
 		await processRawJsonSirenEntity(json, 'token');
 		const state = window.D2L.Foundation.StateStore.get(href, 'token');
 		assert.equal(state.entityID, href, 'state with expected href should be created');
@@ -780,19 +775,14 @@ describe('processRawJsonSirenEntity function', () => {
 			"properties": {
 				"bar": 42
 			},
-			"entities": [
-			  {
+			"entities": [{
 				"class": [ "sub-foo" ],
 				"rel": [ "self" ],
 				"href": "http://foo/sub"
-			  }
-			],
-			"actions": [
-			],
-			"links": [
-			  { "rel": [ "not-my-self-today" ], "href": "${href}" }
-			]
-		  }`;
+			}],
+			"actions": [],
+			"links": [{ "rel": [ "not-my-self-today" ], "href": "${href}" }]
+		}`;
 		await processRawJsonSirenEntity(json, 'token');
 		assert.isFalse(window.D2L.Foundation.StateStore.get(href, 'token'), 'state should not be created');
 	});

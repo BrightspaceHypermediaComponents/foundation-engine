@@ -8,7 +8,10 @@ import { html } from 'lit-html';
 
 describe('Component integration', () => {
 	describe('Actions', () => {
-		afterEach(() => fetchMock.reset());
+		afterEach(() => {
+			fetchMock.reset();
+			clearStore();
+		});
 
 		it('creates an action from the entity', async() => {
 			const selfHref = 'https://entity';
@@ -27,7 +30,7 @@ describe('Component integration', () => {
 			expect(element._hasAction('exampleAction')).to.be.true;
 		});
 
-		it.only('Accepts an action with 204 response', async() => {
+		it('Accepts an action with 204 response', async() => {
 			const selfHref = 'https://entity';
 			const actionHref = 'https://action/do';
 			const entity = {

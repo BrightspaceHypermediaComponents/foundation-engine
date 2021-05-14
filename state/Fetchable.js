@@ -91,6 +91,10 @@ export const Fetchable = superclass => class extends superclass {
 		return this._body;
 	}
 
+	byPassCache() {}
+
+	get childHrefs() { return []; }
+
 	/**
 	 * @returns {FetchStatus} Status object for the fetch
 	 */
@@ -153,6 +157,8 @@ export const Fetchable = superclass => class extends superclass {
 	get token() {
 		return this._token;
 	}
+
+	async waitAfterFetch() { return; }
 
 	/**
 	 * Initializes the headers for the fetch
