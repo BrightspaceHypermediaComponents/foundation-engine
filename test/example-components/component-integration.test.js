@@ -128,6 +128,86 @@ describe('Component integration', () => {
 			expect(mock.called(actionHref)).to.be.true;
 			expect(element._hasAction('nestedSummon'), 'has the action').to.be.true;
 		});
+
+		it('returns the cached entity if one exists', async() => {
+			const selfHref = 'https://summon-action/entity';
+			const actionHref = 'https://summon-action/do';
+			const entity = {
+				actions: [{ href: actionHref, method: 'POST', name: 'example-summon' }],
+				links: [{ rel: ['self'], href: selfHref }]
+			};
+			const firstEntity = {
+				properties: [{ someProperty: 'foobar' }]
+			};
+			const secondEntity = {
+				properties: [{ someProperty: 'hello world' }]
+			};
+			const mock = fetchMock
+				.mock(selfHref, JSON.stringify(entity), {
+					overwriteRoutes: true,
+					delay: 50, // fake a slow network
+				})
+				.post(actionHref, JSON.stringify(firstEntity), {
+					overwriteRoutes: true,
+					delay: 100, // fake a slow network
+				});
+			const element = await fixture(html`<summon-action-component href="${selfHref}" token="foo"></summon-action-component>`);
+			await waitUntil(() => element._loaded === true);
+			await element.getSummonedThing();
+			expect(element.summonedEntity).to.exist;
+			expect(element.summonedEntity.properties).to.deep.equal(firstEntity.properties);
+
+			//Update the post mock to return a different result
+			mock.post(actionHref, JSON.stringify(secondEntity),  {
+				overwriteRoutes: true,
+				delay: 50, // fake a slow network
+			});
+			//Ensure the returned entity is the cached entity from the initial summon
+			await element.getSummonedThing();
+			expect(element.summonedEntity).to.exist;
+			expect(element.summonedEntity.properties).to.deep.equal(firstEntity.properties);
+		});
+
+		it('returns a new entity from the same address if bypassCache is true', async() => {
+			const selfHref = 'https://summon-action/entity';
+			const actionHref = 'https://summon-action/do';
+			const entity = {
+				actions: [{ href: actionHref, method: 'POST', name: 'example-summon' }],
+				links: [{ rel: ['self'], href: selfHref }]
+			};
+			const firstEntity = {
+				properties: [{ someProperty: 'foobar' }]
+			};
+			const secondEntity = {
+				properties: [{ someProperty: 'hello world' }]
+			};
+			const mock = fetchMock
+				.mock(selfHref, JSON.stringify(entity), {
+					overwriteRoutes: true,
+					delay: 50, // fake a slow network
+				})
+				.post(actionHref, JSON.stringify(firstEntity), {
+					overwriteRoutes: true,
+					delay: 100, // fake a slow network
+				});
+			const element = await fixture(html`<summon-action-component href="${selfHref}" token="foo"></summon-action-component>`);
+			const bypassCache = true;
+
+			await waitUntil(() => element._loaded === true);
+			await element.getSummonedThing(undefined, bypassCache);
+			expect(element.summonedEntity).to.exist;
+			expect(element.summonedEntity.properties).to.deep.equal(firstEntity.properties);
+
+			//Update the post mock to return a new entity
+			mock.post(actionHref, JSON.stringify(secondEntity),  {
+				overwriteRoutes: true,
+				delay: 50, // fake a slow network
+			});
+			//Ensure the returned entity is the new entity
+			await element.getSummonedThing(undefined, bypassCache);
+			expect(element.summonedEntity).to.exist;
+			expect(element.summonedEntity.properties).to.deep.equal(secondEntity.properties);
+		});
 	});
 
 	describe('SubEntities', () => {

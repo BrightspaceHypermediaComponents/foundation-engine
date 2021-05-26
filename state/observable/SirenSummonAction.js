@@ -81,11 +81,15 @@ export class SirenSummonAction extends Routable(SirenAction) {
 	_updateAction() {
 		this.action = {
 			has: true,
-			summon: async(observables) => {
+			summon: async(observables, bypassCache) => {
 				this._prepareAction(observables);
 				this._readyToSend = true;
-				// todo: we should be able to just return what we get back from fetch, but it is returning the json
-				await fetch(this);
+
+				const response = await fetch(this);
+				if (bypassCache) {
+					return response;
+				}
+
 				return new SirenFacade(this.routedState._entity, this._verbose);
 			}
 		};
