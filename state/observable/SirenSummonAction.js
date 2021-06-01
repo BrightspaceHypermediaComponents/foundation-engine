@@ -85,11 +85,10 @@ export class SirenSummonAction extends Routable(SirenAction) {
 				this._prepareAction(observables);
 				this._readyToSend = true;
 
-				const response = await fetch(this);
-				if (bypassCache) {
-					return response;
+				if (bypassCache && this.routedState) {
+					this.routedState.byPassCache();
 				}
-
+				await fetch(this);
 				return new SirenFacade(this.routedState._entity, this._verbose);
 			}
 		};
