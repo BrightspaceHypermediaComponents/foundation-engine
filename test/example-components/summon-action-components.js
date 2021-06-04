@@ -9,9 +9,9 @@ class SummonActionComponent extends HypermediaStateMixin(LitElement) {
 		};
 	}
 
-	async getSummonedThing() {
+	async getSummonedThing(observables, bypassCache) {
 		if (this._hasAction('exampleSummon')) {
-			this.summonedEntity = await this.exampleSummon.summon();
+			this.summonedEntity = await this.exampleSummon.summon(observables, bypassCache);
 		}
 	}
 }
