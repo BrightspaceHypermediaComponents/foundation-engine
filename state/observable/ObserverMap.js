@@ -6,6 +6,10 @@ export class ObserverMap {
 		this._methods = new WeakMap();
 	}
 
+	get value() {
+		return this._value;
+	}
+
 	add(observer, property, method) {
 
 		if (observer === undefined || typeof observer !== 'object') {
@@ -48,10 +52,6 @@ export class ObserverMap {
 		this._observers.forEach((property, observer) => {
 			this._setObserverProperty(observer, property);
 		});
-	}
-
-	get value() {
-		return this._value;
 	}
 
 	_setObserverProperty(observer, property) {

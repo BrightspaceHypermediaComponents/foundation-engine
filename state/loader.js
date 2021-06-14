@@ -8,6 +8,10 @@ class LoadingGroup {
 		this.addFetchable(fetchable);
 	}
 
+	get loaded() {
+		return this._loaded;
+	}
+
 	addFetchable(fetchable) {
 		if (this._fetchables.length > 0 && this._fetchables.some(observedFetchable => fetchable === observedFetchable)) return;
 		this._waitForHref = this._waitForHref.filter(href => href !== fetchable.href);
@@ -18,10 +22,6 @@ class LoadingGroup {
 	hasFetchable(fetchable) {
 		return this._fetchables.some(observedFetchable => fetchable === observedFetchable)
 			|| this._waitForHref.some(href => href === fetchable.href);
-	}
-
-	get loaded() {
-		return this._loaded;
 	}
 
 	async queue(fetchable) {

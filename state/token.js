@@ -12,20 +12,20 @@ class Token {
 		return this._value === TOKEN_COOKIE;
 	}
 
-	isResolved() {
-		return !!this.value;
-	}
-
 	get rawToken() {
 		return this._rawToken;
 	}
 
-	toString() {
-		return this._cacheKey;
-	}
-
 	get value() {
 		return this._value;
+	}
+
+	isResolved() {
+		return !!this.value;
+	}
+
+	toString() {
+		return this._cacheKey;
 	}
 
 	/**

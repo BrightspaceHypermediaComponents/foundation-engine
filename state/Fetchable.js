@@ -19,6 +19,10 @@ class FetchStatus {
 		this._resetWaitForNextFetch();
 	}
 
+	get waitForNextFetch() {
+		return this._waitForNextFetch;
+	}
+
 	/**
 	 * Resolves Promise to null and sets pending status to false
 	 */
@@ -50,10 +54,6 @@ class FetchStatus {
 		this._waitForNextFetchResolver();
 
 		return this.complete;
-	}
-
-	get waitForNextFetch() {
-		return this._waitForNextFetch;
 	}
 
 	async _resetWaitForNextFetch() {
@@ -91,8 +91,6 @@ export const Fetchable = superclass => class extends superclass {
 		return this._body;
 	}
 
-	byPassCache() {}
-
 	get childHrefs() { return []; }
 
 	/**
@@ -101,14 +99,6 @@ export const Fetchable = superclass => class extends superclass {
 	get fetchStatus() {
 		return this._fetchStatus;
 	}
-
-	/**
-	 * abstract, handles links in cache primer.
-	 * @param links the links the prime in the cache.
-	 */
-	handleCachePriming() {}
-
-	hasServerResponseCached() { return false; }
 
 	/**
 	 * @returns {Headers} Headers for the request
@@ -132,6 +122,22 @@ export const Fetchable = superclass => class extends superclass {
 		return this._method || 'GET';
 	}
 
+	/**
+	 * @returns {Token} Token object associated with the object
+	 */
+	get token() {
+		return this._token;
+	}
+
+	byPassCache() {}
+	/**
+	 * abstract, handles links in cache primer.
+	 * @param links the links the prime in the cache.
+	 */
+	handleCachePriming() {}
+
+	hasServerResponseCached() { return false; }
+
 	onServerResponse() {}
 
 	/**
@@ -149,13 +155,6 @@ export const Fetchable = superclass => class extends superclass {
 	 */
 	setQueryParams(paramsObj) {
 		this._paramsObj = paramsObj;
-	}
-
-	/**
-	 * @returns {Token} Token object associated with the object
-	 */
-	get token() {
-		return this._token;
 	}
 
 	async waitAfterFetch() { return; }
