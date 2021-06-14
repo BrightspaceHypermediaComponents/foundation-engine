@@ -31,6 +31,10 @@ export class SirenAction extends Fetchable(Observable) {
 		}
 	}
 
+	handleCachePriming(links) {
+		return this._state.handleCachePriming(links);
+	}
+
 	get headers() {
 		super.headers;
 		// set header content to json if present
