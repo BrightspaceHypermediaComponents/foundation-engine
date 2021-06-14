@@ -102,9 +102,10 @@ class HypermediaState extends Fetchable(Object) {
 		this._observers = this._observers.filter(oldObserver => observer !== oldObserver);
 	}
 
-	handleCachePriming(links) {
+	handleCachePriming(links, token = null) {
+		token = token !== null ? token : this.token;
 		return Promise.all(links.map(async(link) => {
-			const state = await stateFactory(link, this.token.rawToken);
+			const state = await stateFactory(link, token.rawToken);
 			return fetch(state);
 		}));
 	}
