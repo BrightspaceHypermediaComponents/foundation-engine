@@ -28,6 +28,16 @@ class HypermediaState extends Fetchable(Object) {
 		this._childHrefs = [];
 	}
 
+	get childHrefs() { return this._childHrefs; }
+
+	get entityID() {
+		return this.href;
+	}
+
+	get isSelfless() {
+		return !this.href;
+	}
+
 	addObservables(observer, observables) {
 		this._observers.push(observer);
 		Object.keys(observables).forEach((name) => {
@@ -73,8 +83,6 @@ class HypermediaState extends Fetchable(Object) {
 		this._entity = null;
 	}
 
-	get childHrefs() { return this._childHrefs; }
-
 	createRoutedState(entityID, token) {
 		entityID && this._childHrefs.push(entityID);
 		token = token === undefined ? this.token.rawToken : token;
@@ -94,10 +102,6 @@ class HypermediaState extends Fetchable(Object) {
 		this._observers = this._observers.filter(oldObserver => observer !== oldObserver);
 	}
 
-	get entityID() {
-		return this.href;
-	}
-
 	handleCachePriming(links) {
 		return Promise.all(links.map(async(link) => {
 			const state = await stateFactory(link, this.token.rawToken);
@@ -107,10 +111,6 @@ class HypermediaState extends Fetchable(Object) {
 
 	hasServerResponseCached() {
 		return this._entity !== null;
-	}
-
-	get isSelfless() {
-		return !this.href;
 	}
 
 	async onServerResponse(response, error) {

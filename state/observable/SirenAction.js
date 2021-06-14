@@ -44,6 +44,10 @@ export class SirenAction extends Fetchable(Observable) {
 		return this._rawSirenAction && this._rawSirenAction.method;
 	}
 
+	handleCachePriming(links) {
+		return this._state.handleCachePriming(links, this._token);
+	}
+
 	async onServerResponse(json, error) {
 		if (error) {
 			throw new FetchError(error);

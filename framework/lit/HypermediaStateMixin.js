@@ -59,6 +59,10 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 		this.__waitForAttributes[property] = [...this.__waitForAttributes[property], ...valuesThatAreFalsy];
 	}
 
+	get _observables() {
+		return deepCopy(this.__observables);
+	}
+
 	__shouldUpdateState(changedProperties = null) {
 		const requiredProperties = { ...this.__waitForAttributes, href: ['undefined'], token: [] };
 		if (changedProperties !== null) {
@@ -94,9 +98,4 @@ export const HypermediaStateMixin = superclass => class extends superclass {
 			this.__gettingState = false;
 		}
 	}
-
-	get _observables() {
-		return deepCopy(this.__observables);
-	}
-
 };
