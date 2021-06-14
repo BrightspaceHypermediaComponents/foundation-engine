@@ -32,7 +32,7 @@ export class SirenAction extends Fetchable(Observable) {
 	}
 
 	handleCachePriming(links) {
-		return this._state.handleCachePriming(links);
+		return this._state.handleCachePriming(links, this._token);
 	}
 
 	get headers() {
