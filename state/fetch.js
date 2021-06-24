@@ -3,6 +3,8 @@ import { myLoadingPromise } from './loader.js';
 
 const d2lfetch = window.d2lfetch;
 
+const serverRequests = new Map();
+
 /**
  * This method sends request to the server. It returns the results to fetchable.onServerResponse and the returned promise.
  * This method also handles cachePrimer header from the server with links with the rel, https://api.brightspace.com/rels/cache-primer.
@@ -55,13 +57,15 @@ async function performServerFetch(fetchable, bypassCache) {
 	const fetch = !fetchable.token.cookie ? d2lfetch : d2lfetch.removeTemp('auth');
 
 	const headers = fetchable.headers;
-	if (bypassCache) {
+	// force a bypass cache if we haven't gotten the href yet on this page
+	if (bypassCache || !serverRequests.has(fetchable.href)) {
 		fetchable.byPassCache();
 		headers.set('pragma', 'no-cache');
 		headers.set('cache-control', 'no-cache');
 	}
 
 	const response = await fetch.fetch(fetchable.href, { headers, body: fetchable.body, method: fetchable.method });
+	serverRequests.set(fetchable.href, true);
 	if (!response.ok) {
 		throw response.status;
 	}
