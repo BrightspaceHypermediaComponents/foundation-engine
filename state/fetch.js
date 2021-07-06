@@ -65,7 +65,9 @@ async function performServerFetch(fetchable, bypassCache) {
 	if (!response.ok) {
 		throw response.status;
 	}
-	await fetchable.handleCachePriming(cachePrimingList(response));
+	setTimeout(() => {
+		fetchable.handleCachePriming(cachePrimingList(response));
+	}, 0);
 	try {
 		return await response.json();
 	} catch (e) {

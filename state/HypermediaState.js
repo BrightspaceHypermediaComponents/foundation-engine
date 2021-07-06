@@ -106,7 +106,7 @@ class HypermediaState extends Fetchable(Object) {
 		token = token !== null ? token : this.token;
 		return Promise.all(links.map(async(link) => {
 			const state = await stateFactory(link, token.rawToken);
-			return fetch(state);
+			return fetch(state, true);
 		}));
 	}
 
